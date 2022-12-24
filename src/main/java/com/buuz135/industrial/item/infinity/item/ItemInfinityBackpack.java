@@ -38,6 +38,7 @@ import com.buuz135.industrial.proxy.network.BackpackOpenedMessage;
 import com.buuz135.industrial.proxy.network.BackpackSyncMessage;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.buuz135.industrial.worlddata.BackpackDataManager;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -383,7 +384,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
                                         handler.getSlotDefinition(slot).setStack(ItemStack.EMPTY);
                                         handler.getSlotDefinition(slot).setAmount(0);
                                     } else {
-                                        ItemHandlerHelper.giveItemToPlayer(playerEntity, handler.extractItem(slot, maxStack, false));
+                                        TransferUtil2.giveItemToPlayer(playerEntity, handler.extractItem(slot, maxStack, false));
                                     }
                                 } else {
                                     result = handler.extractItem(slot, maxStack, false);

@@ -28,6 +28,7 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.buuz135.industrial.utils.BlockUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.buuz135.industrial.utils.apihandlers.plant.TreeCache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -106,7 +107,7 @@ public class ItemInfinitySaw extends ItemInfinity implements CustomEnchantingBeh
                             }
                             consumeFuel(stack);
                         }
-                        itemStacks.forEach(itemStack -> ItemHandlerHelper.giveItemToPlayer((Player) entityLiving, itemStack));
+                        itemStacks.forEach(itemStack -> TransferUtil2.giveItemToPlayer((Player) entityLiving, itemStack));
                         return false;
                     }
                 } catch (ExecutionException e) {

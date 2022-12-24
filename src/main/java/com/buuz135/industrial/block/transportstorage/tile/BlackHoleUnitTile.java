@@ -24,6 +24,7 @@ package com.buuz135.industrial.block.transportstorage.tile;
 import com.buuz135.industrial.gui.component.BigItemGuiAddon;
 import com.buuz135.industrial.utils.BlockUtils;
 import com.buuz135.industrial.utils.NumberUtils;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
@@ -214,7 +215,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
                 BlockHitResult blockResult = (BlockHitResult) rayTraceResult;
                 Direction facing = blockResult.getDirection();
                 if (facing.equals(this.getFacingDirection())) {
-                    ItemHandlerHelper.giveItemToPlayer(playerIn, handler.extractItem(0, playerIn.isShiftKeyDown() ? 64 : 1, false));
+                    TransferUtil2.giveItemToPlayer(playerIn, handler.extractItem(0, playerIn.isShiftKeyDown() ? 64 : 1, false));
                 }
             }
         }

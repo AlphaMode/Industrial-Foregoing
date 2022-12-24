@@ -69,7 +69,7 @@ public class SewageComposterTile extends IndustrialProcessingTile<SewageComposte
 
     @Override
     public boolean canIncrease() {
-        return sewage.getFluidAmount() >= 1000 && TransferUtil2.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), true).isEmpty();
+        return sewage.getFluidAmount() >= 1000 && TransferUtil2.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), true) == 0;
     }
 
     @Override

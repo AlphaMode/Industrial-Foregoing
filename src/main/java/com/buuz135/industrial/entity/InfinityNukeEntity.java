@@ -24,6 +24,7 @@ package com.buuz135.industrial.entity;
 import com.buuz135.industrial.item.infinity.item.ItemInfinityNuke;
 import com.buuz135.industrial.module.ModuleTool;
 import com.buuz135.industrial.proxy.client.sound.TickeableSound;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.buuz135.industrial.utils.explosion.ExplosionTickHandler;
 import com.buuz135.industrial.utils.explosion.ProcessExplosion;
 import net.fabricmc.api.EnvType;
@@ -182,7 +183,7 @@ public class InfinityNukeEntity extends Entity {
         if (!player.level.isClientSide && hand == InteractionHand.MAIN_HAND) {
             if (player.getItemInHand(hand).isEmpty()) {
                 if (player.isShiftKeyDown()) {
-                    ItemHandlerHelper.giveItemToPlayer(player, this.original);
+                    TransferUtil2.giveItemToPlayer(player, this.original);
                     this.remove(RemovalReason.KILLED);
                     this.onClientRemoval();
                     return InteractionResult.SUCCESS;

@@ -200,7 +200,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
         increaseBar(inputBlue.getStackInSlot(0), blue);
         ColorUsage color = colorUsages[dye];
         ItemStack dye = new ItemStack(DyeItem.byColor(DyeColor.byId(this.dye)));
-        return red.getProgress() >= color.r && green.getProgress() >= color.g && blue.getProgress() >= color.b && TransferUtil2.insertItem(output, dye, true).isEmpty();
+        return red.getProgress() >= color.r && green.getProgress() >= color.g && blue.getProgress() >= color.b && TransferUtil2.insertItem(output, dye, true) == 0;
     }
 
     private void increaseBar(ItemStack stack, ProgressBarComponent bar) {
@@ -215,7 +215,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
     public Runnable onFinish() {
         return () -> {
             ItemStack dye = new ItemStack(DyeItem.byColor(DyeColor.byId(this.dye)));
-            if (TransferUtil2.insertItem(output, dye, true).isEmpty()) {
+            if (TransferUtil2.insertItem(output, dye, true) == 0) {
                 ColorUsage color = colorUsages[this.dye];
                 red.setProgress(red.getProgress() - color.r);
                 green.setProgress(green.getProgress() - color.g);

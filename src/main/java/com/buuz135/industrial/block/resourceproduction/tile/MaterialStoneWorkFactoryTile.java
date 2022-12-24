@@ -309,7 +309,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
 
     @Override
     public boolean canIncrease() {
-        return getRecipe().map(recipe -> recipe.canIncrease(water, lava) && TransferUtil2.insertItem(inventoryGenerator, recipe.output.copy(), true).isEmpty()).orElse(false)
+        return getRecipe().map(recipe -> recipe.canIncrease(water, lava) && TransferUtil2.insertItem(inventoryGenerator, recipe.output.copy(), true) == 0).orElse(false)
                 || process(inventoryThird, inventoryFourth, ACTION_RECIPES[fourthRecipeId], true)
                 || process(inventorySecond, inventoryThird, ACTION_RECIPES[thirdRecipeId], true)
                 || process(inventoryFirst, inventorySecond, ACTION_RECIPES[secondRecipeId], true)
@@ -349,7 +349,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
             if (!process(inventoryThird, inventoryFourth, ACTION_RECIPES[fourthRecipeId], false) && !process(inventorySecond, inventoryThird, ACTION_RECIPES[thirdRecipeId], false) && !process(inventoryFirst, inventorySecond, ACTION_RECIPES[secondRecipeId], false) && !process(inventoryGenerator, inventoryFirst, ACTION_RECIPES[firstRecipeId], false)) {
                 getRecipe().ifPresent(recipe -> {
                     ItemStack output = recipe.output.copy();
-                    if (TransferUtil2.insertItem(inventoryGenerator, output, false).isEmpty()) {
+                    if (TransferUtil2.insertItem(inventoryGenerator, output, false) == 0) {
                         recipe.consume(water, lava);
                     }
                 });
@@ -374,7 +374,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
             if (inputStack.isEmpty()) continue;
             ItemStack outputStack = action.work.apply(this.level, inputStack.copy()).copy();
             if (outputStack.isEmpty()) continue;
-            if (TransferUtil2.insertItem(output, outputStack, true).isEmpty()) {
+            if (TransferUtil2.insertItem(output, outputStack, true) == 0) {
                 if (!simulate) {
                     TransferUtil2.insertItem(output, outputStack, false);
                     inputStack.shrink(action.getShrinkAmount());
