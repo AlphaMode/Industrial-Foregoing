@@ -48,10 +48,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import me.alphamode.forgetags.Tags;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -171,7 +171,7 @@ public class TransporterFluidType extends FilteredTransporterType<FluidStack, IF
         this.queue.computeIfAbsent(origin, direction -> new ArrayList<>()).add(0, FluidStack.loadFluidStackFromNBT(compoundNBT));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void renderTransfer(Vector3f pos, Direction direction, int step, PoseStack stack, int combinedOverlayIn, MultiBufferSource buffer, float frame) {
         super.renderTransfer(pos, direction, step, stack, combinedOverlayIn, buffer, frame);

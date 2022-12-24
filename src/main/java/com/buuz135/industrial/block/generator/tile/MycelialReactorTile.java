@@ -36,8 +36,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
@@ -87,11 +87,11 @@ public class MycelialReactorTile extends IndustrialGeneratorTile<MycelialReactor
     public ProgressBarComponent<MycelialReactorTile> getProgressBar() {
         bar = new ProgressBarComponent<MycelialReactorTile>(30, 20, 0, 100) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new ProgressBarScreenAddon(30, 20, bar) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<Component> getTooltipLines() {
                         List<Component> tooltip = new ArrayList<>();
                         tooltip.add(Component.literal(ChatFormatting.GOLD + Component.translatable("tooltip.titanium.progressbar.progress").getString() + ChatFormatting.WHITE + new DecimalFormat().format(bar.getProgress()) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(bar.getMaxProgress())));

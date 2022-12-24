@@ -33,7 +33,7 @@ public class WashingFactoryConfig {
     public static int maxProgress = 100;
 
     @ConfigVal(comment = "Amount of Power Consumed per Tick - Default: [60FE]")
-    public static int powerPerTick = 60;
+    public static long powerPerTick = 60;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
     public static int maxStoredPower = 10000;

@@ -29,10 +29,12 @@ import com.buuz135.industrial.module.ModuleTool;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.api.IRecipeProvider;
 import com.hrznstudio.titanium.block.BasicBlock;
+import com.hrznstudio.titanium.fabric.NonNullLazy;
 import com.hrznstudio.titanium.recipe.generator.TitaniumRecipeProvider;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapelessRecipeBuilder;
-import net.minecraft.data.DataGenerator;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -43,9 +45,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.util.NonNullLazy;
-import net.minecraftforge.registries.RegistryObject;
+import me.alphamode.forgetags.Tags;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +56,7 @@ public class IndustrialRecipeProvider extends TitaniumRecipeProvider {
 
     private final NonNullLazy<List<Block>> blocks;
 
-    public IndustrialRecipeProvider(DataGenerator generatorIn, NonNullLazy<List<Block>> blocks) {
+    public IndustrialRecipeProvider(FabricDataGenerator generatorIn, NonNullLazy<List<Block>> blocks) {
         super(generatorIn);
         this.blocks = blocks;
     }

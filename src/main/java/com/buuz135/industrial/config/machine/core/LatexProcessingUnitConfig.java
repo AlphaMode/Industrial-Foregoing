@@ -33,7 +33,7 @@ public class LatexProcessingUnitConfig {
     public static int maxProgress = 100;
 
     @ConfigVal(comment = "Amount of Power Consumed per Tick - Default: [400FE]")
-    public static int powerPerTick = 20;
+    public static long powerPerTick = 20;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
     public static int maxStoredPower = 10000;

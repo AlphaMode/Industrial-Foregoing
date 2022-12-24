@@ -30,7 +30,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,7 +49,7 @@ public class OreTitaniumFluidType extends FluidType {
         String extra = "";
         if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
             String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(ForgeRegistries.ITEMS, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
             if (items.size() > 0) {
                 extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
             }
@@ -62,7 +62,7 @@ public class OreTitaniumFluidType extends FluidType {
         String extra = "";
         if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
             String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(ForgeRegistries.ITEMS, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
             if (items.size() > 0) {
                 extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
             }
@@ -93,7 +93,7 @@ public class OreTitaniumFluidType extends FluidType {
 
     public static boolean isValid(ResourceLocation resourceLocation) {
         TagKey<Item> key = TagUtil.getItemTag(new ResourceLocation("forge:dusts/" + resourceLocation.toString().replace("forge:raw_materials/", "")));
-        return ForgeRegistries.ITEMS.tags().isKnownTagName(key) && !TagUtil.getAllEntries(ForgeRegistries.ITEMS, key).isEmpty();
+        return Registry.ITEM.tags().isKnownTagName(key) && !TagUtil.getAllEntries(Registry.ITEM, key).isEmpty();
     }
 
     public static ItemStack getOutputDust(FluidStack stack) {
@@ -112,7 +112,7 @@ public class OreTitaniumFluidType extends FluidType {
         public int getTintColor(FluidStack stack) {
             if (Minecraft.getInstance().level != null && stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
                 String tag = stack.getTag().getString(NBT_TAG);
-                List<Item> items = TagUtil.getAllEntries(ForgeRegistries.ITEMS, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+                List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
                 if (items.size() > 0) {
                     return ItemStackUtils.getColor(new ItemStack(items.get(0)));
                 }

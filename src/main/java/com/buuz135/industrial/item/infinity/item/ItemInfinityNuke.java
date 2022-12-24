@@ -28,7 +28,9 @@ import com.buuz135.industrial.item.infinity.ItemInfinity;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTool;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
@@ -36,8 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Consumer;
 
@@ -74,7 +74,7 @@ public class ItemInfinityNuke extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Items.TNT)),
                         new Ingredient.ItemValue(new ItemStack(Items.TNT)),

@@ -22,6 +22,7 @@
 
 package com.buuz135.industrial.utils;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -29,10 +30,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.IReverseTag;
 
@@ -43,7 +43,7 @@ public class ItemStackUtils {
 
     public static ResourceLocation getOreTag(ItemStack stack) {
         Item item = stack.getItem();
-        for (ResourceLocation resourceLocation : ForgeRegistries.ITEMS.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
+        for (ResourceLocation resourceLocation : Registry.ITEM.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
             if (resourceLocation.toString().startsWith("forge:raw_materials/")) {
                 return resourceLocation;
             }
@@ -67,7 +67,7 @@ public class ItemStackUtils {
     }
 
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static int getColor(ItemStack stack) {
         return ColorUtils.getColorFrom(Minecraft.getInstance().getItemRenderer().getModel(stack, Minecraft.getInstance().level, Minecraft.getInstance().player, 0).getParticleIcon());
     }

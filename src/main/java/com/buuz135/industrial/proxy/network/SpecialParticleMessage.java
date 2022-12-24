@@ -24,9 +24,14 @@ package com.buuz135.industrial.proxy.network;
 
 import com.buuz135.industrial.item.infinity.OneThreeFiveHandler;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraftforge.network.NetworkEvent;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.Executor;
 
 public class SpecialParticleMessage extends Message {
 
@@ -40,7 +45,7 @@ public class SpecialParticleMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
         OneThreeFiveHandler.SPECIAL_ENTITIES.put(uuid, System.currentTimeMillis());
     }
 

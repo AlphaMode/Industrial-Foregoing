@@ -45,7 +45,7 @@ public class WaterStrawHandler extends StrawHandlerBase {
     @Override
     public void onDrink(Level world, BlockPos pos, Fluid stack, Player player, boolean fromFluidContainer) {
         player.clearFire();
-        CompoundTag tag = player.getPersistentData();
+        CompoundTag tag = player.getExtraCustomData();
         if (tag.contains("lavaDrink") && world.getGameTime() - tag.getLong("lavaDrink") < 120) { //6 Seconds to drink water after drinking lava to create obsidian
             player.spawnAtLocation(new ItemStack(Blocks.OBSIDIAN), player.getEyeHeight());
             tag.putLong("lavaDrink", 0);

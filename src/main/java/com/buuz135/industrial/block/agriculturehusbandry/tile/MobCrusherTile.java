@@ -66,11 +66,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -113,7 +113,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
         );
         this.addButton(buttonComponent = new ButtonComponent(154 - 18 * 2, 84, 14, 14) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(this,
                         new StateButtonInfo(0, AssetTypes.BUTTON_SIDENESS_ENABLED, ChatFormatting.GOLD + LangUtil.getString("tooltip.industrialforegoing.mob_crusher.produce"), "tooltip.industrialforegoing.mob_crusher.produce_extra"),
@@ -138,7 +138,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
             if (mobs.size() > 0) {
                 Mob entity = mobs.get(0);
                 FakePlayer player = IndustrialForegoing.getFakePlayer(this.level);
-                if (ForgeRegistries.ENTITY_TYPES.tags().getTag(IndustrialTags.EntityTypes.MOB_CRUSHER_INSTANT_KILL_BLACKLIST).contains(entity.getType())) {
+                if (Registry.ENTITY_TYPE.tags().getTag(IndustrialTags.EntityTypes.MOB_CRUSHER_INSTANT_KILL_BLACKLIST).contains(entity.getType())) {
                     return damage(entity, player);
                 } else {
                     return instantKill(entity, player);

@@ -56,8 +56,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -104,7 +104,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
 
         addButton(new ButtonComponent(82 + 20 * 2, 64 + 16, 18, 18) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new BasicButtonAddon(this) {
                     @Override
@@ -129,7 +129,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         }));
         addButton(new ButtonComponent(82 + 20, 64 + 16, 18, 18) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new BasicButtonAddon(this) {
                     @Override
@@ -155,7 +155,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         this.addGuiAddonFactory(() -> new BigItemGuiAddon(79, 25) {

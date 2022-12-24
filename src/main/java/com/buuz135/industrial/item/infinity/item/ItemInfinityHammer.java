@@ -36,9 +36,11 @@ import com.hrznstudio.titanium.client.screen.addon.TextScreenAddon;
 import com.hrznstudio.titanium.component.button.ArrowButtonComponent;
 import com.hrznstudio.titanium.item.BasicItem;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -73,10 +75,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.HashMap;
 import java.util.List;
@@ -276,7 +276,7 @@ public class ItemInfinityHammer extends ItemInfinity {
         tooltip.add(Component.translatable("text.industrialforegoing.display.beheading").append(" " + level).withStyle(ChatFormatting.GRAY));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons(Supplier<ItemStack> stack) {
         List<IFactory<? extends IScreenAddon>> factory = super.getScreenAddons(stack);
@@ -307,7 +307,7 @@ public class ItemInfinityHammer extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_BLOCK)),
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_SWORD)),

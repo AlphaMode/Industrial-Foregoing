@@ -39,7 +39,7 @@ public class BiofuelGeneratorConfig {
     public static int maxStoredPower = 1000000;
 
     @ConfigVal(comment = "Amount of FE/t extracted from the Biofuel Generator")
-    public static int extractionRate = 500;
+    public static long extractionRate = 500;
 
     @ConfigVal(comment = "Max Amount of Stored Fluid [Biofuel] - Default: [8000mB]")
     public static int maxBiofuelTankSize = 4000;

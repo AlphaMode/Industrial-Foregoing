@@ -39,8 +39,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
+import me.alphamode.forgetags.Tags;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.IReverseTag;
@@ -67,7 +67,7 @@ public class WashingFactoryTile extends IndustrialProcessingTile<WashingFactoryT
                 .setInputFilter((stack, integer) -> {
                     if (!stack.is(Tags.Items.RAW_MATERIALS)) return false;
 
-                    for (ResourceLocation resourceLocation : ForgeRegistries.ITEMS.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
+                    for (ResourceLocation resourceLocation : Registry.ITEM.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
                         if (resourceLocation.toString().startsWith("forge:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation)) {
                             return true;
                         }
@@ -124,7 +124,7 @@ public class WashingFactoryTile extends IndustrialProcessingTile<WashingFactoryT
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return WashingFactoryConfig.powerPerTick;
     }
 

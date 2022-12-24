@@ -25,15 +25,13 @@ package com.buuz135.industrial.module;
 import com.buuz135.industrial.IndustrialForegoing;
 import com.buuz135.industrial.block.misc.*;
 import com.buuz135.industrial.utils.Reference;
-import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 

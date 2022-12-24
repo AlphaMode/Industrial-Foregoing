@@ -31,6 +31,8 @@ import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.generator.IJSONGenerator;
 import com.hrznstudio.titanium.recipe.generator.IJsonFile;
 import com.hrznstudio.titanium.recipe.generator.TitaniumSerializableProvider;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -38,8 +40,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
+import me.alphamode.forgetags.Tags;
 
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class IndustrialSerializableProvider extends TitaniumSerializableProvider
                         new Ingredient.TagValue(Tags.Items.INGOTS_IRON),
                         new Ingredient.TagValue(Tags.Items.INGOTS_GOLD),
                         new Ingredient.TagValue(Tags.Items.INGOTS_GOLD),
-                }, new FluidStack(ModuleCore.PINK_SLIME.getSourceFluid().get(), 1000), 300, new ItemStack(ModuleCore.PINK_SLIME_INGOT.get()), FluidStack.EMPTY);
+                }, new FluidStack(ModuleCore.PINK_SLIME.getSourceFluid().get(), FluidConstants.BUCKET), 300, new ItemStack(ModuleCore.PINK_SLIME_INGOT.get()), FluidStack.EMPTY);
         new DissolutionChamberRecipe(new ResourceLocation(Reference.MOD_ID, "mechanical_dirt"),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Blocks.DIRT)),

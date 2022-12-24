@@ -37,8 +37,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class LaserDrillTile extends IndustrialAreaWorkingTile<LaserDrillTile> {
 
@@ -51,7 +51,7 @@ public class LaserDrillTile extends IndustrialAreaWorkingTile<LaserDrillTile> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         addGuiAddonFactory(() -> new TextScreenAddon(ChatFormatting.DARK_GRAY + Component.translatable("text.industrialforegoing.target").getString(), 44, 26, false));

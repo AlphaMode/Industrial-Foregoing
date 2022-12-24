@@ -38,8 +38,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.Calendar;
 
@@ -74,7 +74,7 @@ public class ContributorsCatEarsRender extends RenderLayer<AbstractClientPlayer,
         stack.popPose();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void spookyScarySkeletons(PoseStack stack, MultiBufferSource buffer) {
         BakedModel pumpkin = Minecraft.getInstance().getBlockRenderer().getBlockModel(Minecraft.getInstance().level.getGameTime() % 200 < 100 ? Blocks.CARVED_PUMPKIN.defaultBlockState() : Blocks.JACK_O_LANTERN.defaultBlockState());
         stack.mulPose(Vector3f.YN.rotationDegrees(90f));
@@ -86,7 +86,7 @@ public class ContributorsCatEarsRender extends RenderLayer<AbstractClientPlayer,
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(stack.last(), buffer.getBuffer(RenderType.solid()), null, pumpkin, 0.5f, 255, 255, 255, 255);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void itsSnowyHere(PoseStack stack, MultiBufferSource buffer) {
         BakedModel pumpkin = Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.CAKE.defaultBlockState());
         stack.mulPose(Vector3f.YN.rotationDegrees(90f));

@@ -28,12 +28,12 @@ import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -74,7 +74,7 @@ public class AnimalFeederTile extends IndustrialAreaWorkingTile<AnimalFeederTile
                     stack = getFeedingItem(secondParent);
                     if (stack.isEmpty()) {
                         original.setCount(1);
-                        ItemHandlerHelper.insertItem(input, original, false);
+                        TransferUtil.insertItem(input, original);
                         continue;
                     }
                     stack.shrink(1);

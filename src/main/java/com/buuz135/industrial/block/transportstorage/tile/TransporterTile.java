@@ -30,8 +30,10 @@ import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.proxy.client.model.TransporterModelData;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,9 +45,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -137,7 +136,7 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
 
     public void openGui(Player player, Direction facing) {
         if (player instanceof ServerPlayer) {
-            NetworkHooks.openScreen((ServerPlayer) player, this, packetBuffer -> {
+            NetworkUtil.openGui((ServerPlayer) player, this, packetBuffer -> {
                 packetBuffer.writeBlockPos(worldPosition);
                 packetBuffer.writeEnum(facing);
             });
@@ -175,7 +174,7 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
             }
             CompoundTag upgradeTag = new CompoundTag();
             TransporterType upgrade = getTransporterTypeMap().get(facing);
-            upgradeTag.putString("factory", ForgeRegistries.ITEMS.getKey(upgrade.getFactory().getUpgradeItem()).toString());
+            upgradeTag.putString("factory", Registry.ITEM.getKey(upgrade.getFactory().getUpgradeItem()).toString());
             CompoundTag customNBT = upgrade.serializeNBT();
             if (customNBT != null)
                 upgradeTag.put("customNBT", customNBT);
@@ -196,7 +195,7 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
                 CompoundTag upgradeTag = upgradesTag.getCompound(facing.getSerializedName());
                 TransporterTypeFactory factory = null;
                 for (TransporterTypeFactory transporterTypeFactory : TransporterTypeFactory.FACTORIES) {
-                    if (ForgeRegistries.ITEMS.getKey(transporterTypeFactory.getUpgradeItem()).equals(new ResourceLocation(upgradeTag.getString("factory")))) {
+                    if (Registry.ITEM.getKey(transporterTypeFactory.getUpgradeItem()).equals(new ResourceLocation(upgradeTag.getString("factory")))) {
                         factory = transporterTypeFactory;
                         break;
                     }

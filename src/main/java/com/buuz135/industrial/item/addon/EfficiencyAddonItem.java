@@ -28,7 +28,10 @@ import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.api.augment.AugmentTypes;
 import com.hrznstudio.titanium.item.AugmentWrapper;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
@@ -39,8 +42,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Consumer;
 
@@ -62,7 +63,7 @@ public class EfficiencyAddonItem extends IFCustomItem {
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
         TagKey<Item> tierMaterial = tier == 1 ? IndustrialTags.Items.GEAR_GOLD : IndustrialTags.Items.GEAR_DIAMOND;
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this), new Ingredient.Value[]{
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this), new Ingredient.Value[]{
                 new Ingredient.ItemValue(new ItemStack(Items.REDSTONE)),
                 new Ingredient.ItemValue(new ItemStack(Items.REDSTONE)),
                 new Ingredient.ItemValue(new ItemStack(Items.GLASS_PANE)),
@@ -71,7 +72,7 @@ public class EfficiencyAddonItem extends IFCustomItem {
                 new Ingredient.TagValue(tierMaterial),
                 new Ingredient.ItemValue(new ItemStack(Items.BLAZE_ROD)),
                 new Ingredient.ItemValue(new ItemStack(Items.BLAZE_ROD))
-        }, new FluidStack(ModuleCore.LATEX.getSourceFluid().get(), 1000), 200, new ItemStack(this), FluidStack.EMPTY);
+        }, new FluidStack(ModuleCore.LATEX.getSourceFluid().get(), FluidConstants.BUCKET), 200, new ItemStack(this), FluidStack.EMPTY);
     }
 
     @Override

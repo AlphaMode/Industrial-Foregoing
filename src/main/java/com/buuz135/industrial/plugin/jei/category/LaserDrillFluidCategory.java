@@ -31,7 +31,7 @@ import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -49,7 +49,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,7 +89,7 @@ public class LaserDrillFluidCategory implements IRecipeCategory<LaserDrillFluidR
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, LaserDrillFluidRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 36, 5).addIngredients(recipe.catalyst);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 60 + 35 + 6, 6).setFluidRenderer(200, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, FluidStack.loadFluidStackFromNBT(recipe.output));
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 60 + 35 + 6, 6).setFluidRenderer(200, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(FabricTypes.FLUID_STACK, FluidStack.loadFluidStackFromNBT(recipe.output));
 
     }
 

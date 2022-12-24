@@ -36,7 +36,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.Tags;
+import me.alphamode.forgetags.Tags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

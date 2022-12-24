@@ -35,6 +35,7 @@ import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -42,9 +43,9 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.Tags;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import me.alphamode.forgetags.Tags;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
@@ -114,7 +115,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
         );
         addProgressBar(this.red = new ProgressBarComponent<DyeMixerTile>(33 + 20, 20, 300) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new ProgressBarScreenAddon<DyeMixerTile>(red.getPosX(), red.getPosY(), this) {
                     @Override
@@ -129,7 +130,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
                 .setColor(DyeColor.RED));
         addProgressBar(this.blue = new ProgressBarComponent<DyeMixerTile>(33 + 20 + 13, 20, 300) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new ProgressBarScreenAddon<DyeMixerTile>(blue.getPosX(), blue.getPosY(), this) {
                     @Override
@@ -144,7 +145,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
                 .setColor(DyeColor.BLUE));
         addProgressBar(this.green = new ProgressBarComponent<DyeMixerTile>(33 + 20 + 13 * 2, 20, 300) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new ProgressBarScreenAddon<DyeMixerTile>(green.getPosX(), green.getPosY(), this) {
                     @Override
@@ -180,7 +181,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         addGuiAddonFactory(() -> new ItemGuiAddon(133, 20) {
@@ -218,7 +219,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
                 red.setProgress(red.getProgress() - color.r);
                 green.setProgress(green.getProgress() - color.g);
                 blue.setProgress(blue.getProgress() - color.b);
-                ItemHandlerHelper.insertItem(output, dye, false);
+                TransferUtil.insertItem(output, dye);
                 markForUpdate();
             }
         };
@@ -230,7 +231,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return 30;
     }
 

@@ -28,6 +28,7 @@ import com.buuz135.industrial.module.ModuleMisc;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.EnchantedBookItem;
@@ -77,7 +78,7 @@ public class EnchantmentSorterTile extends IndustrialProcessingTile<EnchantmentS
     public Runnable onFinish() {
         return () -> {
             ItemStack stack = input.getStackInSlot(0).copy();
-            ItemHandlerHelper.insertItem(isEnchanted(stack) ? enchantedItems : noEnchanted, stack, false);
+            TransferUtil.insertItem(isEnchanted(stack) ? enchantedItems : noEnchanted, stack);
             input.setStackInSlot(0, ItemStack.EMPTY);
         };
     }
@@ -88,7 +89,7 @@ public class EnchantmentSorterTile extends IndustrialProcessingTile<EnchantmentS
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return EnchantmentSorterConfig.powerPerTick;
     }
 

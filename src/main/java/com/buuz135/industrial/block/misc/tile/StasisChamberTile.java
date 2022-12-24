@@ -58,7 +58,7 @@ public class StasisChamberTile extends IndustrialAreaWorkingTile<StasisChamberTi
             List<Mob> entities = this.level.getEntitiesOfClass(Mob.class, getWorkingArea().bounds());
             for (Mob entity : entities) {
                 entity.setNoAi(true);
-                entity.getPersistentData().putLong("StasisChamberTime", this.level.getGameTime());
+                entity.getExtraCustomData().putLong("StasisChamberTime", this.level.getGameTime());
                 if (!entity.canChangeDimensions() && level instanceof ServerLevel) {
                     if (StasisChamberConfig.disableBossBars) {
                         level.players().forEach(entity1 -> entity.stopSeenByPlayer((ServerPlayer) entity1));

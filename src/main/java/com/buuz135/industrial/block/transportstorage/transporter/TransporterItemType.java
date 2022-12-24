@@ -49,9 +49,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.Tags;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import me.alphamode.forgetags.Tags;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -195,7 +195,7 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
         this.queue.computeIfAbsent(origin, direction -> new ArrayList<>()).add(0, ItemStack.of(compoundNBT));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void renderTransfer(Vector3f pos, Direction direction, int step, PoseStack stack, int combinedOverlayIn, MultiBufferSource buffer, float frame) {
         super.renderTransfer(pos, direction, step, stack, combinedOverlayIn, buffer, frame);

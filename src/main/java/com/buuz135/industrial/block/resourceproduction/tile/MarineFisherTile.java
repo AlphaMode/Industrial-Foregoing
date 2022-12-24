@@ -29,6 +29,7 @@ import com.buuz135.industrial.utils.BlockUtils;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.DyeColor;
@@ -44,7 +45,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
@@ -75,7 +75,7 @@ public class MarineFisherTile extends IndustrialAreaWorkingTile<MarineFisherTile
                 fishingTable = this.level.getServer().getLootTables().get(BuiltInLootTables.FISHING_TREASURE);
             }
             LootContext.Builder context = new LootContext.Builder((ServerLevel) this.level).withParameter(LootContextParams.ORIGIN, new Vec3(this.worldPosition.getX(), this.worldPosition.getY(), this.worldPosition.getZ())).withParameter(LootContextParams.TOOL, new ItemStack(Items.FISHING_ROD));
-            fishingTable.getRandomItems(context.create(LootContextParamSets.FISHING)).forEach(stack -> ItemHandlerHelper.insertItem(output, stack, false));
+            fishingTable.getRandomItems(context.create(LootContextParamSets.FISHING)).forEach(stack -> TransferUtil.insertItem(output, stack));
             return new WorkAction(1f, powerPerOperation);
         }
         return new WorkAction(1f, 0);

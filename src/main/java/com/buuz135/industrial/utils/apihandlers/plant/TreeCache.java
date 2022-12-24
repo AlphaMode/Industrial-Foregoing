@@ -23,6 +23,7 @@
 package com.buuz135.industrial.utils.apihandlers.plant;
 
 import com.buuz135.industrial.utils.BlockUtils;
+import io.github.fabricators_of_create.porting_lib.extensions.IShearable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
@@ -31,7 +32,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.IForgeShearable;
 
 import java.util.*;
 
@@ -54,8 +54,8 @@ public class TreeCache {
         NonNullList<ItemStack> stacks = NonNullList.create();
         if (BlockUtils.isLeaves(world, p) || BlockUtils.isLog(world, p)) {
             BlockState s = world.getBlockState(p);
-            if (s.getBlock() instanceof IForgeShearable && shear) {
-                stacks.addAll(((IForgeShearable) s.getBlock()).onSheared(null, new ItemStack(Items.SHEARS), world, p, 0));
+            if (s.getBlock() instanceof IShearable && shear) {
+                stacks.addAll(((IShearable) s.getBlock()).onSheared(null, new ItemStack(Items.SHEARS), world, p, 0));
             } else {
                 stacks.addAll(BlockUtils.getBlockDrops(world, p));
             }

@@ -50,14 +50,16 @@ import com.hrznstudio.titanium.client.screen.addon.StateButtonAddon;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
-import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.itemstack.ItemStackHarnessRegistry;
 import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
@@ -83,20 +85,8 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerXpEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
@@ -247,7 +237,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
             String id = stack.getTag().getString("Id");
             IndustrialForegoing.NETWORK.get().sendTo(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
             sync(worldIn, id, (ServerPlayer) player);
-            NetworkHooks.openScreen((ServerPlayer) player, this, buffer ->
+            NetworkUtil.openGui((ServerPlayer) player, this, buffer ->
                     LocatorFactory.writePacketBuffer(buffer, new HeldStackLocatorInstance(handIn == InteractionHand.MAIN_HAND)));
             return InteractionResultHolder.success(player.getItemInHand(handIn));
         }
@@ -480,7 +470,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
         Multimap<Attribute, AttributeModifier> multimap = MultimapBuilder.hashKeys().arrayListValues().build();
         return multimap;
     }
@@ -525,7 +515,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
         }).orElse(null);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons(Supplier<ItemStack> stack) {
         List<IFactory<? extends IScreenAddon>> factory = new ArrayList<>();
@@ -591,7 +581,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(ModuleTransportStorage.BLACK_HOLE_UNIT_COMMON.getLeft().get())),
                         new Ingredient.TagValue(IndustrialTags.Items.GEAR_DIAMOND),

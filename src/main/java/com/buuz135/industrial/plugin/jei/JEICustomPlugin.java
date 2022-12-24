@@ -43,6 +43,10 @@ import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.util.RecipeUtil;
 import com.hrznstudio.titanium.util.TagUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import io.github.tropheusj.milk.Milk;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -50,6 +54,7 @@ import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.api.runtime.IRecipesGui;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
@@ -62,12 +67,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import me.alphamode.forgetags.Tags;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -238,13 +238,13 @@ public class JEICustomPlugin implements IModPlugin {
                         new MachineProduceWrapper(ModuleResourceProduction.DYE_MIXER.getLeft().get(), Tags.Items.DYES),
                         new MachineProduceWrapper(ModuleResourceProduction.SPORES_RECREATOR.getLeft().get(), Tags.Items.MUSHROOMS),
                         new MachineProduceWrapper(ModuleResourceProduction.SPORES_RECREATOR.getLeft().get(), new ItemStack(Items.CRIMSON_FUNGUS), new ItemStack(Items.WARPED_FUNGUS)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.MOB_CRUSHER.getLeft().get(), new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), 1000)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SLAUGHTER_FACTORY.getLeft().get(), new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 1000)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SLAUGHTER_FACTORY.getLeft().get(), new FluidStack(ModuleCore.PINK_SLIME.getSourceFluid().get(), 1000)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.ANIMAL_RANCHER.getLeft().get(), new FluidStack(ForgeMod.MILK.get(), 1000)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SEWER.getLeft().get(), new FluidStack(ModuleCore.SEWAGE.getSourceFluid().get(), 1000)),
-                        new MachineProduceWrapper(ModuleAgricultureHusbandry.PLANT_GATHERER.getLeft().get(), new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), 1000)),
-                        new MachineProduceWrapper(ModuleResourceProduction.WATER_CONDENSATOR.getLeft().get(), new FluidStack(Fluids.WATER, 1000))
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.MOB_CRUSHER.getLeft().get(), new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SLAUGHTER_FACTORY.getLeft().get(), new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SLAUGHTER_FACTORY.getLeft().get(), new FluidStack(ModuleCore.PINK_SLIME.getSourceFluid().get(), FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.ANIMAL_RANCHER.getLeft().get(), new FluidStack(Milk.STILL_MILK, FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.SEWER.getLeft().get(), new FluidStack(ModuleCore.SEWAGE.getSourceFluid().get(), FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleAgricultureHusbandry.PLANT_GATHERER.getLeft().get(), new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), FluidConstants.BUCKET)),
+                        new MachineProduceWrapper(ModuleResourceProduction.WATER_CONDENSATOR.getLeft().get(), new FluidStack(Fluids.WATER, FluidConstants.BUCKET))
                 )
         );
 
@@ -254,11 +254,11 @@ public class JEICustomPlugin implements IModPlugin {
         List<OreFluidEntryFermenter> fluidEntryFermenters = new ArrayList<>();
         List<OreFluidEntrySieve> fluidSieve = new ArrayList<>();
 
-        ForgeRegistries.ITEMS.tags().getTagNames().map(itemTagKey -> itemTagKey.location())
+        Registry.ITEM.tags().getTagNames().map(itemTagKey -> itemTagKey.location())
                 .filter(resourceLocation -> resourceLocation.toString().startsWith("forge:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation))
                 .forEach(resourceLocation -> {
-                    TagKey<Item> tag = ForgeRegistries.ITEMS.tags().createTagKey(resourceLocation);
-                    TagKey<Item> dust = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation(resourceLocation.toString().replace("forge:raw_materials/", "forge:dusts/")));
+                    TagKey<Item> tag = Registry.ITEM.tags().createTagKey(resourceLocation);
+                    TagKey<Item> dust = Registry.ITEM.tags().createTagKey(new ResourceLocation(resourceLocation.toString().replace("forge:raw_materials/", "forge:dusts/")));
                     washer.add(new OreFluidEntryRaw(tag, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 100), OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation)));
                     fluidEntryFermenters.add(new OreFluidEntryFermenter(OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation), OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 200, resourceLocation)));
                     fluidSieve.add(new OreFluidEntrySieve(OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 100, resourceLocation), TagUtil.getItemWithPreference(dust), ItemTags.SAND));

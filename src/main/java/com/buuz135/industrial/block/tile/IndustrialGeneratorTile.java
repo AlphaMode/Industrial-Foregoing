@@ -35,7 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;

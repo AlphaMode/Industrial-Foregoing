@@ -32,15 +32,15 @@ import java.util.List;
 
 public abstract class BigEnergyHandler<T extends IComponentHarness> extends EnergyStorageComponent<T> {
 
-    public BigEnergyHandler(int maxCapacity, int xPos, int yPos) {
+    public BigEnergyHandler(long maxCapacity, int xPos, int yPos) {
         super(maxCapacity, xPos, yPos);
     }
 
-    public BigEnergyHandler(int maxCapacity, int maxIO, int xPos, int yPos) {
+    public BigEnergyHandler(long maxCapacity, long maxIO, int xPos, int yPos) {
         super(maxCapacity, maxIO, xPos, yPos);
     }
 
-    public BigEnergyHandler(int maxCapacity, int maxReceive, int maxExtract, int xPos, int yPos) {
+    public BigEnergyHandler(long maxCapacity, long maxReceive, long maxExtract, int xPos, int yPos) {
         super(maxCapacity, maxReceive, maxExtract, xPos, yPos);
     }
 

@@ -47,9 +47,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.Tags;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import me.alphamode.forgetags.Tags;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -177,7 +177,7 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
 
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void renderTransfer(Vector3f pos, Direction direction, int step, PoseStack stack, int combinedOverlayIn, MultiBufferSource buffer, float frame) {
         super.renderTransfer(pos, direction, step, stack, combinedOverlayIn, buffer, frame);

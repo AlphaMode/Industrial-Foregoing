@@ -115,7 +115,7 @@ public class FluidSievingMachineTile extends IndustrialProcessingTile<FluidSievi
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return FluidSievingMachineConfig.powerPerTick;
     }
 

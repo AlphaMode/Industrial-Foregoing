@@ -24,6 +24,7 @@ package com.buuz135.industrial.api.conveyor;
 
 import com.buuz135.industrial.api.IBlockContainer;
 import com.buuz135.industrial.api.conveyor.gui.IGuiComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -34,7 +35,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.Collection;
 import java.util.Collections;

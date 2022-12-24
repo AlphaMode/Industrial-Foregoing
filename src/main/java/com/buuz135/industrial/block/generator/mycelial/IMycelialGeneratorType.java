@@ -23,6 +23,8 @@
 package com.buuz135.industrial.block.generator.mycelial;
 
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
@@ -30,8 +32,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;

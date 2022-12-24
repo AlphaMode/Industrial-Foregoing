@@ -34,7 +34,10 @@ import com.hrznstudio.titanium.client.screen.addon.TextScreenAddon;
 import com.hrznstudio.titanium.component.button.ArrowButtonComponent;
 import com.hrznstudio.titanium.item.BasicItem;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -55,17 +58,15 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ItemInfinityLauncher extends ItemInfinity {
+public class ItemInfinityLauncher extends ItemInfinity implements CustomEnchantingBehaviorItem {
 
     public static int POWER_CONSUMPTION = 100000;
     public static int FUEL_CONSUMPTION = 30;
@@ -145,7 +146,7 @@ public class ItemInfinityLauncher extends ItemInfinity {
                 playerentity.getCooldowns().addCooldown(this, 20);
                 if (!worldIn.isClientSide) {
                     InfinityLauncherProjectileEntity abstractarrowentity = new InfinityLauncherProjectileEntity(worldIn, playerentity, getPlungerAction(stack), getSelectedTier(stack).getRadius());
-                    abstractarrowentity.shootFromRotation(playerentity, playerentity.xRot, playerentity.yRot, 0.0F, velo * 3.0F, 1.0F);
+                    abstractarrowentity.shootFromRotation(playerentity, playerentity.getXRot(), playerentity.getYRot(), 0.0F, velo * 3.0F, 1.0F);
                     if (velo == 1.0F) {
                         abstractarrowentity.setCritArrow(true);
                     }
@@ -171,7 +172,7 @@ public class ItemInfinityLauncher extends ItemInfinity {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons(Supplier<ItemStack> stack) {
         List<IFactory<? extends IScreenAddon>> factory = super.getScreenAddons(stack);
         factory.add(() -> new ArrowButtonScreenAddon((ArrowButtonComponent) new ArrowButtonComponent(154, 20 + 16 * 2, 14, 14, FacingUtil.Sideness.RIGHT).setId(4)));
@@ -202,7 +203,7 @@ public class ItemInfinityLauncher extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_BLOCK)),
                         new Ingredient.ItemValue(new ItemStack(Items.BOW)),

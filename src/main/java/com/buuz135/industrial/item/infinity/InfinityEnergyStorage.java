@@ -30,8 +30,8 @@ import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -120,7 +120,7 @@ public class InfinityEnergyStorage<T extends IComponentHarness> extends EnergySt
 
     @Nonnull
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Collections.singletonList(() -> new InfinityEnergyScreenAddon(getX(), getY(), this));
     }

@@ -27,8 +27,10 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.hrznstudio.titanium.api.augment.IAugmentType;
 import com.hrznstudio.titanium.item.AugmentWrapper;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -38,8 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -81,7 +81,7 @@ public class RangeAddonItem extends IFCustomItem {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this), new Ingredient.Value[]{
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this), new Ingredient.Value[]{
                 new Ingredient.ItemValue(new ItemStack(Items.REDSTONE)),
                 new Ingredient.ItemValue(new ItemStack(Items.REDSTONE)),
                 new Ingredient.ItemValue(new ItemStack(Items.GLASS_PANE)),

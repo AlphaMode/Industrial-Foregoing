@@ -39,7 +39,10 @@ import com.hrznstudio.titanium.component.button.ArrowButtonComponent;
 import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.item.BasicItem;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -64,16 +67,14 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ItemInfinityTrident extends ItemInfinity {
+public class ItemInfinityTrident extends ItemInfinity implements CustomEnchantingBehaviorItem {
 
     private static String LOYALTY_NBT = "Loyalty";
     private static String RIPTIDE_NBT = "Riptide";
@@ -127,7 +128,7 @@ public class ItemInfinityTrident extends ItemInfinity {
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
         if (enchantment.equals(Enchantments.LOYALTY) || enchantment.equals(Enchantments.RIPTIDE) || enchantment.equals(Enchantments.CHANNELING))
             return false;
-        return Items.TRIDENT.canApplyAtEnchantingTable(new ItemStack(Items.TRIDENT), enchantment);
+        return enchantment.canEnchant(new ItemStack(Items.TRIDENT));
     }
 
     @Override
@@ -145,14 +146,14 @@ public class ItemInfinityTrident extends ItemInfinity {
                         if (riptideModifier == 0) {
                             consumeFuel(stack);
                             InfinityTridentEntity tridententity = new InfinityTridentEntity(worldIn, playerentity, stack);
-                            tridententity.shootFromRotation(playerentity, playerentity.xRot, playerentity.yRot, 0.0F, 2.5F + (float) riptideModifier * 0.5F, 1.0F);
-                            if (playerentity.abilities.instabuild) {
+                            tridententity.shootFromRotation(playerentity, playerentity.getXRot(), playerentity.getYRot(), 0.0F, 2.5F + (float) riptideModifier * 0.5F, 1.0F);
+                            if (playerentity.getAbilities().instabuild) {
                                 tridententity.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             }
 
                             worldIn.addFreshEntity(tridententity);
                             worldIn.playSound((Player) null, tridententity, SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
-                            if (!playerentity.abilities.instabuild) {
+                            if (!playerentity.getAbilities().instabuild) {
                                 playerentity.inventory.removeItem(stack);
                             }
                         }
@@ -160,8 +161,8 @@ public class ItemInfinityTrident extends ItemInfinity {
                 }
                 playerentity.awardStat(Stats.ITEM_USED.get(this));
                 if (riptideModifier > 0 && enoughFuel(stack)) {
-                    float f7 = playerentity.yRot;
-                    float f = playerentity.xRot;
+                    float f7 = playerentity.getYRot();
+                    float f = playerentity.getXRot();
                     float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
                     float f2 = -Mth.sin(f * ((float) Math.PI / 180F));
                     float f3 = Mth.cos(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
@@ -232,7 +233,7 @@ public class ItemInfinityTrident extends ItemInfinity {
     }
 
     //GUI Stuff
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons(Supplier<ItemStack> stack) {
         List<IFactory<? extends IScreenAddon>> factory = super.getScreenAddons(stack);
@@ -292,7 +293,7 @@ public class ItemInfinityTrident extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_BLOCK)),
                         new Ingredient.ItemValue(new ItemStack(Items.TRIDENT)),

@@ -32,12 +32,13 @@ import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.util.RecipeUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -46,7 +47,7 @@ import java.util.Collection;
 
 public class ResourcefulFurnaceTile extends IndustrialProcessingTile<ResourcefulFurnaceTile> {
 
-    private int getPowerPerTick;
+    private long getPowerPerTick;
 
     @Save
     private SidedInventoryComponent<ResourcefulFurnaceTile> input;
@@ -115,7 +116,7 @@ public class ResourcefulFurnaceTile extends IndustrialProcessingTile<Resourceful
                 if (recipe != null && ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
                     if (ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
                         input.setStackInSlot(i, ItemStack.EMPTY);
-                        ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), false);
+                        TransferUtil.insertItem(output, recipe.getResultItem().copy());
                         tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), (int) (recipe.getExperience() * 20)), IFluidHandler.FluidAction.EXECUTE);
                     }
                 }
@@ -129,7 +130,7 @@ public class ResourcefulFurnaceTile extends IndustrialProcessingTile<Resourceful
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return getPowerPerTick;
     }
 

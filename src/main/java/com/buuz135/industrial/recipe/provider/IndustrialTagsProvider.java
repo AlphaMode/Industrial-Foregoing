@@ -25,25 +25,23 @@ package com.buuz135.industrial.recipe.provider;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
-import net.minecraft.data.tags.ItemTagsProvider;
+import me.alphamode.forgetags.Tags;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class IndustrialTagsProvider {
 
-    public static class Blocks extends BlockTagsProvider {
+    public static class Blocks extends FabricTagProvider.BlockTagProvider {
 
-        public Blocks(DataGenerator generatorIn, String modid, ExistingFileHelper helper) {
-            super(generatorIn, modid, helper);
+        public Blocks(FabricDataGenerator generatorIn) {
+            super(generatorIn);
         }
 
         @Override
-        protected void addTags() {
+        protected void generateTags() {
             tag(IndustrialTags.Blocks.MACHINE_FRAME_PITY).add(ModuleCore.PITY.get());
             tag(IndustrialTags.Blocks.MACHINE_FRAME_SIMPLE).add(ModuleCore.SIMPLE.get());
             tag(IndustrialTags.Blocks.MACHINE_FRAME_ADVANCED).add(ModuleCore.ADVANCED.get());
@@ -51,18 +49,18 @@ public class IndustrialTagsProvider {
 
             TagAppender<Block> tTagAppender = this.tag(BlockTags.MINEABLE_WITH_PICKAXE);
 
-            ForgeRegistries.BLOCKS.getValues().stream().filter(block -> ForgeRegistries.BLOCKS.getKey(block).getNamespace().equals(Reference.MOD_ID)).forEach(tTagAppender::add);
+            Registry.BLOCK.stream().filter(block -> Registry.BLOCK.getKey(block).getNamespace().equals(Reference.MOD_ID)).forEach(tTagAppender::add);
         }
     }
 
-    public static class Items extends ItemTagsProvider {
+    public static class Items extends FabricTagProvider.ItemTagProvider {
 
-        public Items(DataGenerator generatorIn, String modid, ExistingFileHelper helper) {
-            super(generatorIn, new Blocks(generatorIn, modid, helper), modid, helper);
+        public Items(FabricDataGenerator generatorIn) {
+            super(generatorIn, new Blocks(generatorIn));
         }
 
         @Override
-        protected void addTags() {
+        protected void generateTags() {
             this.copy(IndustrialTags.Blocks.MACHINE_FRAME_PITY, IndustrialTags.Items.MACHINE_FRAME_PITY);
             this.copy(IndustrialTags.Blocks.MACHINE_FRAME_SIMPLE, IndustrialTags.Items.MACHINE_FRAME_SIMPLE);
             this.copy(IndustrialTags.Blocks.MACHINE_FRAME_ADVANCED, IndustrialTags.Items.MACHINE_FRAME_ADVANCED);

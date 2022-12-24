@@ -43,8 +43,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public abstract class BHTile<T extends BHTile<T>> extends ActiveTile<T> {
         this.display = true;
         addButton(new ButtonComponent(82 + 20 * 3, 64 + 16, 18, 18) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new BasicButtonAddon(this) {
                     @Override

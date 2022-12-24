@@ -23,16 +23,18 @@
 package com.buuz135.industrial.proxy.event;
 
 import com.buuz135.industrial.proxy.CommonProxy;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+
+import java.util.Collection;
 
 public class MobDeathHandler {
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onDeath(LivingDropsEvent event) {
-        if (event.getSource().equals(CommonProxy.custom)) {
-            event.getDrops().clear();
+    public static boolean onDeath(LivingEntity target, DamageSource source, Collection<ItemEntity> drops) {
+        if (source.equals(CommonProxy.custom)) {
+            drops.clear();
         }
+        return false;
     }
 }

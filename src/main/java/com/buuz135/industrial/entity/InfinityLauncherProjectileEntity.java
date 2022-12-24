@@ -27,6 +27,7 @@ import com.buuz135.industrial.item.infinity.item.ItemInfinityLauncher;
 import com.buuz135.industrial.module.ModuleTool;
 import com.buuz135.industrial.proxy.network.PlungerPlayerHitMessage;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -47,9 +48,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class InfinityLauncherProjectileEntity extends AbstractArrow {
 
@@ -66,7 +66,7 @@ public class InfinityLauncherProjectileEntity extends AbstractArrow {
         this.entityData.set(TIER, tier);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public InfinityLauncherProjectileEntity(Level worldIn, double x, double y, double z) {
         super((EntityType<? extends AbstractArrow>) ModuleTool.INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), x, y, z, worldIn);
     }
@@ -109,12 +109,12 @@ public class InfinityLauncherProjectileEntity extends AbstractArrow {
         return new ItemStack(Blocks.STONE);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean isEnchanted() {
         return false;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public boolean shouldRender(double x, double y, double z) {
         return true;
@@ -128,7 +128,7 @@ public class InfinityLauncherProjectileEntity extends AbstractArrow {
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

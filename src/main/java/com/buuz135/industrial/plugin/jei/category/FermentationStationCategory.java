@@ -27,7 +27,7 @@ import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
 import com.buuz135.industrial.utils.Reference;
 import com.mojang.blaze3d.vertex.PoseStack;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -74,8 +74,8 @@ public class FermentationStationCategory implements IRecipeCategory<OreFluidEntr
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, OreFluidEntryFermenter recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 47 - 45, 1).setFluidRenderer(200, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.getInput());
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 99 - 45, 1).setFluidRenderer(200, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.getOutput());
+        builder.addSlot(RecipeIngredientRole.INPUT, 47 - 45, 1).setFluidRenderer(200, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, recipe.getInput());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 99 - 45, 1).setFluidRenderer(200, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, recipe.getOutput());
     }
 
     @Override

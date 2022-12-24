@@ -30,6 +30,9 @@ import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.addon.ProgressBarScreenAddon;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import com.hrznstudio.titanium.item.AugmentWrapper;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,9 +43,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.RegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.text.DecimalFormat;
@@ -60,7 +62,7 @@ public abstract class IndustrialProcessingTile<T extends IndustrialProcessingTil
         //this.addGuiAddonFactory(() -> new EnergyBarScreenAddon(10, 20, getEnergyStorage()));
         this.addProgressBar(progressBar = new ProgressBarComponent<T>(x, y, getMaxProgress()) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                         return Collections.singletonList(() -> new ProgressBarScreenAddon(x, y, progressBar) {
                             @Override
@@ -83,9 +85,12 @@ public abstract class IndustrialProcessingTile<T extends IndustrialProcessingTil
                             int maxProgress = (int) Math.floor(getMaxProgress() * (this.hasAugmentInstalled(AugmentTypes.EFFICIENCY) ? AugmentWrapper.getType(this.getInstalledAugments(AugmentTypes.EFFICIENCY).get(0), AugmentTypes.EFFICIENCY) : 1));
                             progressBar.setMaxProgress(maxProgress);
                         }).
-                        setCanIncrease(tileEntity -> getEnergyStorage().getEnergyStored() >= getTickPower() && canIncrease() && this.getRedstoneManager().getAction().canRun(tileEntity.getEnvironmentValue(false, null)) && this.getRedstoneManager().shouldWork()).
+                        setCanIncrease(tileEntity -> getEnergyStorage().getAmount() >= getTickPower() && canIncrease() && this.getRedstoneManager().getAction().canRun(tileEntity.getEnvironmentValue(false, null)) && this.getRedstoneManager().shouldWork()).
                         setOnTickWork(() -> {
-                            getEnergyStorage().extractEnergy(getTickPower(), false);
+                            try (Transaction t = TransferUtil.getTransaction()) {
+                                getEnergyStorage().extract(getTickPower(), t);
+                                t.commit();
+                            }
                             progressBar.setProgressIncrease(this.hasAugmentInstalled(AugmentTypes.SPEED) ? (int) AugmentWrapper.getType(this.getInstalledAugments(AugmentTypes.SPEED).get(0), AugmentTypes.SPEED) : 1);
                         }).
                         setOnFinishWork(() -> {
@@ -120,7 +125,7 @@ public abstract class IndustrialProcessingTile<T extends IndustrialProcessingTil
 
     public abstract Runnable onFinish();
 
-    protected abstract int getTickPower();
+    protected abstract long getTickPower();
 
     public ProgressBarComponent.BarDirection getBarDirection() {
         return ProgressBarComponent.BarDirection.ARROW_RIGHT;

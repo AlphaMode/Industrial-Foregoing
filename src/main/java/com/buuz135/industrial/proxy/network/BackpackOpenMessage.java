@@ -29,16 +29,20 @@ import com.buuz135.industrial.worlddata.BackpackDataManager;
 import com.hrznstudio.titanium.network.Message;
 import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.Executor;
 
 public class BackpackOpenMessage extends Message {
 
@@ -52,9 +56,9 @@ public class BackpackOpenMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
-            ServerPlayer entity = context.getSender();
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
+        executor.execute(() -> {
+            ServerPlayer entity = (ServerPlayer) sender;
             ItemInfinityBackpack.findFirstBackpack(entity).ifPresent(target -> {
                 ItemStack stack = target.getFinder().getStackGetter().apply(entity, target.getSlot());
                 if (stack.getItem() instanceof ItemInfinityBackpack) {
@@ -87,8 +91,8 @@ public class BackpackOpenMessage extends Message {
                         }
                     } else {
                         ItemInfinityBackpack.sync(entity.level, id, entity);
-                        IndustrialForegoing.NETWORK.get().sendTo(new BackpackOpenedMessage(target.getSlot(), target.getName()), entity.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
-                        NetworkHooks.openScreen(entity, ((ItemInfinityBackpack) ModuleTool.INFINITY_BACKPACK.get()), buffer ->
+                        IndustrialForegoing.NETWORK.get().sendToClient(new BackpackOpenedMessage(target.getSlot(), target.getName()), entity);
+                        NetworkUtil.openGui(entity, ((ItemInfinityBackpack) ModuleTool.INFINITY_BACKPACK.get()), buffer ->
                                 LocatorFactory.writePacketBuffer(buffer, new InventoryStackLocatorInstance(target.getName(), target.getSlot())));
                         return;
                     }

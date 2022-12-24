@@ -22,7 +22,7 @@
 
 package com.buuz135.industrial.api.recipe.ore;
 
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 public class OreFluidEntryFermenter {
 

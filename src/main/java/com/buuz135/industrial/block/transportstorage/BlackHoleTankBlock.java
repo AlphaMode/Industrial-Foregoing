@@ -51,7 +51,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
-import net.minecraftforge.common.Tags;
+import me.alphamode.forgetags.Tags;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -81,7 +81,7 @@ public class BlackHoleTankBlock extends IndustrialBlock<BlackHoleTankTile> {
     /*
     @Override
     public void addAlternatives(DeferredRegistryHelper registry) {
-        setItem(registry.register(ForgeRegistries.ITEMS.getRegistryKey(),rarity.name().toLowerCase() + "_black_hole_tank", this.getItemBlockFactory()));
+        setItem(registry.register(Registry.ITEM_REGISTRY,rarity.name().toLowerCase() + "_black_hole_tank", this.getItemBlockFactory()));
         NBTManager.getInstance().scanTileClassForAnnotations(BlackHoleTankTile.class);
         tileEntityType = BlockEntityType.Builder.of(this.getTileEntityFactory()::create, new Block[]{this}).build((Type) null);
         registry.registerBlockEntityType(rarity.name().toLowerCase() + "_black_hole_tank", () -> tileEntityType);

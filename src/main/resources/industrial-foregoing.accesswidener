@@ -1,0 +1,9 @@
+accessWidener v2 named
+accessible field net/minecraft/world/entity/player/Player inventory Lnet/minecraft/world/entity/player/Inventory;
+accessible field net/minecraft/world/entity/Entity yRot F
+
+# Fabric
+accessible method net/minecraft/world/item/crafting/Ingredient$TagValue <init> (Lnet/minecraft/tags/TagKey;)V
+
+accessible class net/minecraft/client/renderer/RenderStateShard$ShaderStateShard
+accessible class net/minecraft/client/renderer/RenderStateShard$TransparencyStateShard

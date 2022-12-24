@@ -28,6 +28,7 @@ import com.buuz135.industrial.module.ModuleTool;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,9 +47,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 
@@ -78,7 +78,7 @@ public class InfinityTridentEntity extends AbstractArrow {
         this.entityData.set(TIER, ItemInfinity.getSelectedTier(thrownStack).getRadius());
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public InfinityTridentEntity(Level worldIn, double x, double y, double z) {
         super((EntityType<? extends AbstractArrow>) ModuleTool.TRIDENT_ENTITY_TYPE.get(), x, y, z, worldIn);
         this.thrownStack = new ItemStack(ModuleTool.INFINITY_TRIDENT.get());
@@ -209,12 +209,12 @@ public class InfinityTridentEntity extends AbstractArrow {
         return this.thrownStack.copy();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean isEnchanted() {
         return false;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public boolean shouldRender(double x, double y, double z) {
         return true;
@@ -227,7 +227,7 @@ public class InfinityTridentEntity extends AbstractArrow {
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

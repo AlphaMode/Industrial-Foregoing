@@ -26,6 +26,8 @@ import com.buuz135.industrial.module.ModuleTool;
 import com.buuz135.industrial.proxy.client.sound.TickeableSound;
 import com.buuz135.industrial.utils.explosion.ExplosionTickHandler;
 import com.buuz135.industrial.utils.explosion.ProcessExplosion;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -47,10 +49,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
@@ -69,9 +67,9 @@ public class InfinityNukeEntity extends Entity {
     private int radius = 1;
     private int ticksExploding = 1;
     private ProcessExplosion explosionHelper;
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private TickeableSound chargingSound;
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private TickeableSound explodingSound;
 
     public InfinityNukeEntity(EntityType<? extends InfinityNukeEntity> entityTypeIn, Level worldIn) {
@@ -122,7 +120,7 @@ public class InfinityNukeEntity extends Entity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void tickClient() {
         if (chargingSound == null && this.getEntityData().get(EXPLODING)) {
             Minecraft.getInstance().getSoundManager().play(chargingSound = new TickeableSound(this.level, this.blockPosition(), ModuleTool.NUKE_CHARGING.get(), getRadius(), 10, this.level.random));
@@ -204,7 +202,7 @@ public class InfinityNukeEntity extends Entity {
         return super.interact(player, hand);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void arm() {
         Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(ModuleTool.NUKE_ARMING.get(), SoundSource.BLOCKS, 1, 1, Minecraft.getInstance().level.random, this.blockPosition()));
     }

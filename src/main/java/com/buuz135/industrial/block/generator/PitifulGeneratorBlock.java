@@ -30,7 +30,7 @@ import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.Tags;
+import me.alphamode.forgetags.Tags;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;

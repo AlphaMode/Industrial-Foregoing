@@ -29,20 +29,19 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
 public class LatexProcessingUnitTile extends IndustrialProcessingTile<LatexProcessingUnitTile> {
 
-    private static int AMOUNT_LATEX = 100;
-    private static int AMOUNT_WATER = 500;
+    private static long AMOUNT_LATEX = 8100;
+    private static long AMOUNT_WATER = 40500;
 
     @Save
     private SidedFluidTankComponent<LatexProcessingUnitTile> latex;
@@ -75,9 +74,9 @@ public class LatexProcessingUnitTile extends IndustrialProcessingTile<LatexProce
     @Override
     public Runnable onFinish() {
         return () -> {
-            latex.drain(AMOUNT_LATEX, IFluidHandler.FluidAction.EXECUTE);
-            water.drain(AMOUNT_WATER, IFluidHandler.FluidAction.EXECUTE);
-            ItemHandlerHelper.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()), false);
+            TransferUtil.extractAnyFluid(latex, AMOUNT_LATEX);
+            TransferUtil.extractAnyFluid(water, AMOUNT_WATER);
+            TransferUtil.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()));
         };
     }
 
@@ -87,7 +86,7 @@ public class LatexProcessingUnitTile extends IndustrialProcessingTile<LatexProce
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return LatexProcessingUnitConfig.powerPerTick;
     }
 

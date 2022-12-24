@@ -26,6 +26,10 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
 import com.hrznstudio.titanium.recipe.serializer.SerializableRecipe;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -35,11 +39,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -54,9 +53,9 @@ public class LaserDrillFluidRecipe extends SerializableRecipe {
     public static ResourceLocation EMPTY = new ResourceLocation("minecraft", "empty");
 
     public static void init() {
-        new LaserDrillFluidRecipe(new FluidStack(Fluids.LAVA, 100), 1, EMPTY, new LaserDrillRarity(LaserDrillRarity.NETHER, new ResourceKey[0], 5, 20, 8));
-        new LaserDrillFluidRecipe(new FluidStack(ModuleCore.ETHER.getSourceFluid().get(), 10), 10, new ResourceLocation("minecraft", "wither"), new LaserDrillRarity(new ResourceKey[0], new ResourceKey[0], -64, 256, 8));
-        new LaserDrillFluidRecipe("oil", createNBT("pneumaticcraft:oil", 50), 15, EMPTY, new LaserDrillRarity(LaserDrillRarity.OIL, new ResourceKey[0], 20, 60, 8)).setModIdCondition("pneumaticcraft");
+        new LaserDrillFluidRecipe(new FluidStack(Fluids.LAVA, 8100), 1, EMPTY, new LaserDrillRarity(LaserDrillRarity.NETHER, new ResourceKey[0], 5, 20, 8));
+        new LaserDrillFluidRecipe(new FluidStack(ModuleCore.ETHER.getSourceFluid().get(), 810), 10, new ResourceLocation("minecraft", "wither"), new LaserDrillRarity(new ResourceKey[0], new ResourceKey[0], -64, 256, 8));
+        new LaserDrillFluidRecipe("oil", createNBT("pneumaticcraft:oil", 4050), 15, EMPTY, new LaserDrillRarity(LaserDrillRarity.OIL, new ResourceKey[0], 20, 60, 8)).setModIdCondition("pneumaticcraft");
     }
 
     public CompoundTag output;
@@ -81,7 +80,7 @@ public class LaserDrillFluidRecipe extends SerializableRecipe {
     }
 
     public LaserDrillFluidRecipe(FluidStack output, int color, ResourceLocation entity, LaserDrillRarity... rarity) {
-        this(ForgeRegistries.FLUIDS.getKey(output.getFluid()).getPath(), output.writeToNBT(new CompoundTag()), color, entity, rarity);
+        this(Registry.FLUID.getKey(output.getFluid()).getPath(), output.writeToNBT(new CompoundTag()), color, entity, rarity);
     }
 
     public LaserDrillFluidRecipe(ResourceLocation resourceLocation) {
@@ -119,9 +118,9 @@ public class LaserDrillFluidRecipe extends SerializableRecipe {
     }
 
     @Override
-    public Pair<ICondition, IConditionSerializer> getOutputCondition() {
+    public ConditionJsonProvider getOutputCondition() {
         if (modIdCondition != null) {
-            return Pair.of(new ModLoadedCondition(modIdCondition), ModLoadedCondition.Serializer.INSTANCE);
+            return DefaultResourceConditions.allModsLoaded(modIdCondition);
         }
         return null;
     }

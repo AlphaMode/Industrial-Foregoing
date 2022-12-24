@@ -53,8 +53,8 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -81,7 +81,7 @@ public class OreLaserBaseTile extends IndustrialMachineTile<OreLaserBaseTile> im
         this.miningDepth = this.getBlockPos().getY();
         this.addProgressBar(work = new ProgressBarComponent<OreLaserBaseTile>(12, 22, 0, OreLaserBaseConfig.maxProgress) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                         return Collections.singletonList(() -> new ProgressBarScreenAddon<OreLaserBaseTile>(work.getPosX(), work.getPosY(), this) {
                             @Override
@@ -127,7 +127,7 @@ public class OreLaserBaseTile extends IndustrialMachineTile<OreLaserBaseTile> im
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         this.addGuiAddonFactory(() -> new TextScreenAddon("", 70, 84 + 3, false) {
@@ -168,7 +168,7 @@ public class OreLaserBaseTile extends IndustrialMachineTile<OreLaserBaseTile> im
                         ItemStack stack = ItemStack.EMPTY;
                         for (String modid : TagConfig.ITEM_PREFERENCE) {
                             for (ItemStack matchingStack : laserDrillOreRecipe.output.getItems()) {
-                                if (ForgeRegistries.ITEMS.getKey(matchingStack.getItem()).getNamespace().equals(modid)) {
+                                if (Registry.ITEM.getKey(matchingStack.getItem()).getNamespace().equals(modid)) {
                                     stack = matchingStack;
                                     break;
                                 }

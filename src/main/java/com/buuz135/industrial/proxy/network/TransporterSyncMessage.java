@@ -24,11 +24,17 @@ package com.buuz135.industrial.proxy.network;
 import com.buuz135.industrial.block.transportstorage.tile.TransporterTile;
 import com.hrznstudio.titanium.network.Message;
 import com.hrznstudio.titanium.util.TileUtil;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.Executor;
 
 public class TransporterSyncMessage extends Message {
 
@@ -48,8 +54,8 @@ public class TransporterSyncMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
+        executor.execute(() -> {
             TileUtil.getTileEntity(Minecraft.getInstance().level, pos, TransporterTile.class).ifPresent(tileEntity -> {
                 tileEntity.getTransporterTypeMap().get(Direction.from3DDataValue(direction)).handleRenderSync(Direction.from3DDataValue(originDirection), sync);
             });

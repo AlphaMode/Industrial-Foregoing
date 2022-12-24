@@ -26,15 +26,14 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
 import com.hrznstudio.titanium.recipe.serializer.SerializableRecipe;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlotExposedStorage;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +69,7 @@ public class DissolutionChamberRecipe extends SerializableRecipe {
         return false;
     }
 
-    public boolean matches(IItemHandler handler, FluidTankComponent tank) {
+    public boolean matches(SlotExposedStorage handler, FluidTankComponent tank) {
         if (input == null || tank == null || inputFluid == null) return false;
         List<ItemStack> handlerItems = new ArrayList<>();
         for (int i = 0; i < handler.getSlots(); i++) {

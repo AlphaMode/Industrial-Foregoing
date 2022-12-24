@@ -40,8 +40,8 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public class AnimalBabySeparatorTile extends IndustrialAreaWorkingTile<AnimalBab
         this.movingAdults = false;
         addButton(new ButtonComponent(42, 20, 18, 18) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(this, new StateButtonInfo(0, AssetTypes.ITEM_BACKGROUND, "Moving babies"), new StateButtonInfo(1, AssetTypes.ITEM_BACKGROUND, "Moving adults")) {
                     @Override
@@ -78,7 +78,7 @@ public class AnimalBabySeparatorTile extends IndustrialAreaWorkingTile<AnimalBab
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         addGuiAddonFactory(() -> new ItemGuiAddon(42, 20) {

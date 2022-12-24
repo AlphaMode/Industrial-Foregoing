@@ -30,8 +30,13 @@ import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.buuz135.industrial.utils.BlockUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.util.RayTraceUtils;
+import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.BlockAccessor;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.PortingHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,10 +55,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class ItemInfinityDrill extends ItemInfinity {
                         Block block = tempState.getBlock();
                         if (!BlockUtils.isBlockstateInMaterial(tempState, mineableMaterials)) return;
                         if (tempState.getDestroySpeed(worldIn, blockPos) < 0) return;
-                        int xp = ForgeHooks.onBlockBreakEvent(worldIn, ((ServerPlayer) entityLiving).gameMode.getGameModeForPlayer(), (ServerPlayer) entityLiving, blockPos);
+                        int xp = PortingHooks.onBlockBreakEvent(worldIn, ((ServerPlayer) entityLiving).gameMode.getGameModeForPlayer(), (ServerPlayer) entityLiving, blockPos);
                         if (xp >= 0 && block.onDestroyedByPlayer(tempState, worldIn, blockPos, (Player) entityLiving, true, tempState.getFluidState())) {
                             block.destroy(worldIn, blockPos, tempState);
                             //block.harvestBlock(worldIn, (PlayerEntity) entityLiving, blockPos, tempState, null, stack);
@@ -114,7 +115,7 @@ public class ItemInfinityDrill extends ItemInfinity {
                                     totalDrops.add(itemStack);
                                 }
                             });
-                            block.popExperience((ServerLevel) worldIn, blockPos, xp);
+                            ((BlockAccessor)block).port_lib$popExperience((ServerLevel) worldIn, blockPos, xp);
                             consumeFuel(stack);
                         }
                     }
@@ -130,7 +131,7 @@ public class ItemInfinityDrill extends ItemInfinity {
 
     @Override
     public void registerRecipe(Consumer<FinishedRecipe> consumer) {
-        new DissolutionChamberRecipe(ForgeRegistries.ITEMS.getKey(this),
+        new DissolutionChamberRecipe(Registry.ITEM.getKey(this),
                 new Ingredient.Value[]{
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_BLOCK)),
                         new Ingredient.ItemValue(new ItemStack(Items.DIAMOND_SHOVEL)),

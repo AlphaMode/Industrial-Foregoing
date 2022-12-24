@@ -38,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class EnchantmentFactoryTile extends IndustrialProcessingTile<EnchantmentFactoryTile> {
 
@@ -89,7 +88,7 @@ public class EnchantmentFactoryTile extends IndustrialProcessingTile<Enchantment
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return EnchantmentFactoryConfig.powerPerTick;
     }
 

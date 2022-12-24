@@ -33,6 +33,7 @@ import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.util.RecipeUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +48,7 @@ import javax.annotation.Nonnull;
 public class DissolutionChamberTile extends IndustrialProcessingTile<DissolutionChamberTile> {
 
     private int maxProgress;
-    private int powerPerTick;
+    private long powerPerTick;
 
     @Save
     private LockableInventoryBundle<DissolutionChamberTile> input;
@@ -122,7 +123,7 @@ public class DissolutionChamberTile extends IndustrialProcessingTile<Dissolution
                     outputFluid.fillForced(dissolutionChamberRecipe.outputFluid.copy(), IFluidHandler.FluidAction.EXECUTE);
                 ItemStack outputStack = dissolutionChamberRecipe.output.copy();
                 outputStack.getItem().onCraftedBy(outputStack, this.level, null);
-                ItemHandlerHelper.insertItem(output, outputStack, false);
+                TransferUtil.insertItem(output, outputStack);
                 checkForRecipe();
             }
         };
@@ -134,7 +135,7 @@ public class DissolutionChamberTile extends IndustrialProcessingTile<Dissolution
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return powerPerTick;
     }
 

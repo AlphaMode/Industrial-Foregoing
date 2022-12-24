@@ -44,6 +44,7 @@ import com.buuz135.industrial.proxy.network.BackpackOpenMessage;
 import com.buuz135.industrial.utils.FluidUtils;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.event.handler.EventManager;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -55,6 +56,7 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -64,7 +66,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
+import net.fabricmc.api.EnvType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -75,12 +77,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Calendar;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(value = EnvType.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientProxy extends CommonProxy {
 
     public static ResourceLocation GUI = new ResourceLocation(Reference.MOD_ID, "textures/gui/machines.png");
@@ -121,18 +123,18 @@ public class ClientProxy extends CommonProxy {
             }
             return 0xFFFFFFF;
         }, ModuleTransportStorage.CONVEYOR.getLeft().get());
-        Minecraft.getInstance().getItemColors().register((stack, tintIndex) -> {
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
             if (tintIndex == 1 || tintIndex == 2 || tintIndex == 3) {
                 SpawnEggItem info = null;
                 if (stack.hasTag() && stack.getTag().contains("entity")) {
                     ResourceLocation id = new ResourceLocation(stack.getTag().getString("entity"));
-                    info = SpawnEggItem.byId(ForgeRegistries.ENTITY_TYPES.getValue(id));
+                    info = SpawnEggItem.byId(Registry.ENTITY_TYPE.get(id));
                 }
                 return info == null ? 0x636363 : tintIndex == 3 ? ((MobImprisonmentToolItem) ModuleTool.MOB_IMPRISONMENT_TOOL.get()).isBlacklisted(info.getType(new CompoundTag())) ? 0xDB201A : 0x636363 : info.getColor(tintIndex - 1);
             }
             return 0xFFFFFF;
         }, ModuleTool.MOB_IMPRISONMENT_TOOL.get());
-        Minecraft.getInstance().getItemColors().register((stack, tintIndex) -> {
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
             if (tintIndex == 0) {
                 return InfinityTier.getTierBraquet(ItemInfinity.getPowerFromStack(stack)).getLeft().getTextureColor();
             }
@@ -148,7 +150,7 @@ public class ClientProxy extends CommonProxy {
             }
             return 0xFFFFFF;
         }, ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get());
-        Minecraft.getInstance().getItemColors().register((stack, tintIndex) -> {
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
             if (tintIndex == 0 && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
                 IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
                 if (fluidHandlerItem.getFluidInTank(0).getAmount() > 0) {
@@ -169,7 +171,7 @@ public class ClientProxy extends CommonProxy {
             return 0xFFFFFF;
         }, ModuleCore.RAW_ORE_MEAT.getBucketFluid(), ModuleCore.FERMENTED_ORE_MEAT.getBucketFluid());
 
-        EventManager.forge(ItemTooltipEvent.class).filter(event -> ForgeRegistries.ITEMS.getKey(event.getItemStack().getItem()).getNamespace().equals(Reference.MOD_ID)).process(event -> {
+        EventManager.forge(ItemTooltipEvent.class).filter(event -> Registry.ITEM.getKey(event.getItemStack().getItem()).getNamespace().equals(Reference.MOD_ID)).process(event -> {
             if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 && Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL) {
                 event.getToolTip().add(Component.literal("Press Alt + F4 to cheat this item").withStyle(ChatFormatting.DARK_AQUA));
             }

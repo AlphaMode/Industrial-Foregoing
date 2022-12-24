@@ -47,10 +47,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import me.alphamode.forgetags.Tags;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -99,7 +99,7 @@ public class BioReactorTile extends IndustrialWorkingTile<BioReactorTile> {
         );
         addProgressBar(bar = new ProgressBarComponent<BioReactorTile>(96 + 18 * 3, 20, BioReactorConfig.maxProgress) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                         return Collections.singletonList(() -> new ProgressBarScreenAddon<BioReactorTile>(bar.getPosX(), bar.getPosY(), this) {
                             @Override
@@ -145,7 +145,7 @@ public class BioReactorTile extends IndustrialWorkingTile<BioReactorTile> {
             }
         }
         for (TagKey<Item> itemTag : VALID) {
-            if (ForgeRegistries.ITEMS.tags().getTag(itemTag).contains(stack.getItem()) && (foundSlot == -1 || (input.getInventory().getStackInSlot(foundSlot).getCount() + stack.getCount() <= input.getInventory().getStackInSlot(foundSlot).getMaxStackSize() && slot == foundSlot)))
+            if (Registry.ITEM.tags().getTag(itemTag).contains(stack.getItem()) && (foundSlot == -1 || (input.getInventory().getStackInSlot(foundSlot).getCount() + stack.getCount() <= input.getInventory().getStackInSlot(foundSlot).getMaxStackSize() && slot == foundSlot)))
                 return true; //contains
         }
         return false;

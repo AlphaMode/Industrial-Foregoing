@@ -49,8 +49,8 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -93,7 +93,7 @@ public class PotionBrewerTile extends IndustrialProcessingTile<PotionBrewerTile>
         );
         addProgressBar(blaze = new ProgressBarComponent<PotionBrewerTile>(30, 20, 100) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                         return Collections.singletonList(() -> new ProgressBarScreenAddon<PotionBrewerTile>(30, 20, this) {
                             @Override

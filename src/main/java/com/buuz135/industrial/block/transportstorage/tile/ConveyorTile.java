@@ -33,8 +33,12 @@ import com.buuz135.industrial.proxy.client.model.ConveyorModelData;
 import com.buuz135.industrial.utils.MovementUtils;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,12 +52,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -209,7 +207,7 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
             }
             CompoundTag upgradeTag = new CompoundTag();
             ConveyorUpgrade upgrade = upgradeMap.get(facing);
-            upgradeTag.putString("factory", ForgeRegistries.ITEMS.getKey(upgrade.getFactory().getUpgradeItem()).toString());
+            upgradeTag.putString("factory", Registry.ITEM.getKey(upgrade.getFactory().getUpgradeItem()).toString());
             CompoundTag customNBT = upgrade.serializeNBT();
             if (customNBT != null)
                 upgradeTag.put("customNBT", customNBT);
@@ -235,7 +233,7 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
                 CompoundTag upgradeTag = upgradesTag.getCompound(facing.getSerializedName());
                 ConveyorUpgradeFactory factory = null;
                 for (ConveyorUpgradeFactory conveyorUpgradeFactory : ConveyorUpgradeFactory.FACTORIES) {
-                    if (ForgeRegistries.ITEMS.getKey(conveyorUpgradeFactory.getUpgradeItem()).equals(new ResourceLocation(upgradeTag.getString("factory")))) {
+                    if (Registry.ITEM.getKey(conveyorUpgradeFactory.getUpgradeItem()).equals(new ResourceLocation(upgradeTag.getString("factory")))) {
                         factory = conveyorUpgradeFactory;
                         break;
                     }
@@ -345,7 +343,7 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
 
     public void openGui(Player player, Direction facing) {
         if (player instanceof ServerPlayer) {
-            NetworkHooks.openScreen((ServerPlayer) player, this, packetBuffer -> {
+            NetworkUtil.openGui((ServerPlayer) player, this, packetBuffer -> {
                 packetBuffer.writeBlockPos(worldPosition);
                 packetBuffer.writeEnum(facing);
             });

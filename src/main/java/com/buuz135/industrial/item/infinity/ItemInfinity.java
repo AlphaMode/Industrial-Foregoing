@@ -43,6 +43,7 @@ import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -71,13 +72,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkHooks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -299,7 +295,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
         Multimap<Attribute, AttributeModifier> multimap = MultimapBuilder.hashKeys().arrayListValues().build();
         if (slot == EquipmentSlot.MAINHAND) {
             multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", 3, AttributeModifier.Operation.ADDITION)); //AttackDamage
@@ -321,7 +317,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
             public <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> p_221484_1_) {
                 return Optional.empty();
             }
-        }, playerEntity.inventory, menu);
+        }, playerEntity.getInventory(), menu);
     }
 
     @Override
@@ -329,7 +325,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
         if (player.isCrouching()) {
             if (player instanceof ServerPlayer) {
                 IndustrialForegoing.NETWORK.get().sendTo(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
-                NetworkHooks.openScreen((ServerPlayer) player, this, buffer ->
+                NetworkUtil.openGui((ServerPlayer) player, this, buffer ->
                         LocatorFactory.writePacketBuffer(buffer, new HeldStackLocatorInstance(handIn == InteractionHand.MAIN_HAND)));
             }
             return InteractionResultHolder.success(player.getItemInHand(handIn));
@@ -378,7 +374,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
 
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons(Supplier<ItemStack> stack) {
         List<IFactory<? extends IScreenAddon>> factory = new ArrayList<>();
@@ -433,7 +429,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
 
             @Nonnull
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new TankScreenAddon(30, 20, this, FluidTankComponent.Type.NORMAL));
             }

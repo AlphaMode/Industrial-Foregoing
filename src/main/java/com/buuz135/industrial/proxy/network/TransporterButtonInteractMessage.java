@@ -24,11 +24,17 @@ package com.buuz135.industrial.proxy.network;
 
 import com.buuz135.industrial.block.transportstorage.tile.TransporterTile;
 import com.hrznstudio.titanium.network.Message;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.Executor;
 
 public class TransporterButtonInteractMessage extends Message {
 
@@ -49,9 +55,9 @@ public class TransporterButtonInteractMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
-            BlockEntity entity = context.getSender().getLevel().getBlockEntity(pos);
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
+        executor.execute(() -> {
+            BlockEntity entity = sender.getLevel().getBlockEntity(pos);
             Direction facing = Direction.from3DDataValue(this.facing);
             if (entity instanceof TransporterTile) {
                 if (((TransporterTile) entity).hasUpgrade(facing)) {

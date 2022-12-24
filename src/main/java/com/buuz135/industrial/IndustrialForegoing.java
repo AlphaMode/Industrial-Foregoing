@@ -44,6 +44,9 @@ import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
+import io.github.tropheusj.milk.Milk;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -52,8 +55,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.ForgeMod;
@@ -78,8 +81,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mod(Reference.MOD_ID)
-public class IndustrialForegoing extends ModuleController {
+public class IndustrialForegoing extends ModuleController implements ModInitializer {
 
     private static CommonProxy proxy;
     private static HashMap<DimensionType, IFFakePlayer> worldFakePlayer = new HashMap<>();
@@ -99,15 +101,16 @@ public class IndustrialForegoing extends ModuleController {
         NETWORK.registerMessage(PlungerPlayerHitMessage.class);
     }
 
-    public IndustrialForegoing() {
+    @Override
+    public void onInitialize() {
         proxy = new CommonProxy();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> new ClientProxy().run()).subscribe());
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> EventManager.mod(ModelEvent.RegisterAdditional.class).process(modelRegistryEvent -> modelRegistryEvent.register(new ResourceLocation(Reference.MOD_ID, "block/catears"))).subscribe());
+        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> () -> EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> new ClientProxy().run()).subscribe());
+        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> () -> EventManager.mod(ModelEvent.RegisterAdditional.class).process(modelRegistryEvent -> modelRegistryEvent.register(new ResourceLocation(Reference.MOD_ID, "block/catears"))).subscribe());
         EventManager.mod(FMLCommonSetupEvent.class).process(fmlCommonSetupEvent -> proxy.run()).subscribe();
-        EventManager.forge(ServerStartingEvent.class).process(fmlServerStartingEvent -> worldFakePlayer.clear()).subscribe();
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> worldFakePlayer.clear());
         EventManager.mod(NewRegistryEvent.class).process(IFRegistries::create).subscribe();
         /*
-        EventManager.forge(ItemTooltipEvent.class).process(itemTooltipEvent -> ForgeRegistries.ITEMS.tags().getReverseTag(itemTooltipEvent.getItemStack().getItem()).ifPresent(itemIReverseTag -> {
+        EventManager.forge(ItemTooltipEvent.class).process(itemTooltipEvent -> Registry.ITEM.tags().getReverseTag(itemTooltipEvent.getItemStack().getItem()).ifPresent(itemIReverseTag -> {
             itemIReverseTag.getTagKeys().forEach(itemTagKey -> itemTooltipEvent.getToolTip().add(Component.literal(itemTagKey.location().toString())));
         })).subscribe();*/
         RewardGiver giver = RewardManager.get().getGiver(UUID.fromString("d28b7061-fb92-4064-90fb-7e02b95a72a6"), "Buuz135");
@@ -119,8 +122,8 @@ public class IndustrialForegoing extends ModuleController {
         }
         LaserDrillRarity.init();
         PlayerInventoryFinder.init();
-        ForgeMod.enableMilkFluid();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::initClient);
+        Milk.enableMilkFluid();
+        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> this::initClient);
     }
 
     public static FakePlayer getFakePlayer(Level world) {
@@ -147,25 +150,7 @@ public class IndustrialForegoing extends ModuleController {
 
     @Override
     public void addDataProvider(GatherDataEvent event) {
-        super.addDataProvider(event);
-        NonNullLazy<List<Block>> blocksToProcess = NonNullLazy.of(() ->
-                ForgeRegistries.BLOCKS.getValues()
-                        .stream()
-                        .filter(block -> !block.getClass().equals(LiquidBlock.class))
-                        .filter(basicBlock -> Optional.ofNullable(ForgeRegistries.BLOCKS.getKey(basicBlock))
-                                .map(ResourceLocation::getNamespace)
-                                .filter(Reference.MOD_ID::equalsIgnoreCase)
-                                .isPresent())
-                        .collect(Collectors.toList())
-        );
-        event.getGenerator().addProvider(true, new IndustrialTagsProvider.Blocks(event.getGenerator(), Reference.MOD_ID, event.getExistingFileHelper()));
-        event.getGenerator().addProvider(true, new IndustrialTagsProvider.Items(event.getGenerator(), Reference.MOD_ID, event.getExistingFileHelper()));
-        event.getGenerator().addProvider(true, new IndustrialRecipeProvider(event.getGenerator(), blocksToProcess));
-        event.getGenerator().addProvider(true, new IndustrialSerializableProvider(event.getGenerator(), Reference.MOD_ID));
-        event.getGenerator().addProvider(true, new TitaniumLootTableProvider(event.getGenerator(), blocksToProcess));
-        event.getGenerator().addProvider(true, new BlockItemModelGeneratorProvider(event.getGenerator(), Reference.MOD_ID, blocksToProcess));
-        event.getGenerator().addProvider(true, new IndustrialBlockstateProvider(event.getGenerator(), event.getExistingFileHelper(), blocksToProcess));
-        event.getGenerator().addProvider(true, new IndustrialModelProvider(event.getGenerator(), event.getExistingFileHelper()));
+
     }
 
     @Override
@@ -180,7 +165,7 @@ public class IndustrialForegoing extends ModuleController {
         new ModuleMisc().generateFeatures(getRegistries());
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void initClient() {
         EventManager.mod(TextureStitchEvent.Pre.class).process(pre -> {
             if (pre.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {

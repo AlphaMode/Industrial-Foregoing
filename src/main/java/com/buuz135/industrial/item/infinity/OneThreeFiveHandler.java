@@ -32,8 +32,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -52,7 +52,7 @@ public class OneThreeFiveHandler {
 
     public static HashMap<UUID, Long> SPECIAL_ENTITIES = new HashMap<>();
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.level != null && !Minecraft.getInstance().isPaused() && Minecraft.getInstance().player.level.getGameTime() % 5 == 0) {

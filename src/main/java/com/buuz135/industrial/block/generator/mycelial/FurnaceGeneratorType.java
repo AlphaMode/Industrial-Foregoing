@@ -35,9 +35,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.Tags;
+import me.alphamode.forgetags.Tags;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -110,7 +110,7 @@ public class FurnaceGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return ForgeRegistries.ITEMS.getValues().stream().map(ItemStack::new).filter(stack -> ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), ForgeHooks.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
+        return Registry.ITEM.getValues().stream().map(ItemStack::new).filter(stack -> ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), ForgeHooks.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
     }
 
     @Override

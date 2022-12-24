@@ -25,7 +25,9 @@ package com.buuz135.industrial.utils.data;
 import com.buuz135.industrial.block.IndustrialBlock;
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleTransportStorage;
+import com.hrznstudio.titanium.fabric.NonNullLazy;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -35,8 +37,6 @@ import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.util.NonNullLazy;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class IndustrialBlockstateProvider extends BlockStateProvider {
     }
 
     public static ResourceLocation getModel(Block block) {
-        return new ResourceLocation(ForgeRegistries.BLOCKS.getKey(block).getNamespace(), "block/" + ForgeRegistries.BLOCKS.getKey(block).getPath());
+        return new ResourceLocation(Registry.BLOCK.getKey(block).getNamespace(), "block/" + Registry.BLOCK.getKey(block).getPath());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class IndustrialBlockstateProvider extends BlockStateProvider {
                         builder.partialState().addModels(new ConfiguredModel(new ModelFile.UncheckedModelFile(getModel(industrialBlock))));
                     }
                 });
-        simpleBlock(ModuleTransportStorage.TRANSPORTER.getLeft().get(), new ModelFile.UncheckedModelFile(modLoc("block/" + ForgeRegistries.BLOCKS.getKey(ModuleTransportStorage.TRANSPORTER.getLeft().get()).getPath())));
+        simpleBlock(ModuleTransportStorage.TRANSPORTER.getLeft().get(), new ModelFile.UncheckedModelFile(modLoc("block/" + Registry.BLOCK.getKey(ModuleTransportStorage.TRANSPORTER.getLeft().get()).getPath())));
         //VariantBlockStateBuilder conveyor = getVariantBuilder(ModuleTransport.CONVEYOR);
         //for (ConveyorBlock.EnumType type : ConveyorBlock.TYPE.getAllowedValues()) {
         //    for (Direction direction : ConveyorBlock.FACING.getAllowedValues()) {

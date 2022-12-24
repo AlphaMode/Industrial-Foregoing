@@ -29,7 +29,6 @@ import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.client.screen.addon.SlotsScreenAddon;
 import com.hrznstudio.titanium.client.screen.asset.DefaultAssetProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;

@@ -27,11 +27,11 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.capability.FluidHandlerScreenProviderItemStack;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class MultipleFluidHandlerScreenProviderItemStack extends FluidHandlerScr
     }
 
     @Override
-    public int getFluidAmount() {
+    public long getFluidAmount() {
         for (int i = 0; i < tankDefinitions.length; i++) {
             if (tankDefinitions[i].canDrain) return getFluidInTank(i).getAmount();
         }
@@ -164,7 +164,7 @@ public class MultipleFluidHandlerScreenProviderItemStack extends FluidHandlerScr
 
     @Nonnull
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
         for (int i = 0; i < tankDefinitions.length; i++) {

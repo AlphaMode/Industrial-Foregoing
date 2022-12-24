@@ -33,7 +33,7 @@ public class FluidSievingMachineConfig {
     public static int maxProgress = 100;
 
     @ConfigVal(comment = "Amount of Power Consumed per Tick - Default: [40FE]")
-    public static int powerPerTick = 40;
+    public static long powerPerTick = 40;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
     public static int maxStoredPower = 10000;

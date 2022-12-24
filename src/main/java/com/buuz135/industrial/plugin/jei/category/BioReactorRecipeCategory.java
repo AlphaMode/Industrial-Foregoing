@@ -24,7 +24,7 @@ package com.buuz135.industrial.plugin.jei.category;
 
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
 import com.buuz135.industrial.utils.Reference;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -37,7 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import javax.annotation.Nullable;
 
@@ -78,7 +78,7 @@ public class BioReactorRecipeCategory implements IRecipeCategory<BioReactorRecip
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ReactorRecipeWrapper recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 17).addIngredients(Ingredient.of(recipe.stack));
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.getFluid());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, recipe.getFluid());
     }
 
     public static class ReactorRecipeWrapper {

@@ -37,6 +37,7 @@ import com.hrznstudio.titanium.component.bundle.TankInteractionBundle;
 import com.hrznstudio.titanium.component.button.RedstoneControlButtonComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.item.AugmentWrapper;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -44,10 +45,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.registries.RegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class IndustrialMachineTile<T extends IndustrialMachineTile<T>> extends MachineTile<T> implements IRedstoneReader {
@@ -114,7 +113,7 @@ public abstract class IndustrialMachineTile<T extends IndustrialMachineTile<T>> 
     }
 
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void clientTick(Level level, BlockPos pos, BlockState state, T blockEntity) {
         super.clientTick(level, pos, state, blockEntity);

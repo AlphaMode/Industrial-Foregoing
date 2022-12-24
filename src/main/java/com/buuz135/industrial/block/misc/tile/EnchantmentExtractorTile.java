@@ -49,9 +49,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -111,7 +111,7 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
         );
         this.addButton(buttonComponent = new ButtonComponent(62 + 4, 40 + 18, 14, 14) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(this,
                         new StateButtonInfo(0, AssetTypes.BUTTON_SIDENESS_ENABLED, ChatFormatting.GOLD + LangUtil.getString("tooltip.industrialforegoing.enchantment_extractor.extract"), "tooltip.industrialforegoing.enchantment_extractor.extract_extra"),
@@ -175,7 +175,7 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return EnchantmentExtractorConfig.powerPerTick;
     }
 

@@ -32,13 +32,14 @@ import com.buuz135.industrial.proxy.network.ConveyorButtonInteractMessage;
 import com.buuz135.industrial.utils.Reference;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,8 +84,8 @@ public class GuiConveyor extends AbstractContainerScreen<ContainerConveyor> impl
         y = (height - imageHeight) / 2;
         blit(stack, x, y, 0, 0, imageWidth, imageHeight);
         if (upgrade != null) {
-            String localized = Component.translatable(String.format("conveyor.upgrade.%s.%s", ForgeRegistries.ITEMS.getKey(upgrade.getFactory().getUpgradeItem()).getNamespace(), ForgeRegistries.ITEMS.getKey(upgrade.getFactory().getUpgradeItem()).getPath())).getString();
-            getMinecraft().font.draw(stack, localized, x + imageWidth / 2 - getMinecraft().font.width(localized) / 2, y + 6, 0x404040);
+            String localized = Component.translatable(String.format("conveyor.upgrade.%s.%s", Registry.ITEM.getKey(upgrade.getFactory().getUpgradeItem()).getNamespace(), Registry.ITEM.getKey(upgrade.getFactory().getUpgradeItem()).getPath())).getString();
+            Screens.getClient(this).font.draw(stack, localized, x + imageWidth / 2 - Screens.getClient(this).font.width(localized) / 2, y + 6, 0x404040);
         }
         for (IGuiComponent iGuiComponent : componentList) {
             iGuiComponent.drawGuiBackgroundLayer(stack, x, y, mouseX, mouseY);

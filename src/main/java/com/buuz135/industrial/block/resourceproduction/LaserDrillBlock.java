@@ -38,8 +38,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.function.Consumer;
 
@@ -59,7 +59,7 @@ public class LaserDrillBlock extends IndustrialBlock<LaserDrillTile> {
         return RotationType.SIX_WAY;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void animateTick(BlockState stateIn, Level world, BlockPos pos, RandomSource rand) {
         if (world.getBlockEntity(pos) instanceof LaserDrillTile) {

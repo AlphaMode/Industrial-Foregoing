@@ -26,17 +26,17 @@ import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
 import com.hrznstudio.titanium.recipe.serializer.SerializableRecipe;
 import com.hrznstudio.titanium.util.TagUtil;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
-import net.minecraftforge.common.crafting.conditions.NotCondition;
-import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -102,9 +102,9 @@ public class CrusherRecipe extends SerializableRecipe {
     }
 
     @Override
-    public Pair<ICondition, IConditionSerializer> getOutputCondition() {
+    public ConditionJsonProvider getOutputCondition() {
         if (isTag != null) {
-            return Pair.of(new NotCondition(new TagEmptyCondition(isTag)), NotCondition.Serializer.INSTANCE);
+            return DefaultResourceConditions.tagsPopulated(TagKey.create(Registry.ITEM_REGISTRY, isTag));
         }
         return null;
     }

@@ -22,10 +22,10 @@
 
 package com.buuz135.industrial.api.recipe.ore;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 
 public class OreFluidEntrySieve {
 

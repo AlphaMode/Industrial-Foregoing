@@ -47,7 +47,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.Tags;
+import me.alphamode.forgetags.Tags;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

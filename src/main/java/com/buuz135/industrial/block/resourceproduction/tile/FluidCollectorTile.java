@@ -31,13 +31,14 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
@@ -68,7 +69,7 @@ public class FluidCollectorTile extends IndustrialAreaWorkingTile<FluidCollector
             BlockPos pointed = getPointedBlockPos();
             if (isLoaded(pointed) && !level.isEmptyBlock(pointed) && BlockUtils.canBlockBeBroken(this.level, pointed) && level.getFluidState(pointed).isSource()) {
                 Fluid fluid = level.getFluidState(pointed).getType();
-                if (tank.isEmpty() || (tank.getFluid().getFluid().isSame(fluid) && tank.getFluidAmount() + FluidType.BUCKET_VOLUME <= tank.getCapacity())) {
+                if (tank.isEmpty() || (tank.getFluid().getFluid().isSame(fluid) && tank.getFluidAmount() + FluidConstants.BUCKET <= tank.getCapacity())) {
                     if (level.getBlockState(pointed).hasProperty(BlockStateProperties.WATERLOGGED)) { //has
                         level.setBlockAndUpdate(pointed, level.getBlockState(pointed).setValue(BlockStateProperties.WATERLOGGED, false));
                     } else {

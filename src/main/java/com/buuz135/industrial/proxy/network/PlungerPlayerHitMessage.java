@@ -23,9 +23,14 @@ package com.buuz135.industrial.proxy.network;
 
 import com.buuz135.industrial.entity.client.InfinityLauncherProjectileArmorLayer;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraftforge.network.NetworkEvent;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.Executor;
 
 public class PlungerPlayerHitMessage extends Message {
 
@@ -40,8 +45,8 @@ public class PlungerPlayerHitMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
+        executor.execute(() -> {
             int amount = InfinityLauncherProjectileArmorLayer.PROJECTILE_AMOUNT.computeIfAbsent(entity.toString(), s -> 0);
             InfinityLauncherProjectileArmorLayer.PROJECTILE_AMOUNT.put(entity.toString(), amount + 1);
             new Thread(() -> {

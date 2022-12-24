@@ -45,6 +45,7 @@ import com.hrznstudio.titanium.util.FacingUtil;
 import com.hrznstudio.titanium.util.RecipeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,9 +55,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -82,7 +83,7 @@ public class FluidLaserBaseTile extends IndustrialMachineTile<FluidLaserBaseTile
         this.miningDepth = this.getBlockPos().getY();
         this.addProgressBar(work = new ProgressBarComponent<FluidLaserBaseTile>(74, 24 + 18, 0, FluidLaserBaseConfig.maxProgress) {
                     @Override
-                    @OnlyIn(Dist.CLIENT)
+                    @Environment(EnvType.CLIENT)
                     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                         return Collections.singletonList(() -> new ProgressBarScreenAddon<FluidLaserBaseTile>(work.getPosX(), work.getPosY(), this) {
                             @Override
@@ -128,7 +129,7 @@ public class FluidLaserBaseTile extends IndustrialMachineTile<FluidLaserBaseTile
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         this.addGuiAddonFactory(() -> new TextScreenAddon("", 70, 84 + 3, false) {
@@ -155,7 +156,7 @@ public class FluidLaserBaseTile extends IndustrialMachineTile<FluidLaserBaseTile
                     .findFirst()
                     .ifPresent(laserDrillFluidRecipe -> {
                         if (!LaserDrillFluidRecipe.EMPTY.equals(laserDrillFluidRecipe.entity)) {
-                            List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, box.bounds(), entity -> ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).equals(laserDrillFluidRecipe.entity));
+                            List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, box.bounds(), entity -> Registry.ENTITY_TYPE.getKey(entity.getType()).equals(laserDrillFluidRecipe.entity));
                             if (entities.size() > 0) {
                                 LivingEntity first = entities.get(0);
                                 if (first.getHealth() > 5) {

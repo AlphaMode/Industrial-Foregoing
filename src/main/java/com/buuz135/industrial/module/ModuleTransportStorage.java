@@ -39,16 +39,18 @@ import com.buuz135.industrial.item.ItemTransporterType;
 import com.buuz135.industrial.proxy.client.model.ConveyorBlockModel;
 import com.buuz135.industrial.proxy.client.model.TransporterBlockModel;
 import com.buuz135.industrial.utils.Reference;
-import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -57,16 +59,8 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.SimpleModelState;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -111,15 +105,15 @@ public class ModuleTransportStorage implements IModule {
     @Override
     public void generateFeatures(DeferredRegistryHelper registryHelper) {
         TAB_TRANSPORT.addIconStack(() -> new ItemStack(CONVEYOR.getLeft().orElse(Blocks.STONE)));
-        registryHelper.registerGeneric(ForgeRegistries.MENU_TYPES.getRegistryKey(), "conveyor", () -> (MenuType) IForgeMenuType.create(ContainerConveyor::new));
-        ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> registryHelper.registerGeneric(ForgeRegistries.ITEMS.getRegistryKey(), "conveyor_" + conveyorUpgradeFactory.getName() + "_upgrade", () -> new ItemConveyorUpgrade(conveyorUpgradeFactory, TAB_TRANSPORT)));
-        registryHelper.registerGeneric(ForgeRegistries.MENU_TYPES.getRegistryKey(), "transporter", () -> (MenuType) IForgeMenuType.create(ContainerTransporter::new));
-        TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> registryHelper.registerGeneric(ForgeRegistries.ITEMS.getRegistryKey(), transporterTypeFactory.getName() + "_transporter_type", () -> new ItemTransporterType(transporterTypeFactory, TAB_TRANSPORT)));
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::onClient);
+        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "conveyor", () -> new ExtendedScreenHandlerType<>(ContainerConveyor::new));
+        ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "conveyor_" + conveyorUpgradeFactory.getName() + "_upgrade", () -> new ItemConveyorUpgrade(conveyorUpgradeFactory, TAB_TRANSPORT)));
+        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "transporter", () -> new ExtendedScreenHandlerType<>(ContainerTransporter::new));
+        TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, transporterTypeFactory.getName() + "_transporter_type", () -> new ItemTransporterType(transporterTypeFactory, TAB_TRANSPORT)));
+        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> this::onClient);
 
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void conveyorBake(ModelEvent.BakingCompleted event) {
         for (ResourceLocation resourceLocation : event.getModels().keySet()) {
             if (resourceLocation.getNamespace().equals(Reference.MOD_ID)) {
@@ -142,13 +136,13 @@ public class ModuleTransportStorage implements IModule {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void textureStitch(TextureStitchEvent.Pre pre) {
         if (pre.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS))
             ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> conveyorUpgradeFactory.getTextures().forEach(pre::addSprite));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void transporterBake(ModelEvent.BakingCompleted event) {
         for (ResourceLocation resourceLocation : event.getModels().keySet()) {
             if (resourceLocation.getNamespace().equals(Reference.MOD_ID)) {
@@ -178,23 +172,23 @@ public class ModuleTransportStorage implements IModule {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void transporterTextureStitch(TextureStitchEvent.Pre pre) {
         if (pre.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS))
             TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> transporterTypeFactory.getTextures().forEach(pre::addSprite));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void onClientSetupConveyor(FMLClientSetupEvent event) {
         MenuScreens.register(ContainerConveyor.TYPE, GuiConveyor::new);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void onClientSetupTransporter(FMLClientSetupEvent event) {
         MenuScreens.register(ContainerTransporter.TYPE, GuiTransporter::new);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void onClient() {
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClientSetupConveyor).subscribe();
         EventManager.mod(ModelEvent.BakingCompleted.class).process(this::conveyorBake).subscribe();

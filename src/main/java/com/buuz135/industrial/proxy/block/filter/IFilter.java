@@ -25,14 +25,14 @@ package com.buuz135.industrial.proxy.block.filter;
 import com.buuz135.industrial.gui.component.custom.ICanSendNetworkMessage;
 import com.buuz135.industrial.gui.conveyor.GuiConveyor;
 import com.buuz135.industrial.gui.transporter.GuiTransporter;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-
 
 public interface IFilter<T extends Entity> {
 
@@ -116,7 +116,7 @@ public interface IFilter<T extends Entity> {
 
         public void accept(ItemStack ingredient) {
             if (Minecraft.getInstance().screen instanceof ICanSendNetworkMessage) {
-                ((ICanSendNetworkMessage) Minecraft.getInstance().screen).sendMessage(id, ingredient.serializeNBT());
+                ((ICanSendNetworkMessage) Minecraft.getInstance().screen).sendMessage(id, NBTSerializer.serializeNBTCompound(ingredient));
             }
         }
     }

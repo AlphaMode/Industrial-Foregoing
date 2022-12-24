@@ -26,11 +26,17 @@ import com.buuz135.industrial.api.conveyor.ConveyorUpgrade;
 import com.buuz135.industrial.block.transportstorage.conveyor.ConveyorSplittingUpgrade;
 import com.buuz135.industrial.block.transportstorage.tile.ConveyorTile;
 import com.hrznstudio.titanium.network.Message;
+import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.Executor;
 
 public class ConveyorSplittingSyncEntityMessage extends Message {
 
@@ -48,8 +54,8 @@ public class ConveyorSplittingSyncEntityMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
+    protected void handleMessage(Executor executor, @Nullable Player sender, PacketListener packetListener, PacketSender packetSender, SimpleChannel channel) {
+        executor.execute(() -> {
             BlockEntity entity = Minecraft.getInstance().player.level.getBlockEntity(pos);
             Direction facingDirection = Direction.byName(facingCurrent);
             if (entity instanceof ConveyorTile) {

@@ -23,8 +23,8 @@
 package com.buuz135.industrial.proxy.client.model;
 
 import com.buuz135.industrial.api.transporter.TransporterType;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.model.data.ModelProperty;
 
 import java.util.Map;
 
