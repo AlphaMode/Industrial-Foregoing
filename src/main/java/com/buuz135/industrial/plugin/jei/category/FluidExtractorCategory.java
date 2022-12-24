@@ -24,11 +24,12 @@ package com.buuz135.industrial.plugin.jei.category;
 
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.recipe.FluidExtractorRecipe;
 import com.buuz135.industrial.utils.Reference;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -84,7 +85,7 @@ public class FluidExtractorCategory implements IRecipeCategory<FluidExtractorRec
         if (!out.isEmpty()) {
             builder.addSlot(RecipeIngredientRole.OUTPUT, 27, 34).addIngredient(VanillaTypes.ITEM_STACK, out).setBackground(guiHelper.getSlotDrawable(), -1, -1);
         }
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(20, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.output);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(20, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.output));
 
     }
 

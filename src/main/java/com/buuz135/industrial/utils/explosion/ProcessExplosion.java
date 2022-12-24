@@ -39,7 +39,6 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.fluids.IFluidBlock;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -297,7 +296,7 @@ public class ProcessExplosion {
                 }
                 r = 10;
             } else {
-                if (block instanceof IFluidBlock || block instanceof FallingBlock) {
+                if (block instanceof FallingBlock) {
                     blocksToUpdate.add(iPos);
                 }
                 scannedCache.add(iPos);

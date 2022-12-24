@@ -25,6 +25,7 @@ import com.buuz135.industrial.block.core.tile.DissolutionChamberTile;
 import com.buuz135.industrial.config.machine.core.DissolutionChamberConfig;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.hrznstudio.titanium.api.client.AssetTypes;
 import com.hrznstudio.titanium.client.screen.addon.EnergyBarScreenAddon;
@@ -34,6 +35,7 @@ import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -42,6 +44,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.fabric.ingredients.fluid.JeiFluidIngredient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -92,7 +95,7 @@ public class DissolutionChamberCategory implements IRecipeCategory<DissolutionCh
             }
         }
         if (recipe.inputFluid != null && !recipe.inputFluid.isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.INPUT, 33 + 12 + 3, 32 + 3).setFluidRenderer(1000, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.inputFluid);
+            builder.addSlot(RecipeIngredientRole.INPUT, 33 + 12 + 3, 32 + 3).setFluidRenderer(1000, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.inputFluid));
         }
         if (!recipe.output.isEmpty()) {
             ItemStack stack = recipe.output;
@@ -100,7 +103,7 @@ public class DissolutionChamberCategory implements IRecipeCategory<DissolutionCh
             builder.addSlot(RecipeIngredientRole.OUTPUT, 119, 16).addIngredient(VanillaTypes.ITEM_STACK, stack);
         }
         if (recipe.outputFluid != null && !recipe.outputFluid.isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.OUTPUT, 139 + 3, 14 + 3).setFluidRenderer(1000, false, 12, 50).setOverlay(bigTank, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.outputFluid);
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 139 + 3, 14 + 3).setFluidRenderer(1000, false, 12, 50).setOverlay(bigTank, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.outputFluid));
         }
     }
 

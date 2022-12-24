@@ -25,10 +25,12 @@ package com.buuz135.industrial.plugin.jei.category;
 import com.buuz135.industrial.api.recipe.ore.OreFluidEntryRaw;
 import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.client.screen.addon.SlotsScreenAddon;
 import com.hrznstudio.titanium.client.screen.asset.DefaultAssetProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -80,9 +82,9 @@ public class OreWasherCategory implements IRecipeCategory<OreFluidEntryRaw> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, OreFluidEntryRaw recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 16).addIngredients(Ingredient.of(recipe.getOre()));
-        builder.addSlot(RecipeIngredientRole.INPUT, 47, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.getInput());
+        builder.addSlot(RecipeIngredientRole.INPUT, 47, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.getInput()));
 
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 99, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(ForgeTypes.FLUID_STACK, recipe.getOutput());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 99, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.getOutput()));
     }
 
     @Override

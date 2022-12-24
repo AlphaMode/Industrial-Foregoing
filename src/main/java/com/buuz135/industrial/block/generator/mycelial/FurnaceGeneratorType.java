@@ -25,6 +25,8 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
@@ -34,9 +36,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.ForgeHooks;
 import me.alphamode.forgetags.Tags;
-import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -80,7 +80,7 @@ public class FurnaceGeneratorType implements IMycelialGeneratorType {
             ItemStack itemstack = ((SidedInventoryComponent) inputs[0]).getStackInSlot(0);
             int burnTime = ForgeHooks.getBurnTime(itemstack, RecipeType.SMELTING);
             if (itemstack.hasCraftingRemainingItem())
-                ((SidedInventoryComponent) inputs[0]).setStackInSlot(0, itemstack.getCraftingRemainingItem());
+                ((SidedInventoryComponent) inputs[0]).setStackInSlot(0, itemstack.getRecipeRemainder());
             else if (!itemstack.isEmpty()) {
                 itemstack.shrink(1);
                 if (itemstack.isEmpty()) {
@@ -109,7 +109,7 @@ public class FurnaceGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return Registry.ITEM.getValues().stream().map(ItemStack::new).filter(stack -> ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), ForgeHooks.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
+        return Registry.ITEM.stream().map(ItemStack::new).filter(stack -> ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), ForgeHooks.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
     }
 
     @Override

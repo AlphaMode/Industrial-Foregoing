@@ -44,6 +44,8 @@ import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
+import dev.cafeteria.fakeplayerapi.server.FakeServerPlayer;
+import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import io.github.tropheusj.milk.Milk;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -103,8 +105,6 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
     @Override
     public void onInitialize() {
         proxy = new CommonProxy();
-        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> () -> EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> new ClientProxy().run()).subscribe());
-        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> () -> EventManager.mod(ModelEvent.RegisterAdditional.class).process(modelRegistryEvent -> modelRegistryEvent.register(new ResourceLocation(Reference.MOD_ID, "block/catears"))).subscribe());
         EventManager.mod(FMLCommonSetupEvent.class).process(fmlCommonSetupEvent -> proxy.run()).subscribe();
         ServerLifecycleEvents.SERVER_STARTING.register(server -> worldFakePlayer.clear());
         EventManager.mod(NewRegistryEvent.class).process(IFRegistries::create).subscribe();
@@ -148,11 +148,6 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
     }
 
     @Override
-    public void addDataProvider(GatherDataEvent event) {
-
-    }
-
-    @Override
     protected void initModules() {
         INSTANCE = this;
         new ModuleCore().generateFeatures(getRegistries());
@@ -162,17 +157,5 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
         new ModuleAgricultureHusbandry().generateFeatures(getRegistries());
         new ModuleResourceProduction().generateFeatures(getRegistries());
         new ModuleMisc().generateFeatures(getRegistries());
-    }
-
-    @Environment(EnvType.CLIENT)
-    private void initClient() {
-        EventManager.mod(TextureStitchEvent.Pre.class).process(pre -> {
-            if (pre.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-                pre.addSprite(TransporterTESR.TEXTURE);
-            }
-        }).subscribe();
-        EventManager.mod(ModelEvent.BakingCompleted.class).process(event -> {
-            ClientProxy.ears_baked = event.getModels().get(new ResourceLocation(Reference.MOD_ID, "block/catears"));
-        }).subscribe();
     }
 }

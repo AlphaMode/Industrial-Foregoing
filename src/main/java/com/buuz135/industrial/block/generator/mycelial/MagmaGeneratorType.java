@@ -26,6 +26,7 @@ import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
@@ -35,9 +36,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 import me.alphamode.forgetags.Tags;
-import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;

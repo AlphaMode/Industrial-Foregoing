@@ -43,16 +43,29 @@ import com.buuz135.industrial.proxy.client.render.*;
 import com.buuz135.industrial.proxy.network.BackpackOpenMessage;
 import com.buuz135.industrial.utils.FluidUtils;
 import com.buuz135.industrial.utils.Reference;
-import com.hrznstudio.titanium.event.handler.EventManager;
+import io.github.fabricators_of_create.porting_lib.event.client.ModelsBakedCallback;
+import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
@@ -61,28 +74,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.fabricmc.api.EnvType;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fml.common.Mod;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Calendar;
 
 @Mod.EventBusSubscriber(value = EnvType.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ClientProxy extends CommonProxy {
+public class ClientProxy extends CommonProxy implements ClientModInitializer {
 
     public static ResourceLocation GUI = new ResourceLocation(Reference.MOD_ID, "textures/gui/machines.png");
     public static BakedModel ears_baked;
@@ -90,28 +94,42 @@ public class ClientProxy extends CommonProxy {
     public KeyMapping OPEN_BACKPACK;
 
     @Override
+    public void onInitializeClient() {
+        TextureStitchCallback.PRE.register((atlas, spriteAdder) -> {
+            if (atlas.location().equals(InventoryMenu.BLOCK_ATLAS)) {
+                spriteAdder.accept(TransporterTESR.TEXTURE);
+            }
+        });
+        ModelsBakedCallback.EVENT.register((manager, models, loader) -> {
+            ClientProxy.ears_baked = models.get(new ResourceLocation(Reference.MOD_ID, "block/catears"));
+        });
+        ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
+            out.accept(new ResourceLocation(Reference.MOD_ID, "block/catears"));
+        });
+        run();
+    }
+
+    @Override
     public void run() {
         OPEN_BACKPACK = new KeyMapping("key.industrialforegoing.backpack.desc", -1, "key.industrialforegoing.category");
-        EventManager.forge(RegisterKeyMappingsEvent.class).process(event -> {
-            event.register(OPEN_BACKPACK);
-        }).subscribe();
-        EventManager.forge(TickEvent.ClientTickEvent.class).process(event -> {
+        KeyBindingHelper.registerKeyBinding(OPEN_BACKPACK);
+        ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             if (OPEN_BACKPACK.consumeClick()) {
                 IndustrialForegoing.NETWORK.get().sendToServer(new BackpackOpenMessage(Screen.hasControlDown()));
             }
-        }).subscribe();
+        });
 
 
         MinecraftForge.EVENT_BUS.register(new IFClientEvents());
 
         //((IReloadableResourceManager) Minecraft.getInstance().getResourceManager()).addReloadListener(resourceManager -> FluidUtils.colorCache.clear());
 
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.CONVEYOR.getLeft().get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.CONVEYOR.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get(), RenderType.cutout());
 
         Minecraft.getInstance().getBlockColors().register((state, worldIn, pos, tintIndex) -> {
             if (tintIndex == 0 && worldIn != null && pos != null) {
@@ -159,7 +177,7 @@ public class ClientProxy extends CommonProxy {
             }
             return 0xFFFFFF;
         }, ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get());
-        Minecraft.getInstance().getItemColors().register((stack, tintIndex) -> {
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
             if (tintIndex == 1 && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
                 IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
                 if (fluidHandlerItem.getFluidInTank(0).getAmount() > 0) {
@@ -170,11 +188,13 @@ public class ClientProxy extends CommonProxy {
             return 0xFFFFFF;
         }, ModuleCore.RAW_ORE_MEAT.getBucketFluid(), ModuleCore.FERMENTED_ORE_MEAT.getBucketFluid());
 
-        EventManager.forge(ItemTooltipEvent.class).filter(event -> Registry.ITEM.getKey(event.getItemStack().getItem()).getNamespace().equals(Reference.MOD_ID)).process(event -> {
-            if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 && Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL) {
-                event.getToolTip().add(Component.literal("Press Alt + F4 to cheat this item").withStyle(ChatFormatting.DARK_AQUA));
+        ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
+            if (Registry.ITEM.getKey(stack.getItem()).getNamespace().equals(Reference.MOD_ID)) {
+                if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 1 && Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL) {
+                    lines.add(Component.literal("Press Alt + F4 to cheat this item").withStyle(ChatFormatting.DARK_AQUA));
+                }
             }
-        }).subscribe();
+        });
 
         Minecraft instance = Minecraft.getInstance();
         EntityRenderDispatcher manager = instance.getEntityRenderDispatcher();
@@ -185,67 +205,68 @@ public class ClientProxy extends CommonProxy {
             }
             return 2f;
         });
+
+        layerDefinitions();
+        onRegisterRenderers();
+
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register(ClientProxy::addLayers);
     }
 
-    @SubscribeEvent
-    public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        registerAreaRender(event, ModuleCore.FLUID_EXTRACTOR);
-        registerAreaRender(event, ModuleAgricultureHusbandry.PLANT_GATHERER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.PLANT_SOWER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.SEWER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.PLANT_FERTILIZER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.SLAUGHTER_FACTORY);
-        registerAreaRender(event, ModuleAgricultureHusbandry.ANIMAL_RANCHER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.ANIMAL_FEEDER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.ANIMAL_BABY_SEPARATOR);
-        registerAreaRender(event, ModuleAgricultureHusbandry.MOB_CRUSHER);
-        registerAreaRender(event, ModuleAgricultureHusbandry.WITHER_BUILDER);
-        registerAreaRender(event, ModuleMisc.STASIS_CHAMBER);
-        registerAreaRender(event, ModuleResourceProduction.LASER_DRILL);
+    public static void onRegisterRenderers() {
+        registerAreaRender(ModuleCore.FLUID_EXTRACTOR);
+        registerAreaRender(ModuleAgricultureHusbandry.PLANT_GATHERER);
+        registerAreaRender(ModuleAgricultureHusbandry.PLANT_SOWER);
+        registerAreaRender(ModuleAgricultureHusbandry.SEWER);
+        registerAreaRender(ModuleAgricultureHusbandry.PLANT_FERTILIZER);
+        registerAreaRender(ModuleAgricultureHusbandry.SLAUGHTER_FACTORY);
+        registerAreaRender(ModuleAgricultureHusbandry.ANIMAL_RANCHER);
+        registerAreaRender(ModuleAgricultureHusbandry.ANIMAL_FEEDER);
+        registerAreaRender(ModuleAgricultureHusbandry.ANIMAL_BABY_SEPARATOR);
+        registerAreaRender(ModuleAgricultureHusbandry.MOB_CRUSHER);
+        registerAreaRender(ModuleAgricultureHusbandry.WITHER_BUILDER);
+        registerAreaRender(ModuleMisc.STASIS_CHAMBER);
+        registerAreaRender(ModuleResourceProduction.LASER_DRILL);
 
 
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_COMMON.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_PITY.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_SIMPLE.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_ADVANCED.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_SUPREME.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_COMMON.getRight().get(), BlackHoleUnitTESR::new);
-        event.registerBlockEntityRenderer((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_COMMON.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_PITY.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_SIMPLE.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_ADVANCED.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_SUPREME.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_UNIT_COMMON.getRight().get(), BlackHoleUnitTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends BHTile>) ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getRight().get(), BlackHoleUnitTESR::new);
 
-        event.registerBlockEntityRenderer((BlockEntityType<? extends MycelialReactorTile>) ModuleGenerator.MYCELIAL_REACTOR.getRight().get(), MycelialReactorTESR::new);
+        BlockEntityRenderers.register((BlockEntityType<? extends MycelialReactorTile>) ModuleGenerator.MYCELIAL_REACTOR.getRight().get(), MycelialReactorTESR::new);
 
         event.registerEntityRenderer((EntityType<? extends InfinityTridentEntity>) ModuleTool.TRIDENT_ENTITY_TYPE.get(), InfinityTridentRenderer::new);
         event.registerEntityRenderer((EntityType<? extends InfinityNukeEntity>) ModuleTool.INFINITY_NUKE_ENTITY_TYPE.get(), InfinityNukeRenderer::new);
         event.registerEntityRenderer((EntityType<? extends InfinityLauncherProjectileEntity>) ModuleTool.INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), InfinityLauncherProjectileRenderer::new);
 
-        event.registerBlockEntityRenderer(((BlockEntityType<? extends TransporterTile>) ModuleTransportStorage.TRANSPORTER.getRight().get()), TransporterTESR::new);
+        BlockEntityRenderers.register(((BlockEntityType<? extends TransporterTile>) ModuleTransportStorage.TRANSPORTER.getRight().get()), TransporterTESR::new);
 
-        event.registerBlockEntityRenderer(((BlockEntityType<? extends ConveyorTile>) ModuleTransportStorage.CONVEYOR.getRight().get()), FluidConveyorTESR::new);
+        BlockEntityRenderers.register(((BlockEntityType<? extends ConveyorTile>) ModuleTransportStorage.CONVEYOR.getRight().get()), FluidConveyorTESR::new);
     }
 
-    private static void registerAreaRender(EntityRenderersEvent.RegisterRenderers event, Pair<RegistryObject<Block>, RegistryObject<BlockEntityType<?>>> pair) {
-        event.registerBlockEntityRenderer((BlockEntityType<? extends IndustrialAreaWorkingTile>) pair.getRight().get(), WorkingAreaTESR::new);
+    private static void registerAreaRender(Pair<RegistryObject<Block>, RegistryObject<BlockEntityType<?>>> pair) {
+        BlockEntityRenderers.register((BlockEntityType<? extends IndustrialAreaWorkingTile>) pair.getRight().get(), WorkingAreaTESR::new);
     }
 
-    @SubscribeEvent
-    public static void layerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(InfinityTridentRenderer.TRIDENT_LAYER, InfinityTridentModel::createBodyLayer);
-        event.registerLayerDefinition(InfinityNukeRenderer.NUKE_LAYER, InfinityNukeModel::createBodyLayer);
-        event.registerLayerDefinition(InfinityNukeRenderer.NUKE_ARMED_LAYER, () -> InfinityNukeModelArmed.createBodyLayer(new CubeDeformation(0f)));
-        event.registerLayerDefinition(InfinityNukeRenderer.NUKE_ARMED_BIG_LAYER, () -> InfinityNukeModelArmed.createBodyLayer(new CubeDeformation(0.2f)));
-        event.registerLayerDefinition(InfinityLauncherProjectileRenderer.PROJECTILE_LAYER, InfinityLauncherProjectileModel::createBodyLayer);
+    public static void layerDefinitions() {
+        EntityModelLayerRegistry.registerModelLayer(InfinityTridentRenderer.TRIDENT_LAYER, InfinityTridentModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(InfinityNukeRenderer.NUKE_LAYER, InfinityNukeModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(InfinityNukeRenderer.NUKE_ARMED_LAYER, () -> InfinityNukeModelArmed.createBodyLayer(new CubeDeformation(0f)));
+        EntityModelLayerRegistry.registerModelLayer(InfinityNukeRenderer.NUKE_ARMED_BIG_LAYER, () -> InfinityNukeModelArmed.createBodyLayer(new CubeDeformation(0.2f)));
+        EntityModelLayerRegistry.registerModelLayer(InfinityLauncherProjectileRenderer.PROJECTILE_LAYER, InfinityLauncherProjectileModel::createBodyLayer);
     }
 
-    @SubscribeEvent
-    public static void addLayers(EntityRenderersEvent.AddLayers event) {
-        for (String skin : event.getSkins()) {
-            PlayerRenderer renderer = event.getSkin(skin);
-            renderer.addLayer(new ContributorsCatEarsRender(renderer));
-            renderer.addLayer(new InfinityLauncherProjectileArmorLayer(renderer));
+    public static void addLayers(EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) {
+        if (entityRenderer instanceof PlayerRenderer renderer) {
+            registrationHelper.register(new ContributorsCatEarsRender(renderer));
+            registrationHelper.register(new InfinityLauncherProjectileArmorLayer(renderer));
         }
     }
 

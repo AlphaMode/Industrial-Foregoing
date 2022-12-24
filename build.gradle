@@ -88,12 +88,14 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
     //compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.5.5.174")
     // at runtime, use the full JEI jar
-    modCompileOnly("mezz.jei:jei-1.19.2-common-api:11.5.0.297")
-    modCompileOnly("mezz.jei:jei-1.19.2-fabric-api:11.5.0.297")
+//    modCompileOnly("mezz.jei:jei-1.19.2-common-api:11.5.0.297")
+//    modCompileOnly("mezz.jei:jei-1.19.2-fabric-api:11.5.0.297")
     // at runtime, use the full JEI jar for Fabric
-    modRuntimeOnly("mezz.jei:jei-1.19.2-fabric:11.5.0.297")
+//    modImplementation("mezz.jei:jei-1.19.2-fabric:11.5.0.297")
+    modCompileOnlyApi "curse.maven:jei-238222:4239205"
     modImplementation(project.dependencies.create('com.hrznstudio:titanium:1.19.2-3.7.1'))
     modImplementation(include("io.github.tropheusj:milk-lib:${project.milk_lib_version}"))
+    modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraftVersion}-fake-players"))
 
 //    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_mc_version}-${curios_version}:api")
 //    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_mc_version}-${curios_version}")

@@ -25,6 +25,8 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
@@ -99,7 +101,7 @@ public class PinkGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return Registry.ITEM.getValues().stream().map(ItemStack::new).filter(stack -> Registry.ITEM.getKey(stack.getItem()).getPath().contains("pink")).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), 69, 135)).collect(Collectors.toList());
+        return Registry.ITEM.stream().map(ItemStack::new).filter(stack -> Registry.ITEM.getKey(stack.getItem()).getPath().contains("pink")).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), 69, 135)).collect(Collectors.toList());
     }
 
     private Pair<Integer, Integer> calculate(ItemStack stack) {

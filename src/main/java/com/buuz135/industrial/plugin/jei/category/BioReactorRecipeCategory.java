@@ -23,6 +23,7 @@
 package com.buuz135.industrial.plugin.jei.category;
 
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.utils.Reference;
 import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -78,7 +79,7 @@ public class BioReactorRecipeCategory implements IRecipeCategory<BioReactorRecip
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ReactorRecipeWrapper recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 17).addIngredients(Ingredient.of(recipe.stack));
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, recipe.getFluid());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 1).setFluidRenderer(1000, false, 12, 48).setOverlay(tankOverlay, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.getFluid()));
     }
 
     public static class ReactorRecipeWrapper {

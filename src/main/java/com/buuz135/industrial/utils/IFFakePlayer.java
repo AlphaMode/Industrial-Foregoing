@@ -23,6 +23,7 @@
 package com.buuz135.industrial.utils;
 
 import com.mojang.authlib.GameProfile;
+import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -33,8 +34,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.FakePlayer;
 
 import java.util.UUID;
 

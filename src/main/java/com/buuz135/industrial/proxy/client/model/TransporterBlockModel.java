@@ -27,6 +27,7 @@ import com.buuz135.industrial.api.transporter.TransporterTypeFactory;
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
@@ -42,14 +43,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransporterBlockModel extends BakedModelWrapper<BakedModel> {
+public class TransporterBlockModel extends ForwardingBakedModel {
 
     public static Cache<Pair<Pair<String, Pair<Direction, TransporterTypeFactory.TransporterAction>>, Direction>, List<BakedQuad>> CACHE = CacheBuilder.newBuilder().build();
 
     private Map<Direction, List<BakedQuad>> prevQuads = new HashMap<>();
 
     public TransporterBlockModel(BakedModel previousConveyor) {
-        super(previousConveyor);
+        wrapped = previousConveyor;
     }
 
     @Nonnull
@@ -58,11 +59,11 @@ public class TransporterBlockModel extends BakedModelWrapper<BakedModel> {
         CACHE.invalidateAll();
         if (state == null) {
             if (!prevQuads.containsKey(side))
-                prevQuads.put(side, originalModel.getQuads(state, side, rand));
+                prevQuads.put(side, wrapped.getQuads(state, side, rand));
             return prevQuads.get(side);
         }
         if (!prevQuads.containsKey(side))
-            prevQuads.put(side, originalModel.getQuads(state, side, rand));
+            prevQuads.put(side, wrapped.getQuads(state, side, rand));
         List<BakedQuad> quads = new ArrayList<>(prevQuads.get(side));
         if (extraData.has(TransporterModelData.UPGRADE_PROPERTY)) {
             for (TransporterType upgrade : extraData.get(TransporterModelData.UPGRADE_PROPERTY).getUpgrades().values()) {

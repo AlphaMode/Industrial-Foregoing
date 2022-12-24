@@ -57,6 +57,7 @@ import mezz.jei.api.runtime.IRecipesGui;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -254,11 +255,11 @@ public class JEICustomPlugin implements IModPlugin {
         List<OreFluidEntryFermenter> fluidEntryFermenters = new ArrayList<>();
         List<OreFluidEntrySieve> fluidSieve = new ArrayList<>();
 
-        Registry.ITEM.tags().getTagNames().map(itemTagKey -> itemTagKey.location())
-                .filter(resourceLocation -> resourceLocation.toString().startsWith("forge:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation))
+        Registry.ITEM.tags.getTagNames().map(itemTagKey -> itemTagKey.location())
+                .filter(resourceLocation -> resourceLocation.toString().startsWith("c:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation))
                 .forEach(resourceLocation -> {
-                    TagKey<Item> tag = Registry.ITEM.tags().createTagKey(resourceLocation);
-                    TagKey<Item> dust = Registry.ITEM.tags().createTagKey(new ResourceLocation(resourceLocation.toString().replace("forge:raw_materials/", "forge:dusts/")));
+                    TagKey<Item> tag = TagKey.create(Registry.ITEM_REGISTRY, resourceLocation);
+                    TagKey<Item> dust = Registry.ITEM.tags().createTagKey(new ResourceLocation(resourceLocation.toString().replace("c:raw_materials/", "c:dusts/")));
                     washer.add(new OreFluidEntryRaw(tag, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 100), OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation)));
                     fluidEntryFermenters.add(new OreFluidEntryFermenter(OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation), OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 200, resourceLocation)));
                     fluidSieve.add(new OreFluidEntrySieve(OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 100, resourceLocation), TagUtil.getItemWithPreference(dust), ItemTags.SAND));

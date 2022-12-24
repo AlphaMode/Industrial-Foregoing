@@ -24,6 +24,9 @@ package com.buuz135.industrial.worlddata;
 
 import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlotExposedStorage;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -93,7 +96,7 @@ public class BackpackDataManager extends SavedData {
         return null;
     }
 
-    public static class BackpackItemHandler implements IItemHandler, INBTSerializable<CompoundTag> {
+    public static class BackpackItemHandler implements SlotExposedStorage, INBTSerializable<CompoundTag> {
 
         private List<SlotDefinition> definitionList;
         private int maxAmount;
@@ -188,9 +191,9 @@ public class BackpackDataManager extends SavedData {
         }
 
         @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        public boolean isItemValid(int slot, @Nonnull ItemVariant variant, long amount) {
             SlotDefinition def = definitionList.get(slot);
-            return def.getStack().isEmpty() || (def.getStack().sameItem(stack) && ItemStack.tagMatches(def.getStack(), stack));
+            return def.getStack().isEmpty() || (def.getStack().sameItem(variant.toStack((int) amount)) && ItemStack.tagMatches(def.getStack(), variant.toStack((int) amount)));
         }
 
         public void setMaxAmount(int maxAmount) {
@@ -244,7 +247,7 @@ public class BackpackDataManager extends SavedData {
         @Override
         public CompoundTag serializeNBT() {
             CompoundTag compoundNBT = new CompoundTag();
-            compoundNBT.put("Stack", stack.serializeNBT());
+            compoundNBT.put("Stack", NBTSerializer.serializeNBT(stack));
             compoundNBT.putInt("Amount", amount);
             compoundNBT.putBoolean("Void", voidItems);
             compoundNBT.putBoolean("Refill", refillItems);

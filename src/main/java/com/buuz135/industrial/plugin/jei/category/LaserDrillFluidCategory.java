@@ -23,6 +23,7 @@
 package com.buuz135.industrial.plugin.jei.category;
 
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.recipe.LaserDrillFluidRecipe;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.api.client.AssetTypes;
@@ -89,7 +90,7 @@ public class LaserDrillFluidCategory implements IRecipeCategory<LaserDrillFluidR
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, LaserDrillFluidRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 36, 5).addIngredients(recipe.catalyst);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 60 + 35 + 6, 6).setFluidRenderer(200, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(FabricTypes.FLUID_STACK, FluidStack.loadFluidStackFromNBT(recipe.output));
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 60 + 35 + 6, 6).setFluidRenderer(200, false, 12, 13).setOverlay(smallTank, 0, 0).addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(FluidStack.loadFluidStackFromNBT(recipe.output)));
 
     }
 

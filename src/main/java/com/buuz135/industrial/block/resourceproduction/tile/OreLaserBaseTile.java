@@ -48,6 +48,7 @@ import com.hrznstudio.titanium.util.RecipeUtil;
 import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.item.DyeColor;

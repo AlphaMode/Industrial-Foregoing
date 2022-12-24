@@ -24,6 +24,7 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
@@ -32,7 +33,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
-import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 

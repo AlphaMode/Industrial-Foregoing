@@ -116,7 +116,7 @@ public class MycelialReactorTile extends IndustrialGeneratorTile<MycelialReactor
     }
 
     @Override
-    public int getExtractingEnergy() {
+    public long getExtractingEnergy() {
         return getEnergyCapacity();
     }
 

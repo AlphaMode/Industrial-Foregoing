@@ -22,6 +22,8 @@
 
 package com.buuz135.industrial.plugin.jei;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import mezz.jei.fabric.ingredients.fluid.JeiFluidIngredient;
 import net.minecraft.world.item.ItemStack;
 
 public class JEIHelper {
@@ -32,5 +34,9 @@ public class JEIHelper {
 
     public static void openBlockUses(ItemStack stack) {
         if (isInstalled()) JEICustomPlugin.showUses(stack);
+    }
+
+    public static JeiFluidIngredient toIngredient(FluidStack stack) {
+        return new JeiFluidIngredient(stack.getFluid(), stack.getAmount(), stack.getTag());
     }
 }

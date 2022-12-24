@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.food.FoodProperties;
@@ -101,7 +102,7 @@ public class CulinaryGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return Registry.ITEM.getValues().stream().filter(Item::isEdible).map(ItemStack::new).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), calculate(item).getLeft(), calculate(item).getRight())).collect(Collectors.toList());
+        return Registry.ITEM.stream().filter(Item::isEdible).map(ItemStack::new).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), calculate(item).getLeft(), calculate(item).getRight())).collect(Collectors.toList());
     }
 
     private Pair<Integer, Integer> calculate(ItemStack stack) {
