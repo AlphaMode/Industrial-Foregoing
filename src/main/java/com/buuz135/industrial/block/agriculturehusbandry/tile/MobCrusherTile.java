@@ -169,7 +169,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
                 .withParameter(LootContextParams.KILLER_ENTITY, player)
                 .withParameter(LootContextParams.LAST_DAMAGE_PLAYER, player)
                 .withOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY, player);
-        table.getRandomItems(context.create(LootContextParamSets.ENTITY)).forEach(stack -> ItemHandlerHelper.insertItem(this.output, stack, false));
+        table.getRandomItems(context.create(LootContextParamSets.ENTITY)).forEach(stack -> TransferUtil2.insertItem(this.output, stack, false));
         List<ItemEntity> extra = new ArrayList<>();
         //Drop special items
         try {

@@ -7,6 +7,7 @@ import com.buuz135.industrial.config.machine.resourceproduction.HydroponicBedCon
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.registry.IFRegistries;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
@@ -183,7 +184,7 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
                     }
                 }
             }
-            drops.forEach(stack -> ItemHandlerHelper.insertItem(output, stack, false));
+            drops.forEach(stack -> TransferUtil2.insertItem(output, stack, false));
             if (tile instanceof IndustrialAreaWorkingTile<?> && optional.get().shouldCheckNextPlant(level, up, level.getBlockState(up))) {
                 ((IndustrialAreaWorkingTile<?>) tile).increasePointer();
             }

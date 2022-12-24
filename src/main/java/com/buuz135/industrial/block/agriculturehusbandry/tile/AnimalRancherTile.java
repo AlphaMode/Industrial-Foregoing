@@ -28,6 +28,7 @@ import com.buuz135.industrial.block.tile.RangeManager;
 import com.buuz135.industrial.config.machine.agriculturehusbandry.AnimalRancherConfig;
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.utils.ItemStackUtils;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
@@ -87,13 +88,13 @@ public class AnimalRancherTile extends IndustrialAreaWorkingTile<AnimalRancherTi
                     ItemStack shears = new ItemStack(Items.SHEARS);
                     if (mob instanceof IForgeShearable && ((IForgeShearable) mob).isShearable(shears, this.level, mob.blockPosition())) { //getPosition
                         List<ItemStack> items = ((IForgeShearable) mob).onSheared(player, shears, this.level, mob.blockPosition(), 0); //getPosition
-                        items.forEach(stack -> ItemHandlerHelper.insertItem(output, stack, false));
+                        items.forEach(stack -> TransferUtil2.insertItem(output, stack, false));
                         if (items.size() > 0) {
                             return new WorkAction(0.35f, powerPerOperation);
                         }
                     }
                     if (mob instanceof Squid && !ItemStackUtils.isInventoryFull(output) && level.random.nextBoolean() && level.random.nextBoolean() && level.random.nextBoolean() && level.random.nextBoolean()) {
-                        ItemHandlerHelper.insertItem(output, new ItemStack(Items.BLACK_DYE), false);
+                        TransferUtil2.insertItem(output, new ItemStack(Items.BLACK_DYE), false);
                         return new WorkAction(0.35f, powerPerOperation);
                     }
                     //BUCKET INTERACTION

@@ -62,7 +62,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -310,7 +309,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
 
     @Override
     public boolean canIncrease() {
-        return getRecipe().map(recipe -> recipe.canIncrease(water, lava) && ItemHandlerHelper.insertItem(inventoryGenerator, recipe.output.copy(), true).isEmpty()).orElse(false)
+        return getRecipe().map(recipe -> recipe.canIncrease(water, lava) && TransferUtil2.insertItem(inventoryGenerator, recipe.output.copy(), true).isEmpty()).orElse(false)
                 || process(inventoryThird, inventoryFourth, ACTION_RECIPES[fourthRecipeId], true)
                 || process(inventorySecond, inventoryThird, ACTION_RECIPES[thirdRecipeId], true)
                 || process(inventoryFirst, inventorySecond, ACTION_RECIPES[secondRecipeId], true)

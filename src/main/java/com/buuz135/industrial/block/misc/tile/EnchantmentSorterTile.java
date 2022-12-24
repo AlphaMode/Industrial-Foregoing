@@ -72,7 +72,7 @@ public class EnchantmentSorterTile extends IndustrialProcessingTile<EnchantmentS
 
     @Override
     public boolean canIncrease() {
-        return !input.getStackInSlot(0).isEmpty() && ((isEnchanted(input.getStackInSlot(0)) && TransferUtil2.insertItem(enchantedItems, input.getStackInSlot(0).copy(), true).isEmpty()) || (!isEnchanted(input.getStackInSlot(0)) && ItemHandlerHelper.insertItem(noEnchanted, input.getStackInSlot(0).copy(), true).isEmpty()));
+        return !input.getStackInSlot(0).isEmpty() && ((isEnchanted(input.getStackInSlot(0)) && TransferUtil2.insertItem(enchantedItems, input.getStackInSlot(0).copy(), true).isEmpty()) || (!isEnchanted(input.getStackInSlot(0)) && TransferUtil2.insertItem(noEnchanted, input.getStackInSlot(0).copy(), true) == 0));
     }
 
     @Override
