@@ -51,8 +51,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import me.alphamode.forgetags.Tags;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;

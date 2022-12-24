@@ -76,7 +76,6 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 

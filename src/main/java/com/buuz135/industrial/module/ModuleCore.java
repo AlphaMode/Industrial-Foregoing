@@ -196,17 +196,17 @@ public class ModuleCore implements IModule {
                 .addPotion(MobEffects.MOVEMENT_SLOWDOWN, 1000, 2));
 
         DISSOLUTION_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "dissolution_chamber", () -> new GenericSerializer<>(DissolutionChamberRecipe.class, DISSOLUTION_TYPE));
-        DISSOLUTION_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "dissolution_chamber", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "dissolution_chamber")));
+        DISSOLUTION_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "dissolution_chamber", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "dissolution_chamber")));
         FLUID_EXTRACTOR_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "fluid_extractor", () -> new GenericSerializer<>(FluidExtractorRecipe.class, FLUID_EXTRACTOR_TYPE));
-        FLUID_EXTRACTOR_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "fluid_extractor", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "fluid_extractor")));
+        FLUID_EXTRACTOR_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "fluid_extractor", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "fluid_extractor")));
         LASER_DRILL_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "laser_drill_ore", () -> new GenericSerializer<>(LaserDrillOreRecipe.class, LASER_DRILL_TYPE));
-        LASER_DRILL_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "laser_drill_ore", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "laser_drill_ore")));
+        LASER_DRILL_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "laser_drill_ore", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "laser_drill_ore")));
         LASER_DRILL_FLUID_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "laser_drill_fluid", () -> new GenericSerializer<>(LaserDrillFluidRecipe.class, LASER_DRILL_FLUID_TYPE));
-        LASER_DRILL_FLUID_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "laser_drill_fluid", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "laser_drill_fluid")));
+        LASER_DRILL_FLUID_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "laser_drill_fluid", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "laser_drill_fluid")));
         STONEWORK_GENERATE_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "stonework_generate", () -> new GenericSerializer<>(StoneWorkGenerateRecipe.class, STONEWORK_GENERATE_TYPE));
-        STONEWORK_GENERATE_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "stonework_generate", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "stonework_generate")));
+        STONEWORK_GENERATE_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "stonework_generate", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "stonework_generate")));
         CRUSHER_SERIALIZER = helper.registerGeneric(Registry.RECIPE_SERIALIZER_REGISTRY, "crusher", () -> new GenericSerializer<>(CrusherRecipe.class, CRUSHER_TYPE));
-        CRUSHER_TYPE = helper.registerGeneric(ForgeRegistries.RECIPE_TYPES.getRegistryKey(), "crusher", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "crusher")));
+        CRUSHER_TYPE = helper.registerGeneric(Registry.RECIPE_TYPE_REGISTRY, "crusher", () -> RecipeType.simple(new ResourceLocation(Reference.MOD_ID, "crusher")));
     }
 
     @Environment(EnvType.CLIENT)

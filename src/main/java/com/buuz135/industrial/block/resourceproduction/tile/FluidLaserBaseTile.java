@@ -46,6 +46,7 @@ import com.hrznstudio.titanium.util.RecipeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,7 +60,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public class FluidLaserBaseTile extends IndustrialMachineTile<FluidLaserBaseTile
             RecipeUtil.getRecipes(this.level, (RecipeType<LaserDrillFluidRecipe>) ModuleCore.LASER_DRILL_FLUID_TYPE.get())
                     .stream()
                     .filter(laserDrillFluidRecipe -> laserDrillFluidRecipe.catalyst.test(catalyst.getStackInSlot(0)))
-                    .filter(laserDrillFluidRecipe -> laserDrillFluidRecipe.getValidRarity(ForgeRegistries.BIOMES.getKey(this.level.getBiome(this.worldPosition).value()), this.miningDepth) != null)
+                    .filter(laserDrillFluidRecipe -> laserDrillFluidRecipe.getValidRarity(BuiltinRegistries.BIOME.getKey(this.level.getBiome(this.worldPosition).value()), this.miningDepth) != null)
                     .findFirst()
                     .ifPresent(laserDrillFluidRecipe -> {
                         if (!LaserDrillFluidRecipe.EMPTY.equals(laserDrillFluidRecipe.entity)) {

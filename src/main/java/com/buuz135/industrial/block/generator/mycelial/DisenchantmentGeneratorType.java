@@ -24,6 +24,7 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.*;
@@ -33,7 +34,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.util.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -100,7 +100,7 @@ public class DisenchantmentGeneratorType implements IMycelialGeneratorType {
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
         List<MycelialGeneratorRecipe> recipes = new ArrayList<>();
-        for (Enchantment value : ForgeRegistries.ENCHANTMENTS.getValues()) {
+        for (Enchantment value : Registry.ENCHANTMENT) {
             for (int i = value.getMinLevel(); i <= value.getMaxLevel(); i++) {
                 HashMap<Enchantment, Integer> map = new HashMap<>();
                 map.put(value, i);

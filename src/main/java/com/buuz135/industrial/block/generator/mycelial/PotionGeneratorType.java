@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.generator.mycelial;
 import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -36,7 +37,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.util.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -103,7 +103,7 @@ public class PotionGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return ForgeRegistries.POTIONS.getValues().stream().filter(potion -> potion != Potions.EMPTY).map(effect -> Arrays.asList(
+        return Registry.POTION.stream().filter(potion -> potion != Potions.EMPTY).map(effect -> Arrays.asList(
                         PotionUtils.setPotion(new ItemStack(Items.POTION), effect),
                         PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), effect),
                         PotionUtils.setPotion(new ItemStack(Items.LINGERING_POTION), effect)
