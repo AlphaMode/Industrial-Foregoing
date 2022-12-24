@@ -29,6 +29,7 @@ import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.recipe.StoneWorkGenerateRecipe;
 import com.buuz135.industrial.utils.CraftingUtils;
 import com.buuz135.industrial.utils.Reference;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
@@ -349,7 +350,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
             if (!process(inventoryThird, inventoryFourth, ACTION_RECIPES[fourthRecipeId], false) && !process(inventorySecond, inventoryThird, ACTION_RECIPES[thirdRecipeId], false) && !process(inventoryFirst, inventorySecond, ACTION_RECIPES[secondRecipeId], false) && !process(inventoryGenerator, inventoryFirst, ACTION_RECIPES[firstRecipeId], false)) {
                 getRecipe().ifPresent(recipe -> {
                     ItemStack output = recipe.output.copy();
-                    if (ItemHandlerHelper.insertItem(inventoryGenerator, output, false).isEmpty()) {
+                    if (TransferUtil2.insertItem(inventoryGenerator, output, false).isEmpty()) {
                         recipe.consume(water, lava);
                     }
                 });
@@ -374,9 +375,9 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
             if (inputStack.isEmpty()) continue;
             ItemStack outputStack = action.work.apply(this.level, inputStack.copy()).copy();
             if (outputStack.isEmpty()) continue;
-            if (ItemHandlerHelper.insertItem(output, outputStack, true).isEmpty()) {
+            if (TransferUtil2.insertItem(output, outputStack, true).isEmpty()) {
                 if (!simulate) {
-                    ItemHandlerHelper.insertItem(output, outputStack, false);
+                    TransferUtil2.insertItem(output, outputStack, false);
                     inputStack.shrink(action.getShrinkAmount());
                 }
                 return true;

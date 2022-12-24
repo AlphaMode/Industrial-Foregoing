@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.resourceproduction.tile;
 import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.resourceproduction.ResourcefulFurnaceConfig;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
@@ -152,7 +153,7 @@ public class PotionBrewerTile extends IndustrialProcessingTile<PotionBrewerTile>
             if (this.state == 0) {
                 int bottleAmount = Math.min(3, this.bottleInput.getStackInSlot(0).getCount());
                 for (int i = 0; i < bottleAmount; i++) {
-                    ItemHandlerHelper.insertItem(this.output, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), false);
+                    TransferUtil2.insertItem(this.output, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), false);
                     this.bottleInput.getStackInSlot(0).shrink(1);
                 }
                 ++this.state;

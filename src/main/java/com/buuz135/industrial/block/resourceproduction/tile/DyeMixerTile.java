@@ -26,6 +26,7 @@ import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.resourceproduction.DyeMixerConfig;
 import com.buuz135.industrial.gui.component.ItemGuiAddon;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
@@ -199,7 +200,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
         increaseBar(inputBlue.getStackInSlot(0), blue);
         ColorUsage color = colorUsages[dye];
         ItemStack dye = new ItemStack(DyeItem.byColor(DyeColor.byId(this.dye)));
-        return red.getProgress() >= color.r && green.getProgress() >= color.g && blue.getProgress() >= color.b && ItemHandlerHelper.insertItem(output, dye, true).isEmpty();
+        return red.getProgress() >= color.r && green.getProgress() >= color.g && blue.getProgress() >= color.b && TransferUtil2.insertItem(output, dye, true).isEmpty();
     }
 
     private void increaseBar(ItemStack stack, ProgressBarComponent bar) {
@@ -214,7 +215,7 @@ public class DyeMixerTile extends IndustrialProcessingTile<DyeMixerTile> {
     public Runnable onFinish() {
         return () -> {
             ItemStack dye = new ItemStack(DyeItem.byColor(DyeColor.byId(this.dye)));
-            if (ItemHandlerHelper.insertItem(output, dye, true).isEmpty()) {
+            if (TransferUtil2.insertItem(output, dye, true).isEmpty()) {
                 ColorUsage color = colorUsages[this.dye];
                 red.setProgress(red.getProgress() - color.r);
                 green.setProgress(green.getProgress() - color.g);

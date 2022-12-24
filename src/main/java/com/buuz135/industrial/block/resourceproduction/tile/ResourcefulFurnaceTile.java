@@ -26,6 +26,7 @@ import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.resourceproduction.ResourcefulFurnaceConfig;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
@@ -102,7 +103,7 @@ public class ResourcefulFurnaceTile extends IndustrialProcessingTile<Resourceful
     @Override
     public boolean canIncrease() {
         for (SmeltingRecipe recipe : this.recipes) {
-            if (recipe != null && ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), true).isEmpty())
+            if (recipe != null && TransferUtil2.insertItem(output, recipe.getResultItem().copy(), true).isEmpty())
                 return true;
         }
         return false;
@@ -113,8 +114,8 @@ public class ResourcefulFurnaceTile extends IndustrialProcessingTile<Resourceful
         return () -> {
             for (int i = 0; i < this.recipes.length; i++) {
                 SmeltingRecipe recipe = this.recipes[i];
-                if (recipe != null && ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
-                    if (ItemHandlerHelper.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
+                if (recipe != null && TransferUtil2.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
+                    if (TransferUtil2.insertItem(output, recipe.getResultItem().copy(), true).isEmpty()) {
                         input.setStackInSlot(i, ItemStack.EMPTY);
                         TransferUtil.insertItem(output, recipe.getResultItem().copy());
                         tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), (int) (recipe.getExperience() * 20)), IFluidHandler.FluidAction.EXECUTE);

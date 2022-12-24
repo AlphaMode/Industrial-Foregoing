@@ -29,6 +29,7 @@ import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.recipe.LaserDrillOreRecipe;
 import com.buuz135.industrial.utils.ItemStackUtils;
 import com.buuz135.industrial.utils.ItemStackWeightedItem;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium._impl.TagConfig;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
@@ -55,7 +56,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.text.DecimalFormat;
@@ -180,7 +180,7 @@ public class OreLaserBaseTile extends IndustrialMachineTile<OreLaserBaseTile> im
                     }).toList();
             if (!items.isEmpty()) {
                 ItemStack stack = WeightedRandom.getRandomItem(this.level.getRandom(), items).get().getStack();
-                ItemHandlerHelper.insertItem(output, stack, false);
+                TransferUtil2.insertItem(output, stack, false);
             }
         }
     }

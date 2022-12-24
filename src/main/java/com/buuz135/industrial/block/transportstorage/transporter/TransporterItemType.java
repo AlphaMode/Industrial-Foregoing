@@ -31,6 +31,7 @@ import com.buuz135.industrial.proxy.block.filter.RegulatorFilter;
 import com.buuz135.industrial.proxy.client.render.TransporterTESR;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.google.common.collect.Sets;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.TileUtil;
@@ -134,10 +135,10 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
                                     ItemStack extracted = origin.extractItem(extractSlot, amount, true);
                                     int simulatedAmount = ((TransporterItemType) transporterType).getFilter().matches(extracted, destination, ((TransporterItemType) transporterType).isRegulated());
                                     if (!extracted.isEmpty() && filter(this.getFilter(), this.isWhitelist(), extracted, origin, false) && filter(((TransporterItemType) transporterType).getFilter(), ((TransporterItemType) transporterType).isWhitelist(), origin.getStackInSlot(extractSlot), destination, ((TransporterItemType) transporterType).isRegulated()) && simulatedAmount > 0) {
-                                        ItemStack returned = ItemHandlerHelper.insertItem(destination, extracted, true);
+                                        ItemStack returned = TransferUtil2.insertItem(destination, extracted, true);
                                         if (returned.isEmpty() || amount - returned.getCount() > 0) {
                                             extracted = origin.extractItem(extractSlot, returned.isEmpty() ? simulatedAmount : simulatedAmount - returned.getCount(), false);
-                                            ItemHandlerHelper.insertItem(destination, extracted, false);
+                                            TransferUtil2.insertItem(destination, extracted, false);
                                             ((TransporterItemType) transporterType).addTransferedStack(getSide(), extracted);
                                         } else {
                                             this.extractSlot++;

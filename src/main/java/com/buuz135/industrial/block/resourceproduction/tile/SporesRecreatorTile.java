@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.resourceproduction.tile;
 import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.resourceproduction.SporeRecreatorConfig;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
@@ -82,7 +83,7 @@ public class SporesRecreatorTile extends IndustrialProcessingTile<SporesRecreato
     public boolean canIncrease() {
         return !ItemHandlerUtil.getFirstItem(input).isEmpty() && tank.getFluidAmount() >= 100
                 && (ItemHandlerUtil.getFirstItem(input).is(Tags.Items.MUSHROOMS) ? tank.getFluid().getFluid().isSame(Fluids.WATER) : tank.getFluid().getFluid().isSame(Fluids.LAVA))
-                && ItemHandlerHelper.insertItem(output, new ItemStack(ItemHandlerUtil.getFirstItem(input).getItem(), 2), true).isEmpty();
+                && TransferUtil2.insertItem(output, new ItemStack(ItemHandlerUtil.getFirstItem(input).getItem(), 2), true).isEmpty();
     }
 
     @Override
@@ -91,7 +92,7 @@ public class SporesRecreatorTile extends IndustrialProcessingTile<SporesRecreato
             ItemStack outputStack = new ItemStack(ItemHandlerUtil.getFirstItem(input).getItem(), 2);
             tank.drainForced(100, IFluidHandler.FluidAction.EXECUTE);
             ItemHandlerUtil.getFirstItem(input).shrink(1);
-            ItemHandlerHelper.insertItem(output, outputStack, false);
+            TransferUtil2.insertItem(output, outputStack, false);
         };
     }
 

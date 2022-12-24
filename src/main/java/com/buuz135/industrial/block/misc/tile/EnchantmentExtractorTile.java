@@ -28,6 +28,7 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleMisc;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.ItemStackUtils;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
@@ -146,12 +147,12 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
                     if (map.keySet().stream().allMatch(Enchantment::isCurse)) {
                         ItemStack output = input.copy();
                         input.shrink(1);
-                        ItemHandlerHelper.insertItem(this.outputNoEnchantedItem, output, false);
+                        TransferUtil2.insertItem(this.outputNoEnchantedItem, output, false);
                     } else if (map.size() == 1) {
                         ItemStack output = removeEnchantments(input, input.getDamageValue(), input.getCount());
                         input.shrink(1);
-                        ItemHandlerHelper.insertItem(this.outputNoEnchantedItem, output, false);
-                        ItemHandlerHelper.insertItem(this.outputEnchantedBook, book, false);
+                        TransferUtil2.insertItem(this.outputNoEnchantedItem, output, false);
+                        TransferUtil2.insertItem(this.outputEnchantedBook, book, false);
                         this.inputBook.getStackInSlot(0).shrink(1);
                     } else {
                         Map<Enchantment, Integer> cleanMap = EnchantmentHelper.getEnchantments(input).entrySet().stream().filter((enchantmentPair) -> !enchantmentPair.getKey().equals(selected)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -160,7 +161,7 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
                             input.removeTagKey("StoredEnchantments");
                         }
                         EnchantmentHelper.setEnchantments(cleanMap, input);
-                        ItemHandlerHelper.insertItem(this.outputEnchantedBook, book, false);
+                        TransferUtil2.insertItem(this.outputEnchantedBook, book, false);
                         this.inputBook.getStackInSlot(0).shrink(1);
                     }
                 }
@@ -168,7 +169,7 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
                 int essence = getEnchantmentXp(input) * 20;
                 ItemStack output = removeEnchantments(input, input.getDamageValue(), input.getCount());
                 input.shrink(1);
-                ItemHandlerHelper.insertItem(this.outputNoEnchantedItem, output, false);
+                TransferUtil2.insertItem(this.outputNoEnchantedItem, output, false);
                 this.tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), essence), IFluidHandler.FluidAction.EXECUTE);
             }
         };

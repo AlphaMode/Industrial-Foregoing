@@ -26,6 +26,7 @@ import com.buuz135.industrial.config.machine.resourceproduction.FluidSievingMach
 import com.buuz135.industrial.fluid.OreTitaniumFluidType;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
@@ -91,7 +92,7 @@ public class FluidSievingMachineTile extends IndustrialProcessingTile<FluidSievi
 
     @Override
     public boolean canIncrease() {
-        return this.input.getFluidAmount() >= 100 && !InventoryUtil.getStacks(this.sand).isEmpty() && ItemHandlerHelper.insertItem(this.output, OreTitaniumFluidType.getOutputDust(this.input.getFluid()), true).isEmpty();
+        return this.input.getFluidAmount() >= 100 && !InventoryUtil.getStacks(this.sand).isEmpty() && TransferUtil2.insertItem(this.output, OreTitaniumFluidType.getOutputDust(this.input.getFluid()), true).isEmpty();
     }
 
     @Override
@@ -104,7 +105,7 @@ public class FluidSievingMachineTile extends IndustrialProcessingTile<FluidSievi
                 }
             }
             ItemStack output = OreTitaniumFluidType.getOutputDust(this.input.getFluid());
-            ItemHandlerHelper.insertItem(this.output, output, false);
+            TransferUtil2.insertItem(this.output, output, false);
             this.input.drainForced(100, IFluidHandler.FluidAction.EXECUTE);
         };
     }

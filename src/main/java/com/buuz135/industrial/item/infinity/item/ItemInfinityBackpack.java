@@ -55,6 +55,7 @@ import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.ChatFormatting;

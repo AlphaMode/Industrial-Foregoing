@@ -28,6 +28,7 @@ import com.buuz135.industrial.block.tile.RangeManager;
 import com.buuz135.industrial.config.machine.resourceproduction.BlockBreakerConfig;
 import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.utils.BlockUtils;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
@@ -69,7 +70,7 @@ public class BlockBreakerTile extends IndustrialAreaWorkingTile<BlockBreakerTile
                 fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.NETHERITE_PICKAXE));
                 if (this.level.getBlockState(pointed).getDestroySpeed(this.level, pointed) >= 0 && this.level.getBlockState(pointed).canHarvestBlock(this.level, pointed, fakePlayer)) {
                     for (ItemStack blockDrop : BlockUtils.getBlockDrops(this.level, pointed)) {
-                        ItemStack result = ItemHandlerHelper.insertItem(output, blockDrop, false);
+                        ItemStack result = TransferUtil2.insertItem(output, blockDrop, false);
                         if (!result.isEmpty()) {
                             BlockUtils.spawnItemStack(result, this.level, pointed);
                         }

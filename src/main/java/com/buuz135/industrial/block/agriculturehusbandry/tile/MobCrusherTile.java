@@ -29,6 +29,7 @@ import com.buuz135.industrial.item.addon.RangeAddonItem;
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.utils.IndustrialTags;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
@@ -182,7 +183,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
         }
         ForgeHooks.onLivingDrops(entity, source, extra, looting, true);
         extra.forEach(itemEntity -> {
-            ItemHandlerHelper.insertItem(this.output, itemEntity.getItem(), false);
+            TransferUtil2.insertItem(this.output, itemEntity.getItem(), false);
             itemEntity.remove(Entity.RemovalReason.KILLED);
         });
         if (dropXP)

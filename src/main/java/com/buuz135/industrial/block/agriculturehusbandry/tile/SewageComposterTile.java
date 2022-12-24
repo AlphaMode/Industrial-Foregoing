@@ -26,6 +26,7 @@ import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.agriculturehusbandry.SewageComposterConfig;
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleCore;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
@@ -68,14 +69,14 @@ public class SewageComposterTile extends IndustrialProcessingTile<SewageComposte
 
     @Override
     public boolean canIncrease() {
-        return sewage.getFluidAmount() >= 1000 && ItemHandlerHelper.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), true).isEmpty();
+        return sewage.getFluidAmount() >= 1000 && TransferUtil2.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), true).isEmpty();
     }
 
     @Override
     public Runnable onFinish() {
         return () -> {
             sewage.drainForced(1000, IFluidHandler.FluidAction.EXECUTE);
-            ItemHandlerHelper.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), false);
+            TransferUtil2.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), false);
         };
     }
 

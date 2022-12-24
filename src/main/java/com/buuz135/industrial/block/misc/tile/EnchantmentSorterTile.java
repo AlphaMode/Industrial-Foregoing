@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.misc.tile;
 import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.misc.EnchantmentSorterConfig;
 import com.buuz135.industrial.module.ModuleMisc;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
@@ -71,7 +72,7 @@ public class EnchantmentSorterTile extends IndustrialProcessingTile<EnchantmentS
 
     @Override
     public boolean canIncrease() {
-        return !input.getStackInSlot(0).isEmpty() && ((isEnchanted(input.getStackInSlot(0)) && ItemHandlerHelper.insertItem(enchantedItems, input.getStackInSlot(0).copy(), true).isEmpty()) || (!isEnchanted(input.getStackInSlot(0)) && ItemHandlerHelper.insertItem(noEnchanted, input.getStackInSlot(0).copy(), true).isEmpty()));
+        return !input.getStackInSlot(0).isEmpty() && ((isEnchanted(input.getStackInSlot(0)) && TransferUtil2.insertItem(enchantedItems, input.getStackInSlot(0).copy(), true).isEmpty()) || (!isEnchanted(input.getStackInSlot(0)) && ItemHandlerHelper.insertItem(noEnchanted, input.getStackInSlot(0).copy(), true).isEmpty()));
     }
 
     @Override

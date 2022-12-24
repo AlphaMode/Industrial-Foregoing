@@ -25,6 +25,7 @@ package com.buuz135.industrial.block.core.tile;
 import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.core.LatexProcessingUnitConfig;
 import com.buuz135.industrial.module.ModuleCore;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
@@ -68,7 +69,7 @@ public class LatexProcessingUnitTile extends IndustrialProcessingTile<LatexProce
 
     @Override
     public boolean canIncrease() {
-        return latex.getFluidAmount() >= AMOUNT_LATEX && water.getFluidAmount() >= AMOUNT_WATER && ItemHandlerHelper.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()), true).isEmpty();
+        return latex.getFluidAmount() >= AMOUNT_LATEX && water.getFluidAmount() >= AMOUNT_WATER && TransferUtil2.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()), true).isEmpty();
     }
 
     @Override

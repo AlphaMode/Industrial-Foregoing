@@ -27,6 +27,7 @@ import com.buuz135.industrial.config.machine.resourceproduction.SludgeRefinerCon
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleResourceProduction;
 import com.buuz135.industrial.utils.IndustrialTags;
+import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
@@ -79,7 +80,7 @@ public class SludgeRefinerTile extends IndustrialProcessingTile<SludgeRefinerTil
         return () -> {
             Optional<Item> optionalItem = Registry.ITEM.tags().getTag(IndustrialTags.Items.SLUDGE_OUTPUT).getRandomElement(this.level.random);
             optionalItem.ifPresent(item -> {
-                if (ItemHandlerHelper.insertItem(output, new ItemStack(item), true).isEmpty()) {
+                if (TransferUtil2.insertItem(output, new ItemStack(item), true).isEmpty()) {
                     sludge.drainForced(500, IFluidHandler.FluidAction.EXECUTE);
                     TransferUtil.insertItem(output, new ItemStack(item));
                 }
