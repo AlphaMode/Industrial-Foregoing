@@ -117,7 +117,7 @@ public class MechanicalDirtTile extends IndustrialWorkingTile<MechanicalDirtTile
             for (Direction direction : Direction.Plane.HORIZONTAL) {
                 BlockEntity tile = level.getBlockEntity(worldPosition.relative(direction));
                 if (tile instanceof MechanicalDirtTile) {
-                    int difference = meat.getFluidAmount() - ((MechanicalDirtTile) tile).getMeat().getFluidAmount();
+                    long difference = meat.getFluidAmount() - ((MechanicalDirtTile) tile).getMeat().getFluidAmount();
                     if (difference > 0) {
                         if (difference <= 25) difference = difference / 2;
                         else difference = 25;
@@ -125,11 +125,11 @@ public class MechanicalDirtTile extends IndustrialWorkingTile<MechanicalDirtTile
                             meat.drainForced(((MechanicalDirtTile) tile).getMeat().fill(new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), meat.drainForced(difference, IFluidHandler.FluidAction.SIMULATE).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                         }
                     }
-                    difference = getEnergyStorage().getEnergyStored() - ((MechanicalDirtTile) tile).getEnergyStorage().getEnergyStored();
+                    difference = getEnergyStorage().getAmount() - ((MechanicalDirtTile) tile).getEnergyStorage().getAmount();
                     if (difference > 0) {
                         if (difference <= 1000 && difference > 1) difference = difference / 2;
                         if (difference > 1000) difference = 1000;
-                        if (getEnergyStorage().getEnergyStored() >= difference) {
+                        if (getEnergyStorage().getAmount() >= difference) {
                             getEnergyStorage().extractEnergy(((MechanicalDirtTile) tile).getEnergyStorage().receiveEnergy(difference, false), false);
                         }
                     }

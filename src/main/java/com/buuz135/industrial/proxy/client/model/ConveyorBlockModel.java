@@ -27,6 +27,7 @@ import com.buuz135.industrial.block.transportstorage.ConveyorBlock;
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
@@ -44,14 +45,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConveyorBlockModel extends BakedModelWrapper<BakedModel> {
+public class ConveyorBlockModel extends ForwardingBakedModel<BakedModel> {
 
     public static Cache<Pair<Pair<String, Pair<Direction, Direction>>, Direction>, List<BakedQuad>> CACHE = CacheBuilder.newBuilder().build();
 
     private Map<Direction, List<BakedQuad>> prevQuads = new HashMap<>();
 
     public ConveyorBlockModel(BakedModel previousConveyor) {
-        super(previousConveyor);
+        wrapped = previousConveyor;
     }
 
     @Nonnull
@@ -59,11 +60,11 @@ public class ConveyorBlockModel extends BakedModelWrapper<BakedModel> {
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, RenderType renderType) {
         if (state == null) {
             if (!prevQuads.containsKey(side))
-                prevQuads.put(side, originalModel.getQuads(state, side, rand));
+                prevQuads.put(side, wrapped.getQuads(state, side, rand));
             return prevQuads.get(side);
         }
         if (!prevQuads.containsKey(side))
-            prevQuads.put(side, originalModel.getQuads(state, side, rand));
+            prevQuads.put(side, wrapped.getQuads(state, side, rand));
         List<BakedQuad> quads = new ArrayList<>(prevQuads.get(side));
         if (extraData.has(ConveyorModelData.UPGRADE_PROPERTY)) {
             for (ConveyorUpgrade upgrade : extraData.get(ConveyorModelData.UPGRADE_PROPERTY).getUpgrades().values()) {

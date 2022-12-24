@@ -52,7 +52,7 @@ public class OreBucketItem extends BucketItem {
     private static final String NBT_TAG = "Tag";
 
     public OreBucketItem(Supplier<? extends Fluid> supplier, Properties builder) {
-        super(supplier, builder);
+        super(supplier.get(), builder);
     }
 
     @Override

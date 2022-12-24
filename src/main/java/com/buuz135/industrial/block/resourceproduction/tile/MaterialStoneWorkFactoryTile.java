@@ -74,7 +74,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
     public static ResourceLocation DEFAULT = new ResourceLocation(Reference.MOD_ID, "stonework_generate/cobblestone");
 
     private int maxProgress;
-    private int powerPerOperation;
+    private long powerPerOperation;
 
     public static StoneWorkAction[] ACTION_RECIPES = new StoneWorkAction[]{
             new StoneWorkAction(new ItemStack(Blocks.FURNACE), (world1, itemStack) -> {
@@ -358,7 +358,7 @@ public class MaterialStoneWorkFactoryTile extends IndustrialProcessingTile<Mater
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return powerPerOperation;
     }
 

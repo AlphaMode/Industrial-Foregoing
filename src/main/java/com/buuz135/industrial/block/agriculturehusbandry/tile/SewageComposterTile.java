@@ -44,7 +44,7 @@ import javax.annotation.Nonnull;
 public class SewageComposterTile extends IndustrialProcessingTile<SewageComposterTile> {
 
     private int maxProgress;
-    private int powerPerTick;
+    private long powerPerTick;
 
     @Save
     public SidedFluidTankComponent<SewageComposterTile> sewage;
@@ -91,7 +91,7 @@ public class SewageComposterTile extends IndustrialProcessingTile<SewageComposte
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return powerPerTick;
     }
 

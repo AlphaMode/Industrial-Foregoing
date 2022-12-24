@@ -30,7 +30,9 @@ import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.proxy.client.model.TransporterModelData;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -53,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransporterTile extends ActiveTile<TransporterTile> implements IBlockContainer<TransporterTypeFactory> {
+public class TransporterTile extends ActiveTile<TransporterTile> implements IBlockContainer<TransporterTypeFactory>, RenderAttachmentBlockEntity {
 
     private Map<Direction, TransporterType> transporterTypeMap = new HashMap<>();
 
@@ -109,7 +111,6 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
         if (!hasUpgrade(facing)) {
             transporterTypeMap.put(facing, factory.create(this, facing, TransporterTypeFactory.TransporterAction.EXTRACT));
             requestSync();
-            if (level.isClientSide) this.getLevel().getModelDataManager().requestRefresh(this);
         }
     }
 
@@ -127,7 +128,6 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
             transporterTypeMap.get(facing).onUpgradeRemoved();
             transporterTypeMap.remove(facing);
             requestSync();
-            if (level.isClientSide) this.getLevel().getModelDataManager().requestRefresh(this);
         }
         if (transporterTypeMap.isEmpty()) {
             this.level.setBlockAndUpdate(this.worldPosition, Blocks.AIR.defaultBlockState());
@@ -156,7 +156,7 @@ public class TransporterTile extends ActiveTile<TransporterTile> implements IBlo
 
     @Nonnull
     @Override
-    public ModelData getModelData() {
+    public ModelData getRenderAttachmentData() {
         return ModelData.builder().with(TransporterModelData.UPGRADE_PROPERTY, new TransporterModelData(new HashMap<>(transporterTypeMap))).build();
     }
 

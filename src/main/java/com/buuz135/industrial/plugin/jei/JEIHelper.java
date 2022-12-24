@@ -26,6 +26,8 @@ import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import mezz.jei.fabric.ingredients.fluid.JeiFluidIngredient;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
+
 public class JEIHelper {
 
     public static boolean isInstalled() {
@@ -38,5 +40,9 @@ public class JEIHelper {
 
     public static JeiFluidIngredient toIngredient(FluidStack stack) {
         return new JeiFluidIngredient(stack.getFluid(), stack.getAmount(), stack.getTag());
+    }
+
+    public static List<JeiFluidIngredient> toIngredients(List<FluidStack> stack) {
+        return stack.stream().map(fluidStack -> new JeiFluidIngredient(fluidStack.getFluid(), fluidStack.getAmount(), fluidStack.getTag())).toList();
     }
 }

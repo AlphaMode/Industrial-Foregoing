@@ -23,6 +23,8 @@
 package com.buuz135.industrial.utils;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -43,7 +45,7 @@ public class ItemStackUtils {
     public static ResourceLocation getOreTag(ItemStack stack) {
         Item item = stack.getItem();
         for (ResourceLocation resourceLocation : Registry.ITEM.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
-            if (resourceLocation.toString().startsWith("forge:raw_materials/")) {
+            if (resourceLocation.toString().startsWith("c:raw_materials/")) {
                 return resourceLocation;
             }
         }
@@ -62,7 +64,7 @@ public class ItemStackUtils {
     }
 
     public static boolean acceptsFluidItem(ItemStack stack) {
-        return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent();// && !stack.getItem().equals(ForgeModContainer.getInstance().universalBucket);
+        return ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM) != null;// && !stack.getItem().equals(ForgeModContainer.getInstance().universalBucket);
     }
 
 

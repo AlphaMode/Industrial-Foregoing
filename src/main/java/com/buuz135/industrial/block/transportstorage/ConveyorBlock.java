@@ -33,6 +33,7 @@ import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.RayTraceUtils;
 import com.hrznstudio.titanium.util.TileUtil;
 import io.github.fabricators_of_create.porting_lib.block.ValidSpawnBlock;
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -84,7 +85,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class ConveyorBlock extends BasicTileBlock<ConveyorTile> implements SimpleWaterloggedBlock, IRecipeProvider, ValidSpawnBlock {
+public class ConveyorBlock extends BasicTileBlock<ConveyorTile> implements SimpleWaterloggedBlock, IRecipeProvider, ValidSpawnBlock, BlockPickInteractionAware {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -123,7 +124,7 @@ public class ConveyorBlock extends BasicTileBlock<ConveyorTile> implements Simpl
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
+    public ItemStack getPickedStack(BlockState state, BlockGetter world, BlockPos pos, Player player, HitResult target) {
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof ConveyorTile) {
             if (target instanceof DistanceRayTraceResult) {
@@ -134,7 +135,7 @@ public class ConveyorBlock extends BasicTileBlock<ConveyorTile> implements Simpl
             }
             return new ItemStack(this, 1);
         }
-        return super.getCloneItemStack(state, target, world, pos, player);
+        return new ItemStack(this);
     }
 
     @Override

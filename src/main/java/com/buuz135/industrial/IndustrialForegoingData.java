@@ -36,7 +36,7 @@ public class IndustrialForegoingData implements DataGeneratorEntrypoint {
                         .collect(Collectors.toList())
         );
         generator.addProvider(IndustrialTagsProvider.Blocks::new);
-        generator.addProvider(true, new IndustrialTagsProvider.Items(generator, Reference.MOD_ID, event.getExistingFileHelper()));
+        generator.addProvider(IndustrialTagsProvider.Items::new);
         generator.addProvider(true, new IndustrialRecipeProvider(generator, blocksToProcess));
         generator.addProvider(true, new IndustrialSerializableProvider(generator, Reference.MOD_ID));
         generator.addProvider(true, new TitaniumLootTableProvider(generator, blocksToProcess));

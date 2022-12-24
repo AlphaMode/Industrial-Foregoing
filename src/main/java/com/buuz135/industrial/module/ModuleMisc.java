@@ -27,6 +27,7 @@ import com.buuz135.industrial.block.misc.*;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
+import io.github.fabricators_of_create.porting_lib.event.common.LivingEntityEvents;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -48,12 +49,14 @@ public class ModuleMisc implements IModule {
 
     @Override
     public void generateFeatures(DeferredRegistryHelper helper) {
-        EventManager.forge(LivingEvent.LivingTickEvent.class).filter(livingUpdateEvent -> livingUpdateEvent.getEntity() instanceof Mob && livingUpdateEvent.getEntity().getPersistentData().contains("StasisChamberTime")).process(livingUpdateEvent -> {
-            long time = livingUpdateEvent.getEntity().getPersistentData().getLong("StasisChamberTime");
-            if (time + 50 <= livingUpdateEvent.getEntity().level.getGameTime()) {
-                ((Mob) livingUpdateEvent.getEntity()).setNoAi(false);
+        LivingEntityEvents.TICK.register(livingEntity -> {
+            if (livingEntity instanceof Mob && livingEntity.getExtraCustomData().contains("StasisChamberTime")) {
+                long time = livingEntity.getExtraCustomData().getLong("StasisChamberTime");
+                if (time + 50 <= livingEntity.level.getGameTime()) {
+                    ((Mob) livingEntity).setNoAi(false);
+                }
             }
-        }).subscribe();
+        });
         TAB_MISC.addIconStack(() -> new ItemStack(STASIS_CHAMBER.getLeft().get()));
     }
 }

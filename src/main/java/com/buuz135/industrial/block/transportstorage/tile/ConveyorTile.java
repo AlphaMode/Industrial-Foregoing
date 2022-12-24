@@ -33,9 +33,11 @@ import com.buuz135.industrial.proxy.client.model.ConveyorModelData;
 import com.buuz135.industrial.utils.MovementUtils;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -63,7 +65,7 @@ import java.util.Map;
 import static com.buuz135.industrial.block.transportstorage.ConveyorBlock.FACING;
 import static com.buuz135.industrial.block.transportstorage.ConveyorBlock.TYPE;
 
-public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockContainer<ConveyorUpgradeFactory> {
+public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockContainer<ConveyorUpgradeFactory>, RenderAttachmentBlockEntity {
 
     private Direction facing;
     private EnumType type;
@@ -125,7 +127,6 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
         if (!hasUpgrade(facing)) {
             upgradeMap.put(facing, upgrade.create(this, facing));
             requestSync();
-            if (level.isClientSide) this.getLevel().getModelDataManager().requestRefresh(this);
         }
     }
 
@@ -143,7 +144,6 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
             upgradeMap.get(facing).onUpgradeRemoved();
             upgradeMap.remove(facing);
             requestSync();
-            if (level.isClientSide) this.getLevel().getModelDataManager().requestRefresh(this);
         }
     }
 
@@ -304,7 +304,7 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
         if (!level.isClientSide && tank.getFluidAmount() > 0 && level.getGameTime() % 3 == 0 && level.getBlockState(this.worldPosition.relative(facing)).getBlock() instanceof ConveyorBlock && level.getBlockEntity(this.worldPosition.relative(facing)) instanceof ConveyorTile) {
             BlockState state1 = level.getBlockState(this.worldPosition.relative(facing));
             if (!state1.getValue(ConveyorBlock.TYPE).isVertical()) {
-                int amount = Math.max(tank.getFluidAmount() - 1, 1);
+                long amount = Math.max(tank.getFluidAmount() - 1, 1);
                 ConveyorTile conveyorTile = (ConveyorTile) level.getBlockEntity(this.worldPosition.relative(facing));
                 FluidStack drained = tank.drain(conveyorTile.getTank().fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                 if (!drained.isEmpty() && drained.getAmount() > 0) {
@@ -352,7 +352,7 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
 
     @Nonnull
     @Override
-    public ModelData getModelData() {
+    public ModelData getRenderAttachmentData() {
         return ModelData.builder().with(ConveyorModelData.UPGRADE_PROPERTY, new ConveyorModelData(new HashMap<>(upgradeMap))).build();
     }
 

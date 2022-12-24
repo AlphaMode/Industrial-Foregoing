@@ -22,10 +22,13 @@
 
 package com.buuz135.industrial.utils;
 
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,17 +40,17 @@ public class FluidUtils {
     public static ConcurrentHashMap<ResourceLocation, Integer> colorCache = new ConcurrentHashMap<>();
 
     public static int getFluidColor(FluidStack stack) {
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(stack.getFluid());
-        ResourceLocation location = renderProperties.getStillTexture(stack);
-        int tint = renderProperties.getTintColor(stack);
-        int textureColor = colorCache.computeIfAbsent(location, ColorUtils::getColorFrom);
+        FluidVariantRenderHandler renderProperties = FluidVariantRendering.getHandlerOrDefault(stack.getFluid());
+        TextureAtlasSprite location = renderProperties.getSprites(stack.getType())[0];
+        int tint = renderProperties.getColor(stack.getType(), null, null);
+        int textureColor = colorCache.computeIfAbsent(location.getName(), ColorUtils::getColorFrom);
         return FastColor.ARGB32.multiply(textureColor, tint);
     }
 
     public static int getFluidColor(Fluid fluid) {
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluid);
-        ResourceLocation location = renderProperties.getStillTexture();
-        int tint = renderProperties.getTintColor();
+        FluidVariantRenderHandler renderProperties = FluidVariantRendering.getHandlerOrDefault(fluid);
+        ResourceLocation location = renderProperties.getSprites(FluidVariant.of(fluid))[0].getName();
+        int tint = renderProperties.getColor(FluidVariant.of(fluid), null, null);
         int textureColor = colorCache.computeIfAbsent(location, ColorUtils::getColorFrom);
         return FastColor.ARGB32.multiply(textureColor, tint);
     }

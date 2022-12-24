@@ -32,6 +32,7 @@ import com.buuz135.industrial.utils.IFFakePlayer;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
@@ -41,7 +42,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 

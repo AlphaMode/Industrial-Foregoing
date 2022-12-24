@@ -255,11 +255,11 @@ public class JEICustomPlugin implements IModPlugin {
         List<OreFluidEntryFermenter> fluidEntryFermenters = new ArrayList<>();
         List<OreFluidEntrySieve> fluidSieve = new ArrayList<>();
 
-        Registry.ITEM.tags.getTagNames().map(itemTagKey -> itemTagKey.location())
+        Registry.ITEM.tags.keySet().stream().map(itemTagKey -> itemTagKey.location())
                 .filter(resourceLocation -> resourceLocation.toString().startsWith("c:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation))
                 .forEach(resourceLocation -> {
                     TagKey<Item> tag = TagKey.create(Registry.ITEM_REGISTRY, resourceLocation);
-                    TagKey<Item> dust = Registry.ITEM.tags().createTagKey(new ResourceLocation(resourceLocation.toString().replace("c:raw_materials/", "c:dusts/")));
+                    TagKey<Item> dust = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(resourceLocation.toString().replace("c:raw_materials/", "c:dusts/")));
                     washer.add(new OreFluidEntryRaw(tag, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 100), OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation)));
                     fluidEntryFermenters.add(new OreFluidEntryFermenter(OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation), OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 200, resourceLocation)));
                     fluidSieve.add(new OreFluidEntrySieve(OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, 100, resourceLocation), TagUtil.getItemWithPreference(dust), ItemTags.SAND));

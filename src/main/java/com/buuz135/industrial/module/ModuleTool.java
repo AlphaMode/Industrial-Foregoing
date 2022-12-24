@@ -37,9 +37,11 @@ import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.network.IButtonHandler;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
@@ -84,12 +86,12 @@ public class ModuleTool implements IModule {
                 .setCustomClientFactory((spawnEntity, world) -> new InfinityTridentEntity((EntityType<? extends InfinityTridentEntity>) TRIDENT_ENTITY_TYPE.get(), world)).clientTrackingRange(4).updateInterval(20).build("trident_entity"));
         INFINITY_BACKPACK = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_backpack", () -> new ItemInfinityBackpack());
         INFINITY_LAUNCHER = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_launcher", () -> new ItemInfinityLauncher(TAB_TOOL));
-        INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE = registryHelper.registerEntityType("launcher_projectile_entity", () -> EntityType.Builder.<InfinityLauncherProjectileEntity>of(InfinityLauncherProjectileEntity::new, MobCategory.MISC).sized(0.5F, 0.5F)
-                .setShouldReceiveVelocityUpdates(true)
+        INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE = registryHelper.registerEntityType("launcher_projectile_entity", () -> FabricEntityTypeBuilder.<InfinityLauncherProjectileEntity>create(MobCategory.MISC, InfinityLauncherProjectileEntity::new).dimensions(EntityDimensions.fixed(0.5F, 0.5F))
+                .forceTrackedVelocityUpdates(true)
                 .setCustomClientFactory((spawnEntity, world) -> new InfinityLauncherProjectileEntity((EntityType<? extends InfinityLauncherProjectileEntity>) INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), world)).clientTrackingRange(4).updateInterval(20).build("launcher_projectile_entity"));
         INFINITY_NUKE = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_nuke", () -> new ItemInfinityNuke(TAB_TOOL));
-        INFINITY_NUKE_ENTITY_TYPE = registryHelper.registerEntityType("infinity_nuke", () -> EntityType.Builder.<InfinityNukeEntity>of(InfinityNukeEntity::new, MobCategory.MISC).sized(0.5F, 1.5F)
-                .setShouldReceiveVelocityUpdates(true)
+        INFINITY_NUKE_ENTITY_TYPE = registryHelper.registerEntityType("infinity_nuke", () -> FabricEntityTypeBuilder.<InfinityNukeEntity>create(MobCategory.MISC, InfinityNukeEntity::new).dimensions(EntityDimensions.fixed(0.5F, 1.5F))
+                .forceTrackedVelocityUpdates(true)
                 .setCustomClientFactory((spawnEntity, world) -> new InfinityNukeEntity((EntityType<? extends InfinityNukeEntity>) INFINITY_NUKE_ENTITY_TYPE.get(), world)).fireImmune().clientTrackingRange(8).updateInterval(20).build("infinity_nuke"));
         NUKE_CHARGING = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_charging", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_charging")));
         NUKE_ARMING = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_arming", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_arming")));

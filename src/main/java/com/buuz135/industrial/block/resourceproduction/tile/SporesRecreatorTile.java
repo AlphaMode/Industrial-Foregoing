@@ -46,7 +46,7 @@ import javax.annotation.Nonnull;
 
 public class SporesRecreatorTile extends IndustrialProcessingTile<SporesRecreatorTile> {
 
-    private int getPowerPerTick;
+    private long getPowerPerTick;
 
     @Save
     private SidedFluidTankComponent<SporesRecreatorTile> tank;
@@ -102,7 +102,7 @@ public class SporesRecreatorTile extends IndustrialProcessingTile<SporesRecreato
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return getPowerPerTick;
     }
 

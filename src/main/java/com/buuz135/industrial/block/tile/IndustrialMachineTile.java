@@ -37,6 +37,7 @@ import com.hrznstudio.titanium.component.bundle.TankInteractionBundle;
 import com.hrznstudio.titanium.component.button.RedstoneControlButtonComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.item.AugmentWrapper;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -69,7 +70,7 @@ public abstract class IndustrialMachineTile<T extends IndustrialMachineTile<T>> 
     public void addTank(FluidTankComponent<T> tank) {
         super.addTank(tank);
         if (!tankBundleAdded) {
-            this.addBundle(tankBundle = new TankInteractionBundle<>(() -> this.getCapability(ForgeCapabilities.FLUID_HANDLER), 175, 94, this, 10));
+            this.addBundle(tankBundle = new TankInteractionBundle<>(() -> TransferUtil.getFluidStorage(this), 175, 94, this, 10));
             this.tankBundleAdded = true;
         }
     }

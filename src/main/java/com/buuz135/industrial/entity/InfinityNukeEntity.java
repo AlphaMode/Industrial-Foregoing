@@ -27,6 +27,7 @@ import com.buuz135.industrial.proxy.client.sound.TickeableSound;
 import com.buuz135.industrial.utils.TransferUtil2;
 import com.buuz135.industrial.utils.explosion.ExplosionTickHandler;
 import com.buuz135.industrial.utils.explosion.ProcessExplosion;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -35,6 +36,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -153,7 +155,7 @@ public class InfinityNukeEntity extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.put("Original", this.getOriginal().serializeNBT());
+        compound.put("Original", NBTSerializer.serializeNBT(this.getOriginal()));
         compound.putBoolean("Exploding", this.isExploding());
         compound.putBoolean("Armed", this.isArmed());
         compound.putInt("TicksExploding", this.getTicksExploding());
@@ -171,7 +173,7 @@ public class InfinityNukeEntity extends Entity {
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override
