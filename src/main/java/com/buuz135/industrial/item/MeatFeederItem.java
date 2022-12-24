@@ -25,6 +25,13 @@ package com.buuz135.industrial.item;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTool;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import me.alphamode.forgetags.Tags;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
@@ -35,12 +42,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import me.alphamode.forgetags.Tags;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
@@ -80,16 +81,6 @@ public class MeatFeederItem extends IFCustomItem {
         }
     }
 
-    public int getFilledAmount(ItemStack stack) {
-        FluidHandlerItemStack handlerItemStack = (FluidHandlerItemStack) stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseThrow(RuntimeException::new);
-        return (handlerItemStack.getFluid() == null ? 0 : handlerItemStack.getFluid().getAmount());
-    }
-
-    public void drain(ItemStack stack, int amount) {
-        FluidHandlerItemStack handlerItemStack = (FluidHandlerItemStack) stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseThrow(RuntimeException::new);
-        handlerItemStack.drain(new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), amount), IFluidHandler.FluidAction.EXECUTE);
-    }
-
     @Override
     public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
@@ -97,20 +88,27 @@ public class MeatFeederItem extends IFCustomItem {
             Player player = (Player) entityIn;
             if (player.getFoodData().needsFood() || player.getFoodData().getSaturationLevel() < 10) {
                 if (stack.getItem().equals(ModuleTool.MEAT_FEEDER.get())) {
-                    meatTick(stack, player);
+                    meatTick(ContainerItemContext.ofPlayerSlot(player, PlayerInventoryStorage.of(player).getSlot(itemSlot)), player);
                 }
             }
         }
     }
 
-    public static boolean meatTick(ItemStack stack, Player player) {
-        int filledAmount = ((MeatFeederItem) stack.getItem()).getFilledAmount(stack);
-        if (filledAmount >= 400 && (player.getFoodData().getSaturationLevel() < 20 || player.getFoodData().getFoodLevel() < 20)) {
-            ((MeatFeederItem) stack.getItem()).drain(stack, 400);
-            player.getFoodData().eat(1, 1);
-            return true;
+    public static void meatTick(ContainerItemContext stack, Player player) {
+        if (player.getFoodData().getSaturationLevel() < 20 || player.getFoodData().getFoodLevel() < 20) {
+            return;
         }
-        return false;
+
+        var storage = stack.find(FluidStorage.ITEM);
+
+        try (var transaction = TransferUtil.getTransaction()) {
+            storage.extract(FluidVariant.of(ModuleCore.MEAT.getSourceFluid().get()), 400, transaction);
+            transaction.addOuterCloseCallback(result -> {
+                if (result.wasCommitted()) {
+                    player.getFoodData().eat(1, 1);
+                }
+            });
+        }
     }
 
     @Override
