@@ -61,7 +61,7 @@ public class MobCrusherBlock extends IndustrialBlock<MobCrusherTile> {
                 .define('B', Items.BOOK)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_ADVANCED)
                 .define('R', Items.REDSTONE)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .save(consumer);
     }
 }

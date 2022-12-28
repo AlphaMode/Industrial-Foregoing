@@ -44,7 +44,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -81,7 +80,7 @@ public class MechanicalDirtTile extends IndustrialWorkingTile<MechanicalDirtTile
             Mob entity = getMobToSpawn();
             if (entity != null) {
                 level.addFreshEntity(entity);
-                meat.drainForced(20, IFluidHandler.FluidAction.EXECUTE);
+                meat.drainForced(1620, false);
                 if (hasEnergy(getPowerPerOperation)) return new WorkAction(0.5f, getPowerPerOperation);
             }
         }

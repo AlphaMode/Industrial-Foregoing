@@ -24,6 +24,8 @@ package com.buuz135.industrial.utils;
 
 import com.buuz135.industrial.IndustrialForegoing;
 import com.buuz135.industrial.module.ModuleCore;
+import io.github.fabricators_of_create.porting_lib.event.common.BlockEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -40,8 +42,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.BlockEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,9 +92,13 @@ public class BlockUtils {
     }
 
     public static boolean canBlockBeBroken(Level world, BlockPos pos) {
-        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), IndustrialForegoing.getFakePlayer(world));
-        MinecraftForge.EVENT_BUS.post(event);
-        return !event.isCanceled();
+        boolean result = PlayerBlockBreakEvents.BEFORE.invoker().beforeBlockBreak(world, IndustrialForegoing.getFakePlayer(world), pos, world.getBlockState(pos), null);
+        if (result) {
+            BlockEvents.BreakEvent event = new BlockEvents.BreakEvent(world, pos, world.getBlockState(pos), IndustrialForegoing.getFakePlayer(world));
+            event.sendEvent();
+            return !event.isCanceled();
+        }
+        return result;
     }
 
     public static boolean canBlockBeBrokenPlugin(Level world, BlockPos pos) {

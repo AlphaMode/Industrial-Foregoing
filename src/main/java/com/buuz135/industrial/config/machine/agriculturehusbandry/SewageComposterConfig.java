@@ -36,9 +36,9 @@ public class SewageComposterConfig {
     public static long powerPerTick = 40;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
-    public static int maxStoredPower = 10000;
+    public static long maxStoredPower = 10000;
 
     @ConfigVal(comment = "Max Amount of Stored Fluid - Default: [8000mB]")
-    public static int maxTankSize = 8000;
+    public static long maxTankSize = 8000;
 
 }

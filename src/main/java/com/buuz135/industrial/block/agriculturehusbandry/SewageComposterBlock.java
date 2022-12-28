@@ -63,7 +63,7 @@ public class SewageComposterBlock extends IndustrialBlock<SewageComposterTile> {
                 .define('D', Items.PISTON)
                 .define('B', Items.BRICK)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

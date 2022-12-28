@@ -44,8 +44,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -96,7 +94,7 @@ public class PlantGathererTile extends IndustrialAreaWorkingTile<PlantGathererTi
     public IndustrialWorkingTile.WorkAction work() {
         if (this.etherBar.getProgress() == 0 && this.ether.getFluidAmount() > 0) {
             this.etherBar.setProgress(this.etherBar.getMaxProgress());
-            this.ether.drainForced(1, IFluidHandler.FluidAction.EXECUTE);
+            this.ether.drainForced(81, false);
         }
         if (hasEnergy(powerPerOperation)) {
             int amount = Math.max(1, BlockUtils.getBlockPosInAABB(getWorkingArea().bounds()).size() / 30);
@@ -105,14 +103,14 @@ public class PlantGathererTile extends IndustrialAreaWorkingTile<PlantGathererTi
                 if (isLoaded(pointed) && !ItemStackUtils.isInventoryFull(output)) {
                     if (this.etherBar.getProgress() > 0) {
                         if (HydroponicBedTile.tryToHarvestAndReplant(this.level, pointed, this.level.getBlockState(pointed), this.output, this.etherBar, this)) {
-                            tank.fillForced(new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), 10), IFluidHandler.FluidAction.EXECUTE);
+                            tank.fillForced(new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), 810), false);
                             return new WorkAction(0.3f, powerPerOperation);
                         }
                     } else {
-                        Optional<PlantRecollectable> optional = IFRegistries.PLANT_RECOLLECTABLES_REGISTRY.get().getValues().stream().filter(plantRecollectable -> plantRecollectable.canBeHarvested(this.level, pointed, this.level.getBlockState(pointed))).findFirst();
+                        Optional<PlantRecollectable> optional = IFRegistries.PLANT_RECOLLECTABLES_REGISTRY.stream().filter(plantRecollectable -> plantRecollectable.canBeHarvested(this.level, pointed, this.level.getBlockState(pointed))).findFirst();
                         if (optional.isPresent()) {
                             List<ItemStack> drops = optional.get().doHarvestOperation(this.level, pointed, this.level.getBlockState(pointed));
-                            tank.fillForced(new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), 10 * drops.size()), IFluidHandler.FluidAction.EXECUTE);
+                            tank.fillForced(new FluidStack(ModuleCore.SLUDGE.getSourceFluid().get(), 810 * drops.size()), false);
                             drops.forEach(stack -> TransferUtil2.insertItem(output, stack, false));
                             if (optional.get().shouldCheckNextPlant(this.level, pointed, this.level.getBlockState(pointed))) {
                                 increasePointer();

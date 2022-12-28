@@ -24,19 +24,19 @@ package com.buuz135.industrial.gui.conveyor;
 
 import com.buuz135.industrial.block.transportstorage.tile.ConveyorTile;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class ContainerConveyor extends AbstractContainerMenu {
 
-    @ObjectHolder( value = "industrialforegoing:conveyor", registryName = "minecraft:menu")
-    public static MenuType<ContainerConveyor> TYPE;
+    public static MenuType<ContainerConveyor> TYPE = (MenuType<ContainerConveyor>) Registry.MENU.get(new ResourceLocation("industrialforegoing:conveyor"));
 
     private final ConveyorTile conveyor;
     private Direction facing;

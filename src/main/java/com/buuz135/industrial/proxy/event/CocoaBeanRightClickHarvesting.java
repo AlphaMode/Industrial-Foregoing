@@ -22,16 +22,10 @@
 
 package com.buuz135.industrial.proxy.event;
 
-import com.buuz135.industrial.utils.Reference;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-
-@Mod.EventBusSubscriber(modid = Reference.MOD_ID)
 public class CocoaBeanRightClickHarvesting {
 
-    @SubscribeEvent
-    public static void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
+//    @SubscribeEvent
+//    public static void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
         /*
         if (!BlockRegistry.plantInteractorBlock.isRightClickCocoBeansEnabled()) return;
         if (event.getWorld().isRemote) return;
@@ -52,5 +46,5 @@ public class CocoaBeanRightClickHarvesting {
         }
 
          */
-    }
+//    }
 }

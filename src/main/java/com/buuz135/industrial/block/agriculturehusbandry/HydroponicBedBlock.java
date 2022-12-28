@@ -27,6 +27,8 @@ import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.util.IPlantable;
+import io.github.fabricators_of_create.porting_lib.util.PlantType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -35,8 +37,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.PlantType;
 
 import java.util.function.Consumer;
 

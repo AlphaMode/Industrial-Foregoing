@@ -37,6 +37,14 @@ import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
 import com.google.common.collect.Sets;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -55,18 +63,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ConveyorExtractionUpgrade extends ConveyorUpgrade {
@@ -147,15 +150,20 @@ public class ConveyorExtractionUpgrade extends ConveyorUpgrade {
         items.removeIf(ItemEntity -> ItemEntity.getItem().isEmpty() || !ItemEntity.isAlive());
         if (items.size() >= 20) return;
         if (getWorld().getGameTime() % (fast ? 10 : 20) == 0) {
-            getHandlerCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
-                for (int i = 0; i < itemHandler.getSlots(); i++) {
-                    ItemStack stack = itemHandler.extractItem(i, 4, true);
+            getHandlerCapability(ItemStorage.SIDED).ifPresent(itemHandler -> {
+                for (StorageView<ItemVariant> storageView : itemHandler) {
+                    long stackAmount = TransferUtil.simulateExtractView(storageView, storageView.getResource(), 4);
+                    ItemStack stack = storageView.getResource().toStack((int) stackAmount);
                     if (stack.isEmpty() || whitelist != filter.matches(stack))
                         continue;
                     ItemEntity item = new ItemEntity(getWorld(), getPos().getX() + 0.5, getPos().getY() + 0.2, getPos().getZ() + 0.5, stack);
                     item.setDeltaMovement(0, -1, 0);
                     item.setPickUpDelay(40);
-                    item.setItem(itemHandler.extractItem(i, 4, false));
+                    try (Transaction tx = TransferUtil.getTransaction()) {
+                        long extracted = storageView.extract(storageView.getResource(), 4, tx);
+                        item.setItem(storageView.getResource().toStack((int) extracted));
+                        tx.commit();
+                    }
                     if (getWorld().addFreshEntity(item)) {
                         items.add(item);
                     }
@@ -175,16 +183,17 @@ public class ConveyorExtractionUpgrade extends ConveyorUpgrade {
         }
     }
 
-    private <T> LazyOptional<T> getHandlerCapability(Capability<T> capability) {
+    private <T> Optional<T> getHandlerCapability(BlockApiLookup<T, Direction> capability) {
         BlockPos offsetPos = getPos().relative(getSide());
         BlockEntity tile = getWorld().getBlockEntity(offsetPos);
-        if (tile != null && tile.getCapability(capability, getSide().getOpposite()).isPresent())
-            return tile.getCapability(capability, getSide().getOpposite());
-        for (Entity entity : getWorld().getEntitiesOfClass(Entity.class, new AABB(0, 0, 0, 1, 1, 1).move(offsetPos)/*, EntitySelectors.NOT_SPECTATING*/)) {
-            if (entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite()).isPresent())
-                return entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite());
-        }
-        return LazyOptional.empty();
+        T storage = tile != null ? capability.find(getWorld(), offsetPos, tile.getBlockState(), tile, getSide().getOpposite()) : capability.find(getWorld(), offsetPos, getSide().getOpposite());
+        if (storage != null)
+            return Optional.of(storage);
+//        for (Entity entity : getWorld().getEntitiesOfClass(Entity.class, new AABB(0, 0, 0, 1, 1, 1).move(offsetPos)/*, EntitySelectors.NOT_SPECTATING*/)) { TODO: PORT entity support
+//            if (entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite()).isPresent())
+//                return entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite());
+//        }
+        return Optional.empty();
     }
 
     @Override

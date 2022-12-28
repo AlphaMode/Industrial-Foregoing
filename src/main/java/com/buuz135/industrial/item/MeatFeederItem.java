@@ -26,7 +26,6 @@ import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTool;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import me.alphamode.forgetags.Tags;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -34,7 +33,6 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -53,19 +51,6 @@ public class MeatFeederItem extends IFCustomItem {
 
     public MeatFeederItem(CreativeModeTab group) {
         super("meat_feeder", group, new Properties().stacksTo(1));
-    }
-
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        FluidHandlerItemStack handlerItemStack = new FluidHandlerItemStack(stack, 512000) {
-            @Override
-            public boolean canFillFluidType(FluidStack fluid) {
-                return fluid.getFluid().isSame(ModuleCore.MEAT.getSourceFluid().get());
-            }
-        };
-        handlerItemStack.fill(new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 0), IFluidHandler.FluidAction.EXECUTE);
-        return handlerItemStack;
     }
 
     @Override

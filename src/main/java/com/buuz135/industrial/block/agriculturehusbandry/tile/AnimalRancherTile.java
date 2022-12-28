@@ -33,6 +33,13 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.extensions.IShearable;
+import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.PathfinderMob;
@@ -42,12 +49,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.IForgeShearable;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -86,8 +87,8 @@ public class AnimalRancherTile extends IndustrialAreaWorkingTile<AnimalRancherTi
                     FakePlayer player = IndustrialForegoing.getFakePlayer(level, mob.blockPosition()); //getPosition
                     //SHEAR INTERACTION
                     ItemStack shears = new ItemStack(Items.SHEARS);
-                    if (mob instanceof IForgeShearable && ((IForgeShearable) mob).isShearable(shears, this.level, mob.blockPosition())) { //getPosition
-                        List<ItemStack> items = ((IForgeShearable) mob).onSheared(player, shears, this.level, mob.blockPosition(), 0); //getPosition
+                    if (mob instanceof IShearable && ((IShearable) mob).isShearable(shears, this.level, mob.blockPosition())) { //getPosition
+                        List<ItemStack> items = ((IShearable) mob).onSheared(player, shears, this.level, mob.blockPosition(), 0); //getPosition
                         items.forEach(stack -> TransferUtil2.insertItem(output, stack, false));
                         if (items.size() > 0) {
                             return new WorkAction(0.35f, powerPerOperation);
@@ -102,9 +103,9 @@ public class AnimalRancherTile extends IndustrialAreaWorkingTile<AnimalRancherTi
                         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
                         if (((Animal) mob).mobInteract(player, InteractionHand.MAIN_HAND).consumesAction()) { //ProcessInteract
                             ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                            IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
+                            Storage<FluidVariant> fluidHandlerItem = ContainerItemContext.ofPlayerHand(player, InteractionHand.MAIN_HAND).find(FluidStorage.ITEM);
                             if (fluidHandlerItem != null) {
-                                tank.fillForced(fluidHandlerItem.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                tank.fillForced(TransferUtil.extractAnyFluid(fluidHandlerItem, Long.MAX_VALUE), false);
                                 player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 return new WorkAction(0.35f, powerPerOperation);
                             }

@@ -24,6 +24,7 @@ package com.buuz135.industrial.plugin.jei.machineproduce;
 
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.plugin.jei.IndustrialRecipeTypes;
+import com.buuz135.industrial.plugin.jei.JEIHelper;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.api.client.AssetTypes;
 import com.hrznstudio.titanium.client.screen.addon.SlotsScreenAddon;
@@ -31,7 +32,7 @@ import com.hrznstudio.titanium.client.screen.asset.DefaultAssetProvider;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -97,7 +98,7 @@ public class MachineProduceCategory implements IRecipeCategory<MachineProduceWra
             builder.addSlot(RecipeIngredientRole.OUTPUT, 57 + 2, 5 + 2)
                     .setFluidRenderer(1000, false, 12, 13)
                     .setOverlay(smallTank, 0, 0)
-                    .addIngredient(ForgeTypes.FLUID_STACK, recipe.getOutputFluid());
+                    .addIngredient(FabricTypes.FLUID_STACK, JEIHelper.toIngredient(recipe.getOutputFluid()));
         } else {
             List<ItemStack> output = Arrays.asList(outputItem.getItems().clone());
             builder.addSlot(RecipeIngredientRole.OUTPUT, 57, 5)

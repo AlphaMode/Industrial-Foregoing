@@ -40,7 +40,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -77,9 +76,9 @@ public class FluidExtractorTile extends IndustrialAreaWorkingTile<FluidExtractor
             if (currentRecipe != null) {//GetDimensionType
                 FluidExtractionProgress extractionProgress = EXTRACTION.computeIfAbsent(this.level.dimensionType(), dimensionType -> new HashMap<>()).computeIfAbsent(this.level.getChunkAt(pos).getPos(), chunkPos -> new HashMap<>()).computeIfAbsent(pos, pos1 -> new FluidExtractionProgress(this.level));
                 if (currentRecipe.output.getFluid().isSame(ModuleCore.LATEX.getSourceFluid().get())) {
-                    tank.fillForced(new FluidStack(currentRecipe.output.getFluid(), currentRecipe.output.getAmount() * (hasEnergy(powerPerOperation) ? 3 : 1)), IFluidHandler.FluidAction.EXECUTE);
+                    tank.fillForced(new FluidStack(currentRecipe.output.getFluid(), currentRecipe.output.getAmount() * (hasEnergy(powerPerOperation) ? 3 : 1)), false);
                 } else {
-                    tank.fillForced(currentRecipe.output.copy(), IFluidHandler.FluidAction.EXECUTE);
+                    tank.fillForced(currentRecipe.output.copy(), false);
                 }
                 if (this.level.random.nextDouble() <= currentRecipe.breakChance) {
                     extractionProgress.setProgress(extractionProgress.getProgress() + 1);
@@ -88,7 +87,7 @@ public class FluidExtractorTile extends IndustrialAreaWorkingTile<FluidExtractor
                     extractionProgress.setProgress(0);
                     this.level.setBlockAndUpdate(pos, currentRecipe.result.defaultBlockState());
                     if (currentRecipe.output.getFluid().isSame(ModuleCore.LATEX.getSourceFluid().get())) {
-                        tank.fillForced(new FluidStack(currentRecipe.output.getFluid(), currentRecipe.output.getAmount() * (hasEnergy(powerPerOperation) ? 200 : 1)), IFluidHandler.FluidAction.EXECUTE);
+                        tank.fillForced(new FluidStack(currentRecipe.output.getFluid(), currentRecipe.output.getAmount() * (hasEnergy(powerPerOperation) ? 200 : 1)), false);
                     }
                 }
                 if (hasEnergy(powerPerOperation)) return new WorkAction(0.4f, powerPerOperation);

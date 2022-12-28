@@ -26,6 +26,8 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandle
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -34,8 +36,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.registries.tags.IReverseTag;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class ItemStackUtils {
 
     public static ResourceLocation getOreTag(ItemStack stack) {
         Item item = stack.getItem();
-        for (ResourceLocation resourceLocation : Registry.ITEM.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
+        for (ResourceLocation resourceLocation : FabricUtils.getReverseTag(Registry.ITEM, stack.getItem()).map(Holder::tags).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
             if (resourceLocation.toString().startsWith("c:raw_materials/")) {
                 return resourceLocation;
             }

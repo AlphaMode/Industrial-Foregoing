@@ -40,6 +40,9 @@ import com.hrznstudio.titanium.util.LangUtil;
 import com.hrznstudio.titanium.util.RayTraceUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -60,11 +63,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -77,7 +75,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
     @Save
     private ItemStack blStack;
     @Save
-    private int stored;
+    private long stored;
     @Save
     private ItemStackFilter filter;
     @Save
@@ -88,7 +86,6 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
     private boolean hasNBT;
 
     private BlackHoleHandler handler;
-    private final LazyOptional<IItemHandler> lazyStorage;
 
     public BlackHoleUnitTile(BasicTileBlock<BlackHoleUnitTile> basicTileBlock, BlockEntityType<?> type, Rarity rarity, BlockPos blockPos, BlockState blockState) {
         super(basicTileBlock, type, blockPos, blockState);
@@ -98,7 +95,6 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         this.useStackDisplay = false;
         this.hasNBT = false;
         this.handler = new BlackHoleHandler(BlockUtils.getStackAmountByRarity(rarity));
-        this.lazyStorage = LazyOptional.of(() -> handler);
         this.addFilter(filter = new ItemStackFilter("filter", 1));
         FilterSlot slot = new FilterSlot<>(79, 60, 0, ItemStack.EMPTY);
         slot.setColor(DyeColor.CYAN);
@@ -167,7 +163,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
             }
 
             @Override
-            public int getAmount() {
+            public long getAmount() {
                 return stored;
             }
 
@@ -233,7 +229,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         }
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(long amount) {
         boolean equal = amount == stored;
         this.stored = amount;
         if (!equal) syncObject(this.stored);
@@ -246,13 +242,9 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         if (!equal) syncObject(this.blStack);
     }
 
-    @Nonnull
     @Override
-    public <U> LazyOptional<U> getCapability(@Nonnull Capability<U> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return lazyStorage.cast();
-        }
-        return super.getCapability(cap, side);
+    public Storage<ItemVariant> getItemStorage(Direction side) {
+        return handler;
     }
 
     @Override
@@ -271,17 +263,12 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         return voidItems;
     }
 
-    private class BlackHoleHandler implements IItemHandler {
+    private class BlackHoleHandler implements SingleSlotStorage<ItemVariant> {
 
         private int amount;
 
         public BlackHoleHandler(int amount) {
             this.amount = amount;
-        }
-
-        @Override
-        public int getSlots() {
-            return 1;
         }
 
         @Nonnull
@@ -296,7 +283,7 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
             if (isItemValid(slot, stack)) {
-                int inserted = Math.min(this.amount - stored, stack.getCount());
+                long inserted = Math.min(this.amount - stored, stack.getCount());
                 if (!simulate) {
                     setStack(stack);
                     setAmount(Math.min(stored + inserted, amount));
@@ -327,11 +314,6 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
                 }
                 return ItemHandlerHelper.copyStackWithSize(blStack, amount);
             }
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return amount;
         }
 
         @Override

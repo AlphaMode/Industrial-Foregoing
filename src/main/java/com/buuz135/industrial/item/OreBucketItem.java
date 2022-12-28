@@ -22,6 +22,7 @@
 package com.buuz135.industrial.item;
 
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -33,10 +34,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -68,7 +66,7 @@ public class OreBucketItem extends BucketItem {
             @Nonnull
             @Override
             public FluidStack getFluid() {
-                FluidStack stack = new FluidStack(OreBucketItem.this.getFluid(), FluidType.BUCKET_VOLUME);
+                FluidStack stack = new FluidStack(OreBucketItem.this.getFluid(), FluidConstants.BUCKET);
                 if (container.getOrCreateTag().contains(NBT_TAG)) {
                     String tag = container.getOrCreateTag().getString(NBT_TAG);
                     stack.getOrCreateTag().putString(NBT_TAG, tag);
@@ -102,7 +100,7 @@ public class OreBucketItem extends BucketItem {
             ITagCollection<Item> tags = TagCollectionManager.getManager().getItemTags();
             for (ResourceLocation loc : tags.getIDTagMap().keySet()) {
                 String tagName = loc.toString();
-                if (!tagName.startsWith("forge:ores/"))
+                if (!tagName.startsWith("c:ores/"))
                     continue;
                 ItemStack stack = new ItemStack(this);
                 stack.getOrCreateTag().putString(NBT_TAG, tagName);

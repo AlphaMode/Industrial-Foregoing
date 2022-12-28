@@ -123,10 +123,10 @@ public class BioReactorTile extends IndustrialWorkingTile<BioReactorTile> {
         if (hasEnergy(getPowerPerOperation)) {
             int efficiency = getEfficiency();
             if (efficiency <= 0) return new WorkAction(1, 0);
-            int fluidAmount = ((efficiency - 1) * 10 + 80) * efficiency;
+            long fluidAmount = ((efficiency - 1) * 10 + 80) * efficiency;
             if (water.getFluidAmount() >= fluidAmount && biofuel.getCapacity() - biofuel.getFluidAmount() >= fluidAmount) {
-                water.drainForced(fluidAmount, IFluidHandler.FluidAction.EXECUTE);
-                biofuel.fillForced(new FluidStack(ModuleCore.BIOFUEL.getSourceFluid().get(), fluidAmount), IFluidHandler.FluidAction.EXECUTE);
+                water.drainForced(fluidAmount,false);
+                biofuel.fillForced(new FluidStack(ModuleCore.BIOFUEL.getSourceFluid().get(), fluidAmount), false);
                 for (int i = 0; i < input.getInventory().getSlots(); i++) {
                     input.getInventory().getStackInSlot(i).shrink(1);
                 }

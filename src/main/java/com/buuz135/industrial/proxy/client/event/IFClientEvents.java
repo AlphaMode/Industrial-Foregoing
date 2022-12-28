@@ -28,6 +28,8 @@ import com.buuz135.industrial.module.ModuleTool;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -41,27 +43,21 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.event.RenderHighlightEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 public class IFClientEvents {
 
-    @SubscribeEvent
-    public void blockOverlayEvent(RenderHighlightEvent.Block event) {
-        HitResult hit = event.getTarget();
-        if (hit.getType() == HitResult.Type.BLOCK && Minecraft.getInstance().player.getMainHandItem().getItem().equals(ModuleTool.INFINITY_DRILL)) {
+    public boolean blockOverlayEvent(WorldRenderContext context, @Nullable HitResult hit) {
+        if (hit != null && hit.getType() == HitResult.Type.BLOCK && Minecraft.getInstance().player.getMainHandItem().getItem().equals(ModuleTool.INFINITY_DRILL)) {
             BlockHitResult blockRayTraceResult = (BlockHitResult) hit;
-            event.setCanceled(true);
             ItemStack hand = Minecraft.getInstance().player.getMainHandItem();
             InfinityTier tier = ((ItemInfinityDrill) ModuleTool.INFINITY_DRILL.get()).getSelectedTier(hand);
             Level world = Minecraft.getInstance().player.level;
             Pair<BlockPos, BlockPos> area = ((ItemInfinityDrill) ModuleTool.INFINITY_DRILL.get()).getArea(blockRayTraceResult.getBlockPos(), blockRayTraceResult.getDirection(), tier, false);
             PoseStack stack = new PoseStack();
             stack.pushPose();
-            Camera info = event.getCamera();
+            Camera info = context.camera();
             stack.mulPose(Vector3f.XP.rotationDegrees(info.getXRot()));
             stack.mulPose(Vector3f.YP.rotationDegrees(info.getYRot() + 180));
             double d0 = info.getPosition().x();
@@ -75,7 +71,9 @@ public class IFClientEvents {
                 }
             });
             stack.popPose();
+            return false;
         }
+        return true;
     }
 
     @SubscribeEvent
@@ -89,5 +87,9 @@ public class IFClientEvents {
             event.getEntity().startUsingItem(InteractionHand.MAIN_HAND);
         else if (event.getEntity().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(ModuleTool.INFINITY_DRILL))
             event.getEntity().startUsingItem(InteractionHand.OFF_HAND);
+    }
+
+    public void init() {
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(this::blockOverlayEvent);
     }
 }

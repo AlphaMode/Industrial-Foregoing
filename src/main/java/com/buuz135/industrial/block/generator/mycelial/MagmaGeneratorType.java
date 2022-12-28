@@ -76,7 +76,7 @@ public class MagmaGeneratorType implements IMycelialGeneratorType {
     public Pair<Integer, Integer> getTimeAndPowerGeneration(INBTSerializable<CompoundTag>[] inputs) {
         if (inputs.length >= 2 && inputs[0] instanceof SidedFluidTankComponent && inputs[1] instanceof SidedInventoryComponent) {
             if (((SidedFluidTankComponent<?>) inputs[0]).getFluidAmount() >= 250) {
-                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, IFluidHandler.FluidAction.EXECUTE);
+                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, false);
                 boolean hasRedstone = false;
                 if (((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).getCount() > 0) {
                     ((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).shrink(1);

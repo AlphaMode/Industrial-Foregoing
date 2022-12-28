@@ -33,7 +33,7 @@ public class IndustrialTags {
 
     public static class Items {
 
-        public static final TagKey<Item> PLASTIC = TagUtil.getItemTag(new ResourceLocation("forge:" + "plastic"));
+        public static final TagKey<Item> PLASTIC = TagUtil.getItemTag(new ResourceLocation("c:" + "plastic"));
 
         public static final TagKey<Item> MACHINE_FRAME_PITY = TagUtil.getItemTag(new ResourceLocation(Reference.MOD_ID + ":" + "machine_frame/pity"));
         public static final TagKey<Item> MACHINE_FRAME_SIMPLE = TagUtil.getItemTag(new ResourceLocation(Reference.MOD_ID + ":" + "machine_frame/simple"));
@@ -43,11 +43,11 @@ public class IndustrialTags {
         public static final TagKey<Item> BIOREACTOR_INPUT = TagUtil.getItemTag(new ResourceLocation(Reference.MOD_ID + ":" + "bioreactor"));
         public static final TagKey<Item> ENCHANTMENT_EXTRACTOR_BLACKLIST = TagUtil.getItemTag(new ResourceLocation(Reference.MOD_ID + ":" + "enchantment_extractor_blacklist"));
 
-        public static final TagKey<Item> GEAR_GOLD = TagUtil.getItemTag(new ResourceLocation("forge:" + "gears/gold"));
-        public static final TagKey<Item> GEAR_DIAMOND = TagUtil.getItemTag(new ResourceLocation("forge:" + "gears/diamond"));
-        public static final TagKey<Item> GEAR_IRON = TagUtil.getItemTag(new ResourceLocation("forge:" + "gears/iron"));
+        public static final TagKey<Item> GEAR_GOLD = TagUtil.getItemTag(new ResourceLocation("c:" + "gears/gold"));
+        public static final TagKey<Item> GEAR_DIAMOND = TagUtil.getItemTag(new ResourceLocation("c:" + "gears/diamond"));
+        public static final TagKey<Item> GEAR_IRON = TagUtil.getItemTag(new ResourceLocation("c:" + "gears/iron"));
 
-        public static final TagKey<Item> FERTILIZER = TagUtil.getItemTag(new ResourceLocation("forge:" + "fertilizer"));
+        public static final TagKey<Item> FERTILIZER = TagUtil.getItemTag(new ResourceLocation("c:" + "fertilizer"));
     }
 
     public static class Blocks {
@@ -69,6 +69,6 @@ public class IndustrialTags {
 
     public static class Fluids {
 
-        public static final TagKey<Fluid> EXPERIENCE = TagUtil.getFluidTag(new ResourceLocation("forge:experience"));
+        public static final TagKey<Fluid> EXPERIENCE = TagUtil.getFluidTag(new ResourceLocation("c:experience"));
     }
 }

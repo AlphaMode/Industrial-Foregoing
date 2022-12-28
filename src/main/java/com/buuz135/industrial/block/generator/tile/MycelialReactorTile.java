@@ -79,7 +79,7 @@ public class MycelialReactorTile extends IndustrialGeneratorTile<MycelialReactor
     }
 
     @Override
-    public int getEnergyProducedEveryTick() {
+    public long getEnergyProducedEveryTick() {
         return 25_000_000;
     }
 
@@ -111,7 +111,7 @@ public class MycelialReactorTile extends IndustrialGeneratorTile<MycelialReactor
     }
 
     @Override
-    public int getEnergyCapacity() {
+    public long getEnergyCapacity() {
         return 100_000_000;
     }
 

@@ -23,69 +23,41 @@
 package com.buuz135.industrial.proxy.client.model;
 
 import com.buuz135.industrial.api.transporter.TransporterType;
-import com.buuz135.industrial.api.transporter.TransporterTypeFactory;
 import com.buuz135.industrial.module.ModuleTransportStorage;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.function.Supplier;
 
 public class TransporterBlockModel extends ForwardingBakedModel {
-
-    public static Cache<Pair<Pair<String, Pair<Direction, TransporterTypeFactory.TransporterAction>>, Direction>, List<BakedQuad>> CACHE = CacheBuilder.newBuilder().build();
-
-    private Map<Direction, List<BakedQuad>> prevQuads = new HashMap<>();
 
     public TransporterBlockModel(BakedModel previousConveyor) {
         wrapped = previousConveyor;
     }
 
-    @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, RenderType renderType) {
-        CACHE.invalidateAll();
-        if (state == null) {
-            if (!prevQuads.containsKey(side))
-                prevQuads.put(side, wrapped.getQuads(state, side, rand));
-            return prevQuads.get(side);
+    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
+        if (state == null || !(blockView instanceof RenderAttachedBlockView attachedBlockView && attachedBlockView.getBlockEntityRenderAttachment(pos) instanceof ModelData extraData && extraData.has(TransporterModelData.UPGRADE_PROPERTY)))
+            return;
+        for (TransporterType upgrade : extraData.get(TransporterModelData.UPGRADE_PROPERTY).getUpgrades().values()) {
+            if (upgrade == null)
+                continue;
+            BakedModel model = ModuleTransportStorage.TRANSPORTER_CACHE.get(upgrade.getFactory().getModel(upgrade.getSide(), upgrade.getAction()));
+            ((FabricBakedModel)model).emitBlockQuads(blockView, state, pos, randomSupplier, context);
         }
-        if (!prevQuads.containsKey(side))
-            prevQuads.put(side, wrapped.getQuads(state, side, rand));
-        List<BakedQuad> quads = new ArrayList<>(prevQuads.get(side));
-        if (extraData.has(TransporterModelData.UPGRADE_PROPERTY)) {
-            for (TransporterType upgrade : extraData.get(TransporterModelData.UPGRADE_PROPERTY).getUpgrades().values()) {
-                if (upgrade == null)
-                    continue;
-                List<BakedQuad> upgradeQuads = CACHE.getIfPresent(Pair.of(Pair.of(upgrade.getFactory().getName(), Pair.of(upgrade.getSide(), upgrade.getAction())), side));
-                if (upgradeQuads == null) {
-                    try {
-                        BakedModel model = ModuleTransportStorage.TRANSPORTER_CACHE.get(upgrade.getFactory().getModel(upgrade.getSide(), upgrade.getAction()));
-                        upgradeQuads = model.getQuads(state, side, rand, extraData, renderType);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-                    CACHE.put(Pair.of(Pair.of(upgrade.getFactory().getName(), Pair.of(upgrade.getSide(), upgrade.getAction())), side), upgradeQuads);
-                }
-                if (!upgradeQuads.isEmpty()) {
-                    quads.addAll(upgradeQuads);
-                }
-            }
-        }
-        return quads;
+        super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
     }
 
+    @Override
+    public boolean isVanillaAdapter() {
+        return false;
+    }
 }

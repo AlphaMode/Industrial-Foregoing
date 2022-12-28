@@ -62,7 +62,7 @@ public class AnimalFeederBlock extends IndustrialBlock<AnimalFeederTile> {
                 .define('P', IndustrialTags.Items.PLASTIC)
                 .define('A', Items.GOLDEN_APPLE)
                 .define('C', Items.GOLDEN_CARROT)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .define('D', Tags.Items.DYES_PURPLE)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
                 .save(consumer);

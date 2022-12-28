@@ -46,9 +46,9 @@ public class CrusherRecipe extends SerializableRecipe {
     public static List<CrusherRecipe> RECIPES = new ArrayList<>();
 
     public static void init() {
-        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "cobble_gravel"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("forge:cobblestone"))), Ingredient.of(Items.GRAVEL));
-        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "gravel_sand"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("forge:gravel"))), Ingredient.of(Items.SAND));
-        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "sand_silicon"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("forge:sand"))), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("forge:silicon"))), new ResourceLocation("forge:silicon"));
+        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "cobble_gravel"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("c:cobblestone"))), Ingredient.of(Items.GRAVEL));
+        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "gravel_sand"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("c:gravel"))), Ingredient.of(Items.SAND));
+        new CrusherRecipe(new ResourceLocation(Reference.MOD_ID, "sand_silicon"), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("c:sand"))), Ingredient.of(TagUtil.getItemTag(new ResourceLocation("c:silicon"))), new ResourceLocation("c:silicon"));
     }
 
     public Ingredient input;

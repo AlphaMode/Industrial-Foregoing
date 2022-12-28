@@ -25,34 +25,24 @@ package com.buuz135.industrial.registry;
 import com.buuz135.industrial.api.plant.PlantRecollectable;
 import com.buuz135.industrial.api.straw.StrawHandler;
 import com.buuz135.industrial.utils.Reference;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegistryBuilder;
-
-import java.util.function.Supplier;
 
 public class IFRegistries {
 
-    public static Supplier<IForgeRegistry<StrawHandler>> STRAW_HANDLER_REGISTRY;
+    public static Registry<StrawHandler> STRAW_HANDLER_REGISTRY = FabricRegistryBuilder.createSimple(StrawHandler.class, new ResourceLocation(Reference.MOD_ID, "straw"))
+            .attribute(RegistryAttribute.SYNCED).buildAndRegister();
 
-    public static Supplier<IForgeRegistry<PlantRecollectable>> PLANT_RECOLLECTABLES_REGISTRY;
+    public static Registry<PlantRecollectable> PLANT_RECOLLECTABLES_REGISTRY = FabricRegistryBuilder.createSimple(PlantRecollectable.class, new ResourceLocation(Reference.MOD_ID, "plant_recollectable"))
+            .attribute(RegistryAttribute.SYNCED).buildAndRegister();
 
     public static final ResourceKey<Registry<StrawHandler>> STRAW_HANDLER_REGISTRY_KEY = key(Reference.MOD_ID + ":straw");
     public static final ResourceKey<Registry<PlantRecollectable>> PLANT_RECOLLECTABLES_REGISTRY_KEY = key(Reference.MOD_ID + ":plant_recollectable");
 
-    public static void create(NewRegistryEvent newRegistryEvent) {
-        STRAW_HANDLER_REGISTRY = newRegistryEvent.create(new RegistryBuilder<StrawHandler>()
-                .setName(new ResourceLocation(Reference.MOD_ID, "straw"))
-                .setIDRange(1, Integer.MAX_VALUE - 1)
-                .disableSaving());
-        PLANT_RECOLLECTABLES_REGISTRY = newRegistryEvent.create(new RegistryBuilder<PlantRecollectable>()
-                .setName(new ResourceLocation(Reference.MOD_ID, "plant_recollectable"))
-                .setIDRange(1, Integer.MAX_VALUE - 1)
-                .disableSaving());
-    }
+    public static void create() {}
 
     private static <T> ResourceKey<Registry<T>> key(String name)
     {

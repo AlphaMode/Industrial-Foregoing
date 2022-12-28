@@ -62,7 +62,7 @@ public class AnimalBabySeparatorBlock extends IndustrialBlock<AnimalBabySeparato
                 .define('P', IndustrialTags.Items.PLASTIC)
                 .define('A', Items.GOLDEN_CARROT)
                 .define('C', Items.WHEAT)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .define('D', Tags.Items.DYES_PURPLE)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
                 .save(consumer);

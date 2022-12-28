@@ -62,7 +62,7 @@ public class FluidPlacerBlock extends IndustrialBlock<FluidPlacerTile> {
                 .define('B', Items.WATER_BUCKET)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
                 .define('R', Items.REDSTONE)
-                .define('S', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('S', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 

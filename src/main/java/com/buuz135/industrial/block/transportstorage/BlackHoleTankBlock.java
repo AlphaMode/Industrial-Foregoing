@@ -32,6 +32,7 @@ import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.LangUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,11 +53,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,9 +86,9 @@ public class BlackHoleTankBlock extends IndustrialBlock<BlackHoleTankTile> {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(iFluidHandlerItem -> {
-            if (!iFluidHandlerItem.getFluidInTank(0).isEmpty()) {
-                tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.contains") + ": " + ChatFormatting.WHITE + new DecimalFormat().format(iFluidHandlerItem.getFluidInTank(0).getAmount()) + ChatFormatting.YELLOW + LangUtil.getString("tooltip.industrialforegoing.mb_of", ChatFormatting.DARK_AQUA + iFluidHandlerItem.getFluidInTank(0).getDisplayName().getString())));
+        TransferUtil.getFluidContained(stack).ifPresent(fluidStack -> {
+            if (!fluidStack.isEmpty()) {
+                tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.contains") + ": " + ChatFormatting.WHITE + new DecimalFormat().format(fluidStack.getAmount()) + ChatFormatting.YELLOW + LangUtil.getString("tooltip.industrialforegoing.mb_of", ChatFormatting.DARK_AQUA + fluidStack.getDisplayName().getString())));
             }
         });
         tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.can_hold") + ": " + ChatFormatting.WHITE + new DecimalFormat().format(BlockUtils.getFluidAmountByRarity(rarity)) + ChatFormatting.DARK_AQUA + LangUtil.getString("text.industrialforegoing.tooltip.mb")));

@@ -92,7 +92,7 @@ public class DissolutionChamberRecipe extends SerializableRecipe {
             }
             if (!found) return false;
         }
-        return handlerItems.size() == 0 && tank.drainForced(inputFluid, IFluidHandler.FluidAction.SIMULATE).getAmount() == inputFluid.getAmount();
+        return handlerItems.size() == 0 && tank.drainForced(inputFluid, true).getAmount() == inputFluid.getAmount();
     }
 
     @Override

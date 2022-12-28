@@ -37,7 +37,7 @@ public class StrawUtils {
 
     @Nonnull
     public static Optional<StrawHandler> getStrawHandler(@Nonnull Fluid stack) {
-        @NotNull List<StrawHandler> current = new ArrayList<>(IFRegistries.STRAW_HANDLER_REGISTRY.get().getValues());
+        @NotNull List<StrawHandler> current = new ArrayList<>(IFRegistries.STRAW_HANDLER_REGISTRY.stream().toList());
         current.sort(Comparator.comparingInt(StrawHandler::getPriority));
         for (StrawHandler handler : current) {
             if (handler.validFluid(stack))

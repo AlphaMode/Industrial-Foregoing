@@ -45,10 +45,12 @@ import com.hrznstudio.titanium.fluid.TitaniumFluidInstance;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
+import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
@@ -58,6 +60,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.function.Consumer;
 
 public class ModuleCore implements IModule {
 
@@ -210,13 +214,13 @@ public class ModuleCore implements IModule {
     }
 
     @Environment(EnvType.CLIENT)
-    public void textureStitch(TextureStitchEvent.Pre event) {
+    public void textureStitch(TextureAtlas atlas, Consumer<ResourceLocation> adder) {
         //event.addSprite(LATEX.getSourceFluid().getAttributes().getFlowingTexture()); ??
         //event.addSprite(LATEX.getSourceFluid().getAttributes().getStillTexture()); TODO Add ether as Tags.Fluids.GASEOUS 1.19
     }
 
     @Environment(EnvType.CLIENT)
     public void onClient() {
-        EventManager.mod(TextureStitchEvent.Pre.class).process(this::textureStitch).subscribe();
+        TextureStitchCallback.PRE.register(this::textureStitch);
     }
 }

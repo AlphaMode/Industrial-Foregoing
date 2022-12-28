@@ -71,12 +71,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.FakePlayer;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -188,7 +183,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
             itemEntity.remove(Entity.RemovalReason.KILLED);
         });
         if (dropXP)
-            this.tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), experience * 20), IFluidHandler.FluidAction.EXECUTE);
+            this.tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), experience * 20), false);
         entity.setHealth(0);
         entity.remove(Entity.RemovalReason.KILLED);
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);

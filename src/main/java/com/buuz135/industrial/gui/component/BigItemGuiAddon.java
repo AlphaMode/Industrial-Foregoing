@@ -95,7 +95,7 @@ public abstract class BigItemGuiAddon extends BasicScreenAddon {
 
     public abstract ItemStack getItemStack();
 
-    public abstract int getAmount();
+    public abstract long getAmount();
 
     public abstract String getAmountDisplay();
 }

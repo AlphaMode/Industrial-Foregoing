@@ -27,11 +27,15 @@ import com.buuz135.industrial.module.ModuleMisc;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import team.reborn.energy.api.EnergyStorage;
 
 public class InfinityChargerTile extends IndustrialMachineTile<InfinityChargerTile> {
 
@@ -43,14 +47,15 @@ public class InfinityChargerTile extends IndustrialMachineTile<InfinityChargerTi
         addInventory(chargingSlot = (SidedInventoryComponent<InfinityChargerTile>) new SidedInventoryComponent<InfinityChargerTile>("charging", 80, 40, 1, 0)
                 .setColor(DyeColor.BLUE)
                 .setSlotLimit(1)
-                .setInputFilter((stack, integer) -> stack.getCapability(ForgeCapabilities.ENERGY).isPresent())
+                .setInputFilter((stack, integer) -> ContainerItemContext.withInitial(stack).find(EnergyStorage.ITEM) != null)
         );
     }
 
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, InfinityChargerTile blockEntity) {
         if (!chargingSlot.getStackInSlot(0).isEmpty() && this.getRedstoneManager().getAction().canRun(this.getEnvironmentValue(false, null)) && this.getRedstoneManager().shouldWork()) {
-            chargingSlot.getStackInSlot(0).getCapability(ForgeCapabilities.ENERGY).ifPresent(iEnergyStorage -> {
+            EnergyStorage iEnergyStorage = new ItemStackHandlerContainerItemContext(chargingSlot, 0).find(EnergyStorage.ITEM);
+            if (iEnergyStorage != null) {
                 if (this.getEnergyStorage() instanceof InfinityEnergyStorage) {
                     if (iEnergyStorage instanceof InfinityEnergyStorage) {
                         long added = Math.min(Long.MAX_VALUE - ((InfinityEnergyStorage) iEnergyStorage).getLongEnergyStored(), Math.min(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongCapacity(), ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored()));
@@ -58,12 +63,15 @@ public class InfinityChargerTile extends IndustrialMachineTile<InfinityChargerTi
                         ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored() - added);
                         markForUpdate();
                     } else {
-                        int extracted = this.getEnergyStorage().getEnergyStored();
-                        ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored() - iEnergyStorage.receiveEnergy(extracted, false));
+                        long extracted = this.getEnergyStorage().getAmount();
+                        try (Transaction t = TransferUtil.getTransaction()) {
+                            ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored() - iEnergyStorage.insert(extracted, t));
+                            t.commit();
+                        }
                         markForUpdate();
                     }
                 }
-            });
+            }
             this.getRedstoneManager().finish();
         }
     }

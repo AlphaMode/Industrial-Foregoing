@@ -35,6 +35,10 @@ import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.TileUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -50,14 +54,12 @@ import net.minecraft.world.phys.AABB;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class TransporterWorldType extends FilteredTransporterType<ItemStack, IItemHandler> {
+public class TransporterWorldType extends FilteredTransporterType<ItemStack, Storage<ItemVariant>> {
 
     private int extractSlot;
 
@@ -67,16 +69,16 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
     }
 
     @Override
-    public RegulatorFilter<ItemStack, IItemHandler> createFilter() {
-        return new RegulatorFilter<ItemStack, IItemHandler>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
+    public RegulatorFilter<ItemStack, Storage<ItemVariant>> createFilter() {
+        return new RegulatorFilter<ItemStack, Storage<ItemVariant>>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
             @Override
-            public int matches(ItemStack stack, IItemHandler itemHandler, boolean isRegulated) {
+            public long matches(ItemStack stack, Storage<ItemVariant> itemHandler, boolean isRegulated) {
                 if (isEmpty()) return stack.getCount();
-                int amount = 0;
+                long amount = 0;
                 if (isRegulated) {
-                    for (int i = 0; i < itemHandler.getSlots(); i++) {
-                        if (itemHandler.getStackInSlot(i).sameItem(stack)) {
-                            amount += itemHandler.getStackInSlot(i).getCount();
+                    for (StorageView<ItemVariant> view : itemHandler) {
+                        if (view.getResource().toStack().sameItem(stack)) {
+                            amount += view.getAmount();
                         }
                     }
                 }
@@ -84,7 +86,7 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
                 for (IFilter.GhostSlot slot : this.getFilter()) {
                     if (stack.sameItem(slot.getStack())) {
                         int maxAmount = isRegulated ? slot.getAmount() : Integer.MAX_VALUE;
-                        int returnAmount = Math.min(stack.getCount(), maxAmount - amount);
+                        long returnAmount = Math.min(stack.getCount(), maxAmount - amount);
                         if (returnAmount > 0) return returnAmount;
                     }
                 }
@@ -149,7 +151,7 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
         }
     }
 
-    private void findSlot(IItemHandler itemHandler) {
+    private void findSlot(Storage<ItemVariant> itemHandler) {
         for (int i = this.extractSlot; i < itemHandler.getSlots(); i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty() && filter(this.getFilter(), this.isWhitelist(), itemHandler.getStackInSlot(i), itemHandler, false)) {
                 this.extractSlot = i;
@@ -159,8 +161,8 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
         this.extractSlot = 0;
     }
 
-    private boolean filter(RegulatorFilter<ItemStack, IItemHandler> filter, boolean whitelist, ItemStack stack, IItemHandler handler, boolean isRegulated) {
-        int accepts = filter.matches(stack, handler, isRegulated);
+    private boolean filter(RegulatorFilter<ItemStack, Storage<ItemVariant>> filter, boolean whitelist, ItemStack stack, Storage<ItemVariant> handler, boolean isRegulated) {
+        long accepts = filter.matches(stack, handler, isRegulated);
         if (whitelist && filter.isEmpty()) {
             return false;
         }
@@ -208,7 +210,7 @@ public class TransporterWorldType extends FilteredTransporterType<ItemStack, IIt
 
         @Override
         public boolean canBeAttachedAgainst(Level world, BlockPos pos, Direction face) {
-            return TileUtil.getTileEntity(world, pos).map(tileEntity -> tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face).isPresent()).orElse(false);
+            return TransferUtil.getItemStorage(world, pos, face) != null;
         }
 
         @Nonnull

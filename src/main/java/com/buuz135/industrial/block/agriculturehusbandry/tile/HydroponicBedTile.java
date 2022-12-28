@@ -14,6 +14,10 @@ import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
+import io.github.fabricators_of_create.porting_lib.util.IPlantable;
+import io.github.fabricators_of_create.porting_lib.util.PlantType;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,12 +30,7 @@ import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.PlantType;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -76,7 +75,7 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
     @Override
     public WorkAction work() {
         if (this.etherBuffer.getProgress() <= 0 && this.ether.getFluidAmount() > 0) {
-            this.ether.drainForced(1, IFluidHandler.FluidAction.EXECUTE);
+            this.ether.drainForced(81, false);
             this.etherBuffer.setProgress(this.etherBuffer.getMaxProgress());
         }
         if (hasEnergy(1000)) {
@@ -97,7 +96,7 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
                                 this.level.getBlockState(up).randomTick((ServerLevel) this.level, up, this.level.random);
                             }
                         }
-                        this.water.drainForced(10, IFluidHandler.FluidAction.EXECUTE);
+                        this.water.drainForced(810, false);
                         return new WorkAction(1, HydroponicBedConfig.powerPerOperation);
                     } else if (this.etherBuffer.getProgress() > 0) {
                         tryToHarvestAndReplant(this.level, up, state, this.output, this.etherBuffer, this);
@@ -115,7 +114,7 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
                                 this.level.getBlockState(up).randomTick((ServerLevel) this.level, up, this.level.random);
                             }
                         }
-                        this.water.drainForced(10, IFluidHandler.FluidAction.EXECUTE);
+                        this.water.drainForced(810, false);
                     }
                     return new WorkAction(1, HydroponicBedConfig.powerPerOperation);
                 }
@@ -131,7 +130,7 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
             for (Direction direction : Direction.Plane.HORIZONTAL) {
                 BlockEntity tile = level.getBlockEntity(worldPosition.relative(direction));
                 if (tile instanceof HydroponicBedTile) {
-                    int difference = water.getFluidAmount() - ((HydroponicBedTile) tile).getWater().getFluidAmount();
+                    long difference = water.getFluidAmount() - ((HydroponicBedTile) tile).getWater().getFluidAmount();
                     if (difference > 0 && (water.getFluid().isFluidEqual(((HydroponicBedTile) tile).getWater().getFluid()) || ((HydroponicBedTile) tile).getWater().isEmpty())) {
                         if (difference <= 25) difference = difference / 2;
                         else difference = 25;
@@ -146,11 +145,11 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
                             ether.drainForced(((HydroponicBedTile) tile).getEther().fill(new FluidStack(ModuleCore.ETHER.getSourceFluid().get(), ether.drainForced(difference, IFluidHandler.FluidAction.SIMULATE).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                         }
                     }
-                    difference = getEnergyStorage().getEnergyStored() - ((HydroponicBedTile) tile).getEnergyStorage().getEnergyStored();
+                    difference = getEnergyStorage().getAmount() - ((HydroponicBedTile) tile).getEnergyStorage().getAmount();
                     if (difference > 0) {
                         if (difference <= 1000 && difference > 1) difference = difference / 2;
                         if (difference > 1000) difference = 1000;
-                        if (getEnergyStorage().getEnergyStored() >= difference) {
+                        if (getEnergyStorage().getAmount() >= difference) {
                             getEnergyStorage().extractEnergy(((HydroponicBedTile) tile).getEnergyStorage().receiveEnergy(difference, false), false);
                         }
                     }
@@ -167,8 +166,8 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
         return ether;
     }
 
-    public static boolean tryToHarvestAndReplant(Level level, BlockPos up, BlockState state, IItemHandler output, ProgressBarComponent<?> etherBuffer, IndustrialWorkingTile tile) {
-        Optional<PlantRecollectable> optional = IFRegistries.PLANT_RECOLLECTABLES_REGISTRY.get().getValues().stream().filter(plantRecollectable -> plantRecollectable.canBeHarvested(level, up, state)).findFirst();
+    public static boolean tryToHarvestAndReplant(Level level, BlockPos up, BlockState state, Storage<ItemVariant> output, ProgressBarComponent<?> etherBuffer, IndustrialWorkingTile tile) {
+        Optional<PlantRecollectable> optional = IFRegistries.PLANT_RECOLLECTABLES_REGISTRY.stream().filter(plantRecollectable -> plantRecollectable.canBeHarvested(level, up, state)).findFirst();
         if (optional.isPresent()) {
             List<ItemStack> drops = optional.get().doHarvestOperation(level, up, state);
             if (level.isEmptyBlock(up)) {

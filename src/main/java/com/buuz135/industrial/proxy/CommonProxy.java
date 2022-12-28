@@ -27,6 +27,8 @@ import com.buuz135.industrial.proxy.event.MobDeathHandler;
 import com.buuz135.industrial.proxy.event.SkullHandler;
 import com.buuz135.industrial.utils.explosion.ExplosionTickHandler;
 import io.github.fabricators_of_create.porting_lib.event.common.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.event.common.MountEntityCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
@@ -49,10 +51,10 @@ public class CommonProxy {
 
     public void run() {
         LivingEntityEvents.DROPS.register(MobDeathHandler::onDeath);
-        MinecraftForge.EVENT_BUS.register(new FakePlayerRideEntityHandler());
-        MinecraftForge.EVENT_BUS.register(new SkullHandler());
+        MountEntityCallback.EVENT.register(new FakePlayerRideEntityHandler());
+//        MinecraftForge.EVENT_BUS.register(new SkullHandler());
 
-        EventManager.forge(TickEvent.ServerTickEvent.class).process(ExplosionTickHandler::serverTick).subscribe();
+        ServerTickEvents.START_SERVER_TICK.register(ExplosionTickHandler::serverTick);
     }
 
 }

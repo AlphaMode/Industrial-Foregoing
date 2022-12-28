@@ -38,6 +38,7 @@ import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import com.hrznstudio.titanium.util.InventoryUtil;
 import com.hrznstudio.titanium.util.ItemHandlerUtil;
+import io.github.fabricators_of_create.porting_lib.brewing.BrewingRecipeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -52,9 +53,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -172,7 +170,7 @@ public class PotionBrewerTile extends IndustrialProcessingTile<PotionBrewerTile>
     }
 
     @Override
-    protected int getTickPower() {
+    protected long getTickPower() {
         return 80;
     }
 

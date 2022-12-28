@@ -28,6 +28,7 @@ import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.capability.FluidHandlerScreenProviderItemStack;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.fabricmc.api.EnvType;
@@ -45,7 +46,7 @@ public class MultipleFluidHandlerScreenProviderItemStack extends FluidHandlerScr
 
     private TankDefinition[] tankDefinitions;
 
-    public MultipleFluidHandlerScreenProviderItemStack(@Nonnull ItemStack container, int capacity, TankDefinition... tankDefinitions) {
+    public MultipleFluidHandlerScreenProviderItemStack(@Nonnull ContainerItemContext container, int capacity, TankDefinition... tankDefinitions) {
         super(container, capacity);
         this.tankDefinitions = tankDefinitions;
     }
@@ -65,11 +66,11 @@ public class MultipleFluidHandlerScreenProviderItemStack extends FluidHandlerScr
     }
 
     @Override
-    public long getFluidAmount() {
+    public long getAmount() {
         for (int i = 0; i < tankDefinitions.length; i++) {
             if (tankDefinitions[i].canDrain) return getFluidInTank(i).getAmount();
         }
-        return super.getFluidAmount();
+        return super.getAmount();
     }
 
     @Nonnull

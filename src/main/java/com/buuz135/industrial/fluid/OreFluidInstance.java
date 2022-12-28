@@ -34,8 +34,6 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidType;
 
 import java.util.function.Consumer;
 
@@ -80,9 +78,5 @@ public class OreFluidInstance {
 
     public String getFluid() {
         return fluid;
-    }
-
-    public RegistryObject<FluidType> getFluidType() {
-        return fluidType;
     }
 }

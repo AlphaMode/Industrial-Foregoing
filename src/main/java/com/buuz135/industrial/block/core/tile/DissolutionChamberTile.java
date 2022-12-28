@@ -40,8 +40,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -108,7 +106,7 @@ public class DissolutionChamberTile extends IndustrialProcessingTile<Dissolution
 
     @Override
     public boolean canIncrease() {
-        return currentRecipe != null && TransferUtil2.insertItem(output, currentRecipe.output.copy(), true) == 0 && (currentRecipe.outputFluid == null || outputFluid.fillForced(currentRecipe.outputFluid.copy(), IFluidHandler.FluidAction.SIMULATE) == currentRecipe.outputFluid.getAmount());
+        return currentRecipe != null && TransferUtil2.insertItem(output, currentRecipe.output.copy(), true) == 0 && (currentRecipe.outputFluid == null || outputFluid.fillForced(currentRecipe.outputFluid.copy(), true) == currentRecipe.outputFluid.getAmount());
     }
 
     @Override
@@ -116,12 +114,12 @@ public class DissolutionChamberTile extends IndustrialProcessingTile<Dissolution
         return () -> {
             if (currentRecipe != null) {
                 DissolutionChamberRecipe dissolutionChamberRecipe = currentRecipe;
-                inputFluid.drainForced(dissolutionChamberRecipe.inputFluid, IFluidHandler.FluidAction.EXECUTE);
+                inputFluid.drainForced(dissolutionChamberRecipe.inputFluid, false);
                 for (int i = 0; i < input.getInventory().getSlots(); i++) {
                     input.getInventory().getStackInSlot(i).shrink(1);
                 }
                 if (dissolutionChamberRecipe.outputFluid != null && !dissolutionChamberRecipe.outputFluid.isEmpty())
-                    outputFluid.fillForced(dissolutionChamberRecipe.outputFluid.copy(), IFluidHandler.FluidAction.EXECUTE);
+                    outputFluid.fillForced(dissolutionChamberRecipe.outputFluid.copy(), false);
                 ItemStack outputStack = dissolutionChamberRecipe.output.copy();
                 outputStack.getItem().onCraftedBy(outputStack, this.level, null);
                 TransferUtil.insertItem(output, outputStack);

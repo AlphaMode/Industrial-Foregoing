@@ -36,6 +36,12 @@ import com.buuz135.industrial.proxy.block.filter.ItemStackFilter;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -51,16 +57,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
@@ -91,7 +92,7 @@ public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
         if (getWorld().isClientSide)
             return;
         if (entity instanceof ItemEntity) {
-            getHandlerCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
+            getHandlerCapability(ItemStorage.SIDED).ifPresent(handler -> {
                 if (getWorkingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
                     if (whitelist != filter.matches((ItemEntity) entity)) return;
                     ItemStack stack = ((ItemEntity) entity).getItem();
@@ -116,8 +117,8 @@ public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
         if (getWorld().isClientSide)
             return;
         if (getWorld().getGameTime() % 2 == 0 && getContainer() instanceof ConveyorTile) {
-            IFluidTank tank = ((ConveyorTile) getContainer()).getTank();
-            getHandlerCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(fluidHandler -> {
+            FluidTank tank = ((ConveyorTile) getContainer()).getTank();
+            getHandlerCapability(FluidStorage.SIDED).ifPresent(fluidHandler -> {
                 if (!tank.drain(50, IFluidHandler.FluidAction.SIMULATE).isEmpty() && fluidHandler.fill(tank.drain(50, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0 && whitelist == filter.matches(tank.drain(50, IFluidHandler.FluidAction.SIMULATE))) {
                     FluidStack drain = tank.drain(fluidHandler.fill(tank.drain(50, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                     if (!drain.isEmpty() && drain.getAmount() > 0) getContainer().requestFluidSync();
@@ -126,16 +127,17 @@ public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
         }
     }
 
-    private <T> LazyOptional<T> getHandlerCapability(Capability<T> capability) {
+    private <T> Optional<T> getHandlerCapability(BlockApiLookup<T, Direction> capability) {
         BlockPos offsetPos = getPos().relative(getSide());
         BlockEntity tile = getWorld().getBlockEntity(offsetPos);
-        if (tile != null && tile.getCapability(capability, getSide().getOpposite()).isPresent())
-            return tile.getCapability(capability, getSide().getOpposite());
-        for (Entity entity : getWorld().getEntitiesOfClass(Entity.class, new AABB(0, 0, 0, 1, 1, 1).move(offsetPos))) {
-            if (entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite()).isPresent())
-                return entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite());
-        }
-        return LazyOptional.empty();
+        T storage = tile != null ? capability.find(getWorld(), offsetPos, tile.getBlockState(), tile, getSide().getOpposite()) : capability.find(getWorld(), offsetPos, getSide().getOpposite());
+        if (storage != null)
+            return Optional.of(storage);
+//        for (Entity entity : getWorld().getEntitiesOfClass(Entity.class, new AABB(0, 0, 0, 1, 1, 1).move(offsetPos))) { TODO: PORT
+//            if (entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite()).isPresent())
+//                return entity.getCapability(capability, entity instanceof ServerPlayer ? null : getSide().getOpposite());
+//        }
+        return Optional.empty();
     }
 
     @Override

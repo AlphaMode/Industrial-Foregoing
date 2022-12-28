@@ -42,13 +42,15 @@ import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.event.client.ModelsBakedCallback;
+import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
+import io.github.fabricators_of_create.porting_lib.model.SimpleModelState;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -64,6 +66,8 @@ import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class ModuleTransportStorage implements IModule {
 
@@ -109,16 +113,16 @@ public class ModuleTransportStorage implements IModule {
         ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "conveyor_" + conveyorUpgradeFactory.getName() + "_upgrade", () -> new ItemConveyorUpgrade(conveyorUpgradeFactory, TAB_TRANSPORT)));
         registryHelper.registerGeneric(Registry.MENU_REGISTRY, "transporter", () -> new ExtendedScreenHandlerType<>(ContainerTransporter::new));
         TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, transporterTypeFactory.getName() + "_transporter_type", () -> new ItemTransporterType(transporterTypeFactory, TAB_TRANSPORT)));
-        DistExecutor.unsafeRunWhenOn(EnvType.CLIENT, () -> this::onClient);
+        EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::onClient);
 
     }
 
     @Environment(EnvType.CLIENT)
-    private void conveyorBake(ModelEvent.BakingCompleted event) {
-        for (ResourceLocation resourceLocation : event.getModels().keySet()) {
+    private void conveyorBake(ModelManager manager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+        for (ResourceLocation resourceLocation : models.keySet()) {
             if (resourceLocation.getNamespace().equals(Reference.MOD_ID)) {
                 if (resourceLocation.getPath().contains("conveyor") && !resourceLocation.getPath().contains("upgrade"))
-                    event.getModels().put(resourceLocation, new ConveyorBlockModel(event.getModels().get(resourceLocation)));
+                    models.put(resourceLocation, new ConveyorBlockModel(models.get(resourceLocation)));
             }
         }
         for (ConveyorUpgradeFactory conveyorUpgradeFactory : ConveyorUpgradeFactory.FACTORIES) {
@@ -126,8 +130,8 @@ public class ModuleTransportStorage implements IModule {
                 for (Direction conveyorFacing : ConveyorBlock.FACING.getPossibleValues()) {
                     try {
                         ResourceLocation resourceLocation = conveyorUpgradeFactory.getModel(upgradeFacing, conveyorFacing);
-                        UnbakedModel unbakedModel = event.getModelBakery().getModel(resourceLocation);
-                        CONVEYOR_UPGRADES_CACHE.put(resourceLocation, unbakedModel.bake(event.getModelBakery(), Material::sprite, new SimpleModelState(Transformation.identity()), resourceLocation));
+                        UnbakedModel unbakedModel = modelBakery.getModel(resourceLocation);
+                        CONVEYOR_UPGRADES_CACHE.put(resourceLocation, unbakedModel.bake(modelBakery, Material::sprite, new SimpleModelState(Transformation.identity()), resourceLocation));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -137,17 +141,17 @@ public class ModuleTransportStorage implements IModule {
     }
 
     @Environment(EnvType.CLIENT)
-    private void textureStitch(TextureStitchEvent.Pre pre) {
-        if (pre.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS))
-            ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> conveyorUpgradeFactory.getTextures().forEach(pre::addSprite));
+    private void textureStitch(TextureAtlas atlas, Consumer<ResourceLocation> adder) {
+        if (atlas.location().equals(TextureAtlas.LOCATION_BLOCKS))
+            ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> conveyorUpgradeFactory.getTextures().forEach(adder));
     }
 
     @Environment(EnvType.CLIENT)
-    private void transporterBake(ModelEvent.BakingCompleted event) {
-        for (ResourceLocation resourceLocation : event.getModels().keySet()) {
+    private void transporterBake(ModelManager manager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+        for (ResourceLocation resourceLocation : models.keySet()) {
             if (resourceLocation.getNamespace().equals(Reference.MOD_ID)) {
                 if (resourceLocation.getPath().contains("transporter") && !resourceLocation.getPath().contains("transporters/") && !resourceLocation.getPath().contains("type"))
-                    event.getModels().put(resourceLocation, new TransporterBlockModel(event.getModels().get(resourceLocation)));
+                    models.put(resourceLocation, new TransporterBlockModel(models.get(resourceLocation)));
             }
         }
         for (TransporterTypeFactory transporterTypeFactory : TransporterTypeFactory.FACTORIES) {
@@ -156,45 +160,45 @@ public class ModuleTransportStorage implements IModule {
                 for (TransporterTypeFactory.TransporterAction actions : TransporterTypeFactory.TransporterAction.values()) {
                     try {
                         ResourceLocation resourceLocation = transporterTypeFactory.getModel(upgradeFacing, actions);
-                        UnbakedModel unbakedModel = event.getModelBakery().getModel(resourceLocation);
-                        TRANSPORTER_CACHE.put(resourceLocation, unbakedModel.bake(event.getModelBakery(), Material::sprite, new SimpleModelState(Transformation.identity()), resourceLocation));
+                        UnbakedModel unbakedModel = modelBakery.getModel(resourceLocation);
+                        TRANSPORTER_CACHE.put(resourceLocation, unbakedModel.bake(modelBakery, Material::sprite, new SimpleModelState(Transformation.identity()), resourceLocation));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
-            for (ResourceLocation resourceLocation : event.getModels().keySet()) {
+            for (ResourceLocation resourceLocation : models.keySet()) {
                 if (resourceLocation.getNamespace().equals(Reference.MOD_ID)) {
                     if (resourceLocation.toString().equals(itemRL))
-                        event.getModels().put(resourceLocation, TRANSPORTER_CACHE.get(transporterTypeFactory.getItemModel()));
+                        models.put(resourceLocation, TRANSPORTER_CACHE.get(transporterTypeFactory.getItemModel()));
                 }
             }
         }
     }
 
     @Environment(EnvType.CLIENT)
-    private void transporterTextureStitch(TextureStitchEvent.Pre pre) {
-        if (pre.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS))
-            TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> transporterTypeFactory.getTextures().forEach(pre::addSprite));
+    private void transporterTextureStitch(TextureAtlas atlas, Consumer<ResourceLocation> adder) {
+        if (atlas.location().equals(TextureAtlas.LOCATION_BLOCKS))
+            TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> transporterTypeFactory.getTextures().forEach(adder));
     }
 
     @Environment(EnvType.CLIENT)
-    private void onClientSetupConveyor(FMLClientSetupEvent event) {
+    private void onClientSetupConveyor() {
         MenuScreens.register(ContainerConveyor.TYPE, GuiConveyor::new);
     }
 
     @Environment(EnvType.CLIENT)
-    private void onClientSetupTransporter(FMLClientSetupEvent event) {
+    private void onClientSetupTransporter() {
         MenuScreens.register(ContainerTransporter.TYPE, GuiTransporter::new);
     }
 
     @Environment(EnvType.CLIENT)
     private void onClient() {
-        EventManager.mod(FMLClientSetupEvent.class).process(this::onClientSetupConveyor).subscribe();
-        EventManager.mod(ModelEvent.BakingCompleted.class).process(this::conveyorBake).subscribe();
-        EventManager.mod(TextureStitchEvent.Pre.class).process(this::textureStitch).subscribe();
-        EventManager.mod(ModelEvent.BakingCompleted.class).process(this::transporterBake).subscribe();
-        EventManager.mod(TextureStitchEvent.Pre.class).process(this::transporterTextureStitch).subscribe();
-        EventManager.mod(FMLClientSetupEvent.class).process(this::onClientSetupTransporter).subscribe();
+        onClientSetupConveyor();
+        ModelsBakedCallback.EVENT.register(this::conveyorBake);
+        TextureStitchCallback.PRE.register(this::textureStitch);
+        ModelsBakedCallback.EVENT.register(this::transporterBake);
+        TextureStitchCallback.PRE.register(this::transporterTextureStitch);
+        onClientSetupTransporter();
     }
 }

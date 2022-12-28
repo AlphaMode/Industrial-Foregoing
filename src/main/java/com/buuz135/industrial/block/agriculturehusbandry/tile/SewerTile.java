@@ -37,7 +37,6 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -71,13 +70,13 @@ public class SewerTile extends IndustrialAreaWorkingTile<SewerTile> {
         List<Animal> entities = this.level.getEntitiesOfClass(Animal.class, getWorkingArea().bounds());
         int amount = entities.size();
         if (amount > 0 && hasEnergy(powerPerOperation * amount)) {
-            sewage.fillForced(new FluidStack(ModuleCore.SEWAGE.getSourceFluid().get(), 50 * amount), IFluidHandler.FluidAction.EXECUTE);
+            sewage.fillForced(new FluidStack(ModuleCore.SEWAGE.getSourceFluid().get(), 50 * amount), false);
             ++amount;
         }
         List<ExperienceOrb> orb = this.level.getEntitiesOfClass(ExperienceOrb.class, getWorkingArea().bounds());
         for (ExperienceOrb experienceOrbEntity : orb) {
             if (experienceOrbEntity.isAlive() && essence.getFluidAmount() + experienceOrbEntity.value * 20 <= essence.getCapacity()) {
-                essence.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), experienceOrbEntity.value * 20), IFluidHandler.FluidAction.EXECUTE);
+                essence.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), experienceOrbEntity.value * 20), false);
                 experienceOrbEntity.onClientRemoval();
             }
         }

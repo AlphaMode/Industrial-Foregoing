@@ -40,8 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.state.BlockState;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -118,7 +116,7 @@ public class ResourcefulFurnaceTile extends IndustrialProcessingTile<Resourceful
                     if (TransferUtil2.insertItem(output, recipe.getResultItem().copy(), true) == 0) {
                         input.setStackInSlot(i, ItemStack.EMPTY);
                         TransferUtil.insertItem(output, recipe.getResultItem().copy());
-                        tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), (int) (recipe.getExperience() * 20)), IFluidHandler.FluidAction.EXECUTE);
+                        tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), (int) (recipe.getExperience() * 20)), false);
                     }
                 }
             }

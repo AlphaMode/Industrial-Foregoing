@@ -127,11 +127,6 @@ public class OreFluid extends FlowingFluid {
         return fluidIn == instance.getFlowingFluid() || fluidIn == instance.getSourceFluid();
     }
 
-    @Override
-    public FluidType getFluidType() {
-        return instance.getFluidType().get();
-    }
-
     public static class Flowing extends OreFluid {
         {
             registerDefaultState(getStateDefinition().any().setValue(LEVEL, 7));

@@ -24,13 +24,13 @@ package com.buuz135.industrial.proxy.block.filter;
 
 import com.buuz135.industrial.item.MobImprisonmentToolItem;
 import com.buuz135.industrial.module.ModuleTool;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 
 public class ItemStackFilter extends AbstractFilter<Entity> {
 

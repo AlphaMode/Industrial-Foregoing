@@ -46,7 +46,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -171,7 +170,7 @@ public class FermentationStationTile extends IndustrialProcessingTile<Fermentati
     @Override
     public boolean canIncrease() {
         ProductionType productionType = ProductionType.values()[this.production];
-        int multipliedAmount = productionType.amount * this.input.getFluidAmount();
+        long multipliedAmount = productionType.amount * this.input.getFluidAmount();
         return isSealed && this.output.getFluidAmount() + multipliedAmount <= this.output.getCapacity() && (productionType.neededFluid.isEmpty() || (!this.catalyst.isEmpty() && productionType.neededFluid.getFluid().isSame(this.catalyst.getFluid().getFluid()) && this.catalyst.getFluidAmount() >= (productionType.neededFluid.getAmount() * this.input.getFluidAmount() / 100)));
     }
 
@@ -179,11 +178,11 @@ public class FermentationStationTile extends IndustrialProcessingTile<Fermentati
     public Runnable onFinish() {
         return () -> {
             ProductionType productionType = ProductionType.values()[this.production];
-            int multipliedAmount = productionType.amount * this.input.getFluidAmount();
+            long multipliedAmount = productionType.amount * this.input.getFluidAmount();
             FluidStack stack = OreTitaniumFluidType.getFluidWithTag(ModuleCore.FERMENTED_ORE_MEAT, multipliedAmount, new ResourceLocation(OreTitaniumFluidType.getFluidTag(this.input.getFluid())));
-            this.output.fillForced(stack, IFluidHandler.FluidAction.EXECUTE);
-            this.catalyst.drainForced(productionType.neededFluid.getAmount() * this.input.getFluidAmount() / 100, IFluidHandler.FluidAction.EXECUTE);
-            this.input.drainForced(this.input.getFluidAmount(), IFluidHandler.FluidAction.EXECUTE);
+            this.output.fillForced(stack, false);
+            this.catalyst.drainForced(productionType.neededFluid.getAmount() * this.input.getFluidAmount() / 100, false);
+            this.input.drainForced(this.input.getFluidAmount(), false);
         };
     }
 

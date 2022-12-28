@@ -61,7 +61,7 @@ public class DyeMixerBlock extends IndustrialBlock<DyeMixerTile> {
                 .define('P', IndustrialTags.Items.PLASTIC)
                 .define('D', Tags.Items.DYES)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('R', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('R', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .save(consumer);
     }
 }

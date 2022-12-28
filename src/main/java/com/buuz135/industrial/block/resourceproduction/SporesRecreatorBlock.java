@@ -61,7 +61,7 @@ public class SporesRecreatorBlock extends IndustrialBlock<SporesRecreatorTile> {
                 .define('P', IndustrialTags.Items.PLASTIC)
                 .define('I', Tags.Items.MUSHROOMS)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('S', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('S', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

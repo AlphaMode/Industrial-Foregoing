@@ -39,6 +39,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -52,9 +56,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import me.alphamode.forgetags.Tags;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -64,7 +65,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class TransporterFluidType extends FilteredTransporterType<FluidStack, IFluidHandler> {
+public class TransporterFluidType extends FilteredTransporterType<FluidStack, Storage<FluidVariant>> {
 
     public static final int QUEUE_SIZE = 6;
 
@@ -84,24 +85,24 @@ public class TransporterFluidType extends FilteredTransporterType<FluidStack, IF
     }
 
     @Override
-    public RegulatorFilter<FluidStack, IFluidHandler> createFilter() {
-        return new RegulatorFilter<FluidStack, IFluidHandler>(20, 20, 5, 3, 50, 250, 32000, "mb") {
+    public RegulatorFilter<FluidStack, Storage<FluidVariant>> createFilter() {
+        return new RegulatorFilter<FluidStack, Storage<FluidVariant>>(20, 20, 5, 3, 50, 250, 32000, "mb") {
             @Override
-            public int matches(FluidStack stack, IFluidHandler iFluidHandler, boolean isRegulated) {
-                int amount = 0;
+            public long matches(FluidStack stack, Storage<FluidVariant> iFluidHandler, boolean isRegulated) {
+                long amount = 0;
                 if (isEmpty()) return stack.getAmount();
                 if (isRegulated) {
-                    for (int i = 0; i < iFluidHandler.getTanks(); i++) {
-                        if (iFluidHandler.isFluidValid(i, stack) && iFluidHandler.getFluidInTank(i).isFluidEqual(stack)) {
-                            amount += iFluidHandler.getFluidInTank(i).getAmount();
+                    for (StorageView<FluidVariant> view : iFluidHandler) {
+                        if (new FluidStack(view).isFluidEqual(stack)) {
+                            amount += view.getAmount();
                         }
                     }
                 }
                 for (IFilter.GhostSlot slot : this.getFilter()) {
-                    FluidStack original = FluidUtil.getFluidContained(slot.getStack()).orElse(null);
+                    FluidStack original = TransferUtil.getFluidContained(slot.getStack()).orElse(null);
                     if (original != null && original.isFluidEqual(stack)) {
-                        int allowedAmount = isRegulated ? slot.getAmount() : Integer.MAX_VALUE;
-                        int returnAmount = Math.min(stack.getAmount(), allowedAmount - amount);
+                        long allowedAmount = isRegulated ? slot.getAmount() : Long.MAX_VALUE;
+                        long returnAmount = Math.min(stack.getAmount(), allowedAmount - amount);
                         if (returnAmount > 0) return returnAmount;
                     }
                 }
@@ -140,8 +141,8 @@ public class TransporterFluidType extends FilteredTransporterType<FluidStack, IF
         }
     }
 
-    private boolean filter(RegulatorFilter<FluidStack, IFluidHandler> filter, boolean whitelist, FluidStack fluidStack, IFluidHandler handler, boolean isRegulated) {
-        int accepts = filter.matches(fluidStack, handler, isRegulated);
+    private boolean filter(RegulatorFilter<FluidStack, Storage<FluidVariant>> filter, boolean whitelist, FluidStack fluidStack, Storage<FluidVariant> handler, boolean isRegulated) {
+        long accepts = filter.matches(fluidStack, handler, isRegulated);
         if (whitelist && filter.isEmpty()) {
             return false;
         }
@@ -244,7 +245,7 @@ public class TransporterFluidType extends FilteredTransporterType<FluidStack, IF
 
         @Override
         public boolean canBeAttachedAgainst(Level world, BlockPos pos, Direction face) {
-            return TileUtil.getTileEntity(world, pos).map(tileEntity -> tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, face).isPresent()).orElse(false);
+            return TransferUtil.getFluidStorage(world, pos, face) != null;
         }
 
         @Nonnull

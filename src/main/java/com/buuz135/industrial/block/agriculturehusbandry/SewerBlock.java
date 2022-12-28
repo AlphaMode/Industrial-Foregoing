@@ -62,7 +62,7 @@ public class SewerBlock extends IndustrialBlock<SewerTile> {
                 .define('E', Items.BUCKET)
                 .define('B', Items.BRICK)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

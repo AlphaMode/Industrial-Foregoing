@@ -39,8 +39,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluid;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 
@@ -75,7 +73,7 @@ public class FluidCollectorTile extends IndustrialAreaWorkingTile<FluidCollector
                     } else {
                         level.setBlockAndUpdate(pointed, Blocks.AIR.defaultBlockState());
                     }
-                    tank.fillForced(new FluidStack(fluid, FluidType.BUCKET_VOLUME), IFluidHandler.FluidAction.EXECUTE);
+                    tank.fillForced(new FluidStack(fluid, FluidConstants.BUCKET), false);
                     increasePointer();
                     return new WorkAction(1, getPowerPerOperation);
                 }

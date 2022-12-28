@@ -39,8 +39,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
@@ -90,7 +88,7 @@ public class SporesRecreatorTile extends IndustrialProcessingTile<SporesRecreato
     public Runnable onFinish() {
         return () -> {
             ItemStack outputStack = new ItemStack(ItemHandlerUtil.getFirstItem(input).getItem(), 2);
-            tank.drainForced(100, IFluidHandler.FluidAction.EXECUTE);
+            tank.drainForced(8100, false);
             ItemHandlerUtil.getFirstItem(input).shrink(1);
             TransferUtil2.insertItem(output, outputStack, false);
         };

@@ -59,7 +59,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -161,11 +160,11 @@ public class FluidLaserBaseTile extends IndustrialMachineTile<FluidLaserBaseTile
                                 LivingEntity first = entities.get(0);
                                 if (first.getHealth() > 5) {
                                     first.hurt(DamageSource.GENERIC, 5);
-                                    output.fillForced(FluidStack.loadFluidStackFromNBT(laserDrillFluidRecipe.output), IFluidHandler.FluidAction.EXECUTE);
+                                    output.fillForced(FluidStack.loadFluidStackFromNBT(laserDrillFluidRecipe.output), false);
                                 }
                             }
                         } else {
-                            output.fillForced(FluidStack.loadFluidStackFromNBT(laserDrillFluidRecipe.output), IFluidHandler.FluidAction.EXECUTE);
+                            output.fillForced(FluidStack.loadFluidStackFromNBT(laserDrillFluidRecipe.output), false);
                         }
                     });
         }

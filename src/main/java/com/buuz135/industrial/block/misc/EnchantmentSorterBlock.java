@@ -61,7 +61,7 @@ public class EnchantmentSorterBlock extends IndustrialBlock<EnchantmentSorterTil
                 .define('B', Items.BOOK)
                 .define('E', Items.ENCHANTED_BOOK)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_ADVANCED)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/diamond")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:diamond_gears")))
                 .save(consumer);
     }
 

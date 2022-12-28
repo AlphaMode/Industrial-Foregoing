@@ -41,8 +41,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -106,7 +104,7 @@ public class FluidSievingMachineTile extends IndustrialProcessingTile<FluidSievi
             }
             ItemStack output = OreTitaniumFluidType.getOutputDust(this.input.getFluid());
             TransferUtil2.insertItem(this.output, output, false);
-            this.input.drainForced(100, IFluidHandler.FluidAction.EXECUTE);
+            this.input.drainForced(8100, false);
         };
     }
 

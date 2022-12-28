@@ -35,7 +35,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class EnchantmentSorterTile extends IndustrialProcessingTile<EnchantmentSorterTile> {
 

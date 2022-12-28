@@ -36,7 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 
@@ -64,10 +63,10 @@ public class WaterCondensatorTile extends IndustrialWorkingTile<WaterCondensator
         int water = getWaterSources();
         if (water >= 2) {
             if (hasEnergy(getPowerPerOperation)) {
-                this.water.fillForced(new FluidStack(Fluids.WATER, water * 100), IFluidHandler.FluidAction.EXECUTE);
+                this.water.fillForced(new FluidStack(Fluids.WATER, water * 100), false);
                 return new WorkAction(0.1f, getPowerPerOperation);
             } else {
-                this.water.fillForced(new FluidStack(Fluids.WATER, water * 50), IFluidHandler.FluidAction.EXECUTE);
+                this.water.fillForced(new FluidStack(Fluids.WATER, water * 50), false);
                 return new WorkAction(0.5f, 0);
             }
         }

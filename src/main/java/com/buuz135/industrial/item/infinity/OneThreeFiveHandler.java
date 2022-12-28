@@ -26,6 +26,8 @@ import com.buuz135.industrial.IndustrialForegoing;
 import com.buuz135.industrial.proxy.client.particle.ParticleVex;
 import com.buuz135.industrial.proxy.network.SpecialParticleMessage;
 import com.buuz135.industrial.utils.Reference;
+import io.github.fabricators_of_create.porting_lib.event.common.PlayerTickEvents;
+import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,18 +36,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = Reference.MOD_ID)
 public class OneThreeFiveHandler {
 
     private static final String SPECIAL = "135135";
@@ -73,13 +69,11 @@ public class OneThreeFiveHandler {
         toRemove.forEach(uuid -> SPECIAL_ENTITIES.remove(uuid));
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) return;
-        if (event.player.level.getGameTime() % 20 == 0) {
-            for (ItemStack stack : event.player.inventory.items) {
+    public static void onPlayerTick(Player player) {
+        if (player.level.getGameTime() % 20 == 0) {
+            for (ItemStack stack : player.getInventory().items) {
                 if (stack.getItem() instanceof ItemInfinity && ((ItemInfinity) stack.getItem()).isSpecial(stack) && ((ItemInfinity) stack.getItem()).isSpecialEnabled(stack)) {
-                    IndustrialForegoing.NETWORK.sendToNearby(event.player.level, new BlockPos(event.player.blockPosition().getX(), event.player.blockPosition().getY(), event.player.blockPosition().getZ()), 64, new SpecialParticleMessage(event.player.getUUID()));
+                    IndustrialForegoing.NETWORK.sendToNearby(player.level, new BlockPos(player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ()), 64, new SpecialParticleMessage(event.player.getUUID()));
                     return;
                 }
             }
@@ -94,6 +88,11 @@ public class OneThreeFiveHandler {
                 player.getMainHandItem().getTag().putBoolean("Special", true);
             }
         }
+    }
+
+    public static void init() {
+        PlayerTickEvents.START.register(OneThreeFiveHandler::onPlayerTick);
+
     }
 
 }

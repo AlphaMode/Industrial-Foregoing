@@ -63,8 +63,8 @@ public class BlockBreakerBlock extends IndustrialBlock<BlockBreakerTile> {
                 .define('D', Items.IRON_SHOVEL)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
                 .define('R', Items.REDSTONE)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
-                .define('S', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
+                .define('S', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

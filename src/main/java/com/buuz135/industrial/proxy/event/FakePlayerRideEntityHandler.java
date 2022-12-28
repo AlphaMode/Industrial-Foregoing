@@ -23,13 +23,12 @@
 package com.buuz135.industrial.proxy.event;
 
 import com.buuz135.industrial.utils.IFFakePlayer;
-import net.minecraftforge.event.entity.EntityMountEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.InteractionResult;
 
 public class FakePlayerRideEntityHandler {
 
     @SubscribeEvent
-    public void onFakePlayerRide(EntityMountEvent entityMountEvent) {
+    public static InteractionResult onFakePlayerRide(EntityMountEvent entityMountEvent) {
         if (entityMountEvent.getEntityMounting() instanceof IFFakePlayer) entityMountEvent.setCanceled(true);
     }
 }

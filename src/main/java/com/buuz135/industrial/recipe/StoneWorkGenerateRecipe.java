@@ -105,8 +105,8 @@ public class StoneWorkGenerateRecipe extends SerializableRecipe {
     }
 
     public void consume(FluidTankComponent fluidTank, FluidTankComponent fluidTank2) {
-        fluidTank.drainForced(waterConsume, IFluidHandler.FluidAction.EXECUTE);
-        fluidTank2.drainForced(lavaConsume, IFluidHandler.FluidAction.EXECUTE);
+        fluidTank.drainForced(waterConsume, false);
+        fluidTank2.drainForced(lavaConsume, false);
     }
 
 }

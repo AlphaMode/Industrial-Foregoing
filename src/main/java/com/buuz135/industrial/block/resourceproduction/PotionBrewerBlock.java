@@ -60,7 +60,7 @@ public class PotionBrewerBlock extends IndustrialBlock<PotionBrewerTile> {
                 .pattern("PSP").pattern("BMB").pattern("GBG")
                 .define('P', IndustrialTags.Items.PLASTIC)
                 .define('S', Blocks.BREWING_STAND)
-                .define('B', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('B', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_ADVANCED)
                 .define('G', Items.REPEATER)
                 .save(consumer);

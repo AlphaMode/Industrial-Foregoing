@@ -32,6 +32,7 @@ import com.buuz135.industrial.proxy.network.TransporterButtonInteractMessage;
 import com.buuz135.industrial.utils.Reference;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.nbt.CompoundTag;
@@ -83,7 +84,7 @@ public class GuiTransporter extends AbstractContainerScreen<ContainerTransporter
         blit(stack, x, y, 0, 0, imageWidth, imageHeight);
         if (upgrade != null) {
             String localized = Component.translatable(upgrade.getFactory().getUpgradeItem().getDescriptionId()).getString();
-            getMinecraft().font.draw(stack, localized, x + imageWidth / 2 - getMinecraft().font.width(localized) / 2, y + 6, 0x404040);
+            Screens.getClient(this).font.draw(stack, localized, x + imageWidth / 2 - Screens.getClient(this).font.width(localized) / 2, y + 6, 0x404040);
         }
         for (IGuiComponent iGuiComponent : componentList) {
             iGuiComponent.drawGuiBackgroundLayer(stack, x, y, mouseX, mouseY);

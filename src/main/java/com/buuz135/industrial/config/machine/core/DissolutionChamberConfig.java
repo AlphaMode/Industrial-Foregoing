@@ -33,15 +33,15 @@ public class DissolutionChamberConfig {
     public static int maxProgress = 100;
 
     @ConfigVal(comment = "Amount of Power Consumed per Tick - Default: [60FE]")
-    public static int powerPerTick = 90;
+    public static long powerPerTick = 90;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
-    public static int maxStoredPower = 10000;
+    public static long maxStoredPower = 10000;
 
     @ConfigVal(comment = "Max Amount of Stored Fluid [Input] - Default: [8000mB]")
-    public static int maxInputTankSize = 8000;
+    public static long maxInputTankSize = 8000;
 
     @ConfigVal(comment = "Max Amount of Stored Fluid [Output] - Default: [8000mB]")
-    public static int maxOutputTankSize = 16000;
+    public static long maxOutputTankSize = 16000;
 
 }

@@ -21,21 +21,27 @@
  */
 package com.buuz135.industrial.capability;
 
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlotExposedStorage;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class BLHBlockItemHandlerItemStack implements IItemHandler {
+public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVariant>, SlotExposedStorage {
 
-    public final ItemStack stack;
+    public final ContainerItemContext context;
     public final int slotLimit;
 
-    public BLHBlockItemHandlerItemStack(ItemStack stack, int slotLimit) {
-        this.stack = stack;
+    public BLHBlockItemHandlerItemStack(ContainerItemContext context, int slotLimit) {
+        this.context = context;
         this.slotLimit = slotLimit;
     }
 
@@ -57,8 +63,8 @@ public class BLHBlockItemHandlerItemStack implements IItemHandler {
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
         if (isItemValid(slot, stack)) {
             int amount = getSlotLimit(slot);
-            int stored = getAmount();
-            int inserted = Math.min(amount - stored, stack.getCount());
+            long stored = getAmount();
+            long inserted = Math.min(amount - stored, stack.getCount());
             if (getVoid()) inserted = stack.getCount();
             if (!simulate) {
                 setStack(stack);
@@ -75,11 +81,11 @@ public class BLHBlockItemHandlerItemStack implements IItemHandler {
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0) return ItemStack.EMPTY;
         ItemStack blStack = getStack();
-        int stored = getAmount();
+        long stored = getAmount();
         if (blStack.isEmpty()) return ItemStack.EMPTY;
         if (stored <= amount) {
             ItemStack out = blStack.copy();
-            int newAmount = stored;
+            long newAmount = stored;
             if (!simulate) {
                 //setStack(ItemStack.EMPTY);
                 setAmount(0);
@@ -101,16 +107,22 @@ public class BLHBlockItemHandlerItemStack implements IItemHandler {
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    public boolean isItemValid(int slot, @Nonnull ItemVariant variant, long amount) {
         ItemStack current = getStack();
         return current.isEmpty() || (current.sameItem(stack) && ItemStack.tagMatches(current, stack));
     }
 
-    public int getAmount() {
+    @Override
+    public long getAmount() {
         CompoundTag tag = getTag();
         if (tag != null && tag.contains("stored")) {
             return tag.getInt("stored");
         }
+        return 0;
+    }
+
+    @Override
+    public long getCapacity() {
         return 0;
     }
 
@@ -130,31 +142,60 @@ public class BLHBlockItemHandlerItemStack implements IItemHandler {
         return true;
     }
 
-    private void setAmount(int amount) {
+    private void setAmount(long amount) {
         CompoundTag tag = getTag();
+        ItemStack newStack = context.getItemVariant().toStack();
         if (tag == null) {
             CompoundTag compoundNBT = new CompoundTag();
             compoundNBT.put("BlockEntityTag", new CompoundTag());
-            this.stack.setTag(compoundNBT);
+            newStack.setTag(compoundNBT);
         }
-        this.stack.getTag().getCompound("BlockEntityTag").putInt("stored", amount);
+        newStack.getTag().getCompound("BlockEntityTag").putLong("stored", amount);
+        try (Transaction tx = TransferUtil.getTransaction()) {
+            if (context.exchange(ItemVariant.of(newStack), 1, tx) == 1)
+                tx.commit();
+        }
     }
 
     private void setStack(ItemStack stack) {
         CompoundTag tag = getTag();
+        ItemStack newStack = context.getItemVariant().toStack();
         if (tag == null) {
             CompoundTag compoundNBT = new CompoundTag();
             compoundNBT.put("BlockEntityTag", new CompoundTag());
-            this.stack.setTag(compoundNBT);
+            newStack.setTag(compoundNBT);
         }
-        this.stack.getTag().getCompound("BlockEntityTag").put("blStack", stack.serializeNBT());
+        newStack.getTag().getCompound("BlockEntityTag").put("blStack", NBTSerializer.serializeNBT(stack));
+        try (Transaction tx = TransferUtil.getTransaction()) {
+            if (context.exchange(ItemVariant.of(newStack), 1, tx) == 1)
+                tx.commit();
+        }
     }
 
     private CompoundTag getTag() {
-        if (stack.hasTag() && stack.getTag().contains("BlockEntityTag"))
-            return stack.getTag().getCompound("BlockEntityTag");
+        if (context.getItemVariant().hasNbt() && context.getItemVariant().getNbt().contains("BlockEntityTag"))
+            return context.getItemVariant().getNbt().getCompound("BlockEntityTag");
         return null;
     }
 
 
+    @Override
+    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        return 0;
+    }
+
+    @Override
+    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        return 0;
+    }
+
+    @Override
+    public boolean isResourceBlank() {
+        return false;
+    }
+
+    @Override
+    public ItemVariant getResource() {
+        return null;
+    }
 }

@@ -62,7 +62,7 @@ public class ResourcefulFurnaceBlock extends IndustrialBlock<ResourcefulFurnaceT
                 .define('B', Items.BUCKET)
                 .define('L', Items.FURNACE)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('R', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('R', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .save(consumer);
     }
 }

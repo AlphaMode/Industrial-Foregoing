@@ -94,7 +94,7 @@ dependencies {
     modRuntimeOnly("mezz.jei:jei-1.19.2-fabric:11.5.0.297")
     modImplementation(project.dependencies.create('com.hrznstudio:titanium:1.19.2-3.7.1'))
     modImplementation(include("io.github.tropheusj:milk-lib:${project.milk_lib_version}"))
-    modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraftVersion}-fake-players"))
+    modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraftVersion}"))
 
 //    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_mc_version}-${curios_version}:api")
 //    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_mc_version}-${curios_version}")

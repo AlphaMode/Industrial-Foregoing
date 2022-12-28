@@ -29,6 +29,10 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
 import com.hrznstudio.titanium.component.inventory.InventoryComponent;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -37,15 +41,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,8 +53,6 @@ public class BlackHoleControllerTile extends ActiveTile<BlackHoleControllerTile>
 
     private BlackHoleControllerInventory inventory;
     private BlackHoleControllerTank tank;
-    private LazyOptional<BlackHoleControllerInventory> lazyInventory;
-    private LazyOptional<BlackHoleControllerTank> lazyTank;
 
     public BlackHoleControllerTile(BlockPos blockPos, BlockState blockState) {
         super((BasicTileBlock<BlackHoleControllerTile>) ModuleTransportStorage.BLACK_HOLE_CONTROLLER.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_CONTROLLER.getRight().get(), blockPos, blockState);
@@ -73,8 +67,6 @@ public class BlackHoleControllerTile extends ActiveTile<BlackHoleControllerTile>
         }
         this.inventory = new BlackHoleControllerInventory();
         this.tank = new BlackHoleControllerTank();
-        this.lazyInventory = LazyOptional.of(() -> this.inventory);
-        this.lazyTank = LazyOptional.of(() -> this.tank);
     }
 
     @Nonnull
@@ -83,12 +75,14 @@ public class BlackHoleControllerTile extends ActiveTile<BlackHoleControllerTile>
         return this;
     }
 
-    @Nonnull
     @Override
-    public <U> LazyOptional<U> getCapability(@Nonnull Capability<U> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return lazyInventory.cast();
-        if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return lazyTank.cast();
-        return super.getCapability(cap, side);
+    public Storage<ItemVariant> getItemStorage(Direction side) {
+        return this.inventory;
+    }
+
+    @Override
+    public Storage<FluidVariant> getFluidStorage(Direction side) {
+        return this.tank;
     }
 
     @Override
@@ -104,7 +98,7 @@ public class BlackHoleControllerTile extends ActiveTile<BlackHoleControllerTile>
         return units_storage;
     }
 
-    private class BlackHoleControllerInventory implements IItemHandler {
+    private class BlackHoleControllerInventory implements Storage<ItemVariant> {
 
         @Override
         public int getSlots() {
@@ -165,7 +159,7 @@ public class BlackHoleControllerTile extends ActiveTile<BlackHoleControllerTile>
         }
     }
 
-    private class BlackHoleControllerTank implements IFluidHandler {
+    private class BlackHoleControllerTank implements Storage<FluidVariant> {
 
         @Override
         public int getTanks() {

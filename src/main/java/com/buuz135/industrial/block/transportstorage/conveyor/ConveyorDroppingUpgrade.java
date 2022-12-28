@@ -34,6 +34,9 @@ import com.buuz135.industrial.proxy.block.filter.IFilter;
 import com.buuz135.industrial.proxy.block.filter.ItemStackFilter;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -49,7 +52,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import me.alphamode.forgetags.Tags;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -78,7 +80,8 @@ public class ConveyorDroppingUpgrade extends ConveyorUpgrade {
         if (entity instanceof ItemEntity) {
             BlockEntity tile = getWorld().getBlockEntity(getPos().relative(Direction.DOWN));
             if (tile != null) {
-                tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).ifPresent(handler -> {
+                Storage<ItemVariant> handler = TransferUtil.getItemStorage(tile);
+                if (handler != null) {
                     if (getBoundingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
                         ItemStack stack = ((ItemEntity) entity).getItem();
                         for (int i = 0; i < handler.getSlots(); i++) {
@@ -91,7 +94,7 @@ public class ConveyorDroppingUpgrade extends ConveyorUpgrade {
                             }
                         }
                     }
-                });
+                }
             }
         }
         if (!entity.isAlive()) return;

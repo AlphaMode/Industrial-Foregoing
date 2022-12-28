@@ -39,6 +39,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -52,10 +57,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import me.alphamode.forgetags.Tags;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import me.alphamode.forgetags.Tags;;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -65,7 +67,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class TransporterItemType extends FilteredTransporterType<ItemStack, IItemHandler> {
+public class TransporterItemType extends FilteredTransporterType<ItemStack, Storage<ItemVariant>> {
 
     public static final int QUEUE_SIZE = 6;
 
@@ -87,24 +89,24 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
     }
 
     @Override
-    public RegulatorFilter<ItemStack, IItemHandler> createFilter() {
-        return new RegulatorFilter<ItemStack, IItemHandler>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
+    public RegulatorFilter<ItemStack, Storage<ItemVariant>> createFilter() {
+        return new RegulatorFilter<ItemStack, Storage<ItemVariant>>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
             @Override
-            public int matches(ItemStack stack, IItemHandler itemHandler, boolean isRegulated) {
+            public long matches(ItemStack stack, Storage<ItemVariant> itemHandler, boolean isRegulated) {
                 if (isEmpty()) return stack.getCount();
-                int amount = 0;
+                long amount = 0;
                 if (isRegulated) {
-                    for (int i = 0; i < itemHandler.getSlots(); i++) {
-                        if (itemHandler.getStackInSlot(i).sameItem(stack)) {
-                            amount += itemHandler.getStackInSlot(i).getCount();
+                    for (StorageView<ItemVariant> view : itemHandler) {
+                        if (view.getResource().toStack().sameItem(stack)) {
+                            amount += view.getAmount();
                         }
                     }
                 }
 
                 for (IFilter.GhostSlot slot : this.getFilter()) {
                     if (stack.sameItem(slot.getStack())) {
-                        int maxAmount = isRegulated ? slot.getAmount() : Integer.MAX_VALUE;
-                        int returnAmount = Math.min(stack.getCount(), maxAmount - amount);
+                        long maxAmount = isRegulated ? slot.getAmount() : Long.MAX_VALUE;
+                        long returnAmount = Math.min(stack.getCount(), maxAmount - amount);
                         if (returnAmount > 0) return returnAmount;
                     }
                 }
@@ -155,8 +157,8 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
         }
     }
 
-    private boolean filter(RegulatorFilter<ItemStack, IItemHandler> filter, boolean whitelist, ItemStack stack, IItemHandler handler, boolean isRegulated) {
-        int accepts = filter.matches(stack, handler, isRegulated);
+    private boolean filter(RegulatorFilter<ItemStack, Storage<ItemVariant>> filter, boolean whitelist, ItemStack stack, Storage<ItemVariant> handler, boolean isRegulated) {
+        long accepts = filter.matches(stack, handler, isRegulated);
         if (whitelist && filter.isEmpty()) {
             return false;
         }
@@ -177,7 +179,7 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
         }
     }
 
-    private void findSlot(IItemHandler itemHandler, RegulatorFilter<ItemStack, IItemHandler> otherFilter, boolean otherWhitelist, IItemHandler otherItemHandler, boolean otherRegulated) {
+    private void findSlot(Storage<ItemVariant> itemHandler, RegulatorFilter<ItemStack, Storage<ItemVariant>> otherFilter, boolean otherWhitelist, Storage<ItemVariant> otherItemHandler, boolean otherRegulated) {
         for (int i = this.extractSlot; i < itemHandler.getSlots(); i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty() && filter(this.getFilter(), this.isWhitelist(), itemHandler.getStackInSlot(i), itemHandler, false) && filter(otherFilter, otherWhitelist, itemHandler.getStackInSlot(i), otherItemHandler, otherRegulated)) {
                 this.extractSlot = i;
@@ -188,7 +190,7 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
     }
 
     public void addTransferedStack(Direction direction, ItemStack stack) {
-        syncRender(direction, stack.serializeNBT());
+        syncRender(direction, NBTSerializer.serializeNBTCompound(stack));
     }
 
     @Override
@@ -262,7 +264,7 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, IIte
 
         @Override
         public boolean canBeAttachedAgainst(Level world, BlockPos pos, Direction face) {
-            return TileUtil.getTileEntity(world, pos).map(tileEntity -> tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face).isPresent()).orElse(false);
+            return TransferUtil.getItemStorage(world, pos, face) != null;
         }
 
         @Nonnull

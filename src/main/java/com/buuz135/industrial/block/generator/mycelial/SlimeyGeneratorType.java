@@ -26,6 +26,7 @@ import com.buuz135.industrial.plugin.jei.generator.MycelialGeneratorRecipe;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.tropheusj.milk.Milk;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
@@ -34,11 +35,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.ForgeMod;
 import me.alphamode.forgetags.Tags;
 import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class SlimeyGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<Predicate<FluidStack>> getTankInputPredicates() {
-        return Arrays.asList(fluidStack -> fluidStack.getFluid().isSame(ForgeMod.MILK.get()), null);
+        return Arrays.asList(fluidStack -> fluidStack.getFluid().isSame(Milk.STILL_MILK), null);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class SlimeyGeneratorType implements IMycelialGeneratorType {
     public Pair<Integer, Integer> getTimeAndPowerGeneration(INBTSerializable<CompoundTag>[] inputs) {
         if (inputs.length >= 2 && inputs[0] instanceof SidedFluidTankComponent && inputs[1] instanceof SidedInventoryComponent) {
             if (((SidedFluidTankComponent<?>) inputs[0]).getFluidAmount() >= 250 && ((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).getCount() > 0) {
-                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, IFluidHandler.FluidAction.EXECUTE);
+                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, false);
                 ((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).shrink(1);
                 return Pair.of(20 * 20, 200);
             }
@@ -104,7 +103,7 @@ public class SlimeyGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return Collections.singletonList(new MycelialGeneratorRecipe(Arrays.asList(new ArrayList<>(), Collections.singletonList(Ingredient.of(Tags.Items.SLIMEBALLS))), Arrays.asList(Arrays.asList(new FluidStack(ForgeMod.MILK.get(), 250)), Arrays.asList()), 20 * 20, 200));
+        return Collections.singletonList(new MycelialGeneratorRecipe(Arrays.asList(new ArrayList<>(), Collections.singletonList(Ingredient.of(Tags.Items.SLIMEBALLS))), Arrays.asList(Arrays.asList(new FluidStack(Milk.STILL_MILK, 250)), Arrays.asList()), 20 * 20, 200));
     }
 
     @Override

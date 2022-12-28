@@ -60,7 +60,7 @@ public class EnchantmentExtractorBlock extends IndustrialBlock<EnchantmentExtrac
                 .define('S', Blocks.NETHER_BRICKS)
                 .define('B', Items.BOOK)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_ADVANCED)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .define('D', Items.DIAMOND)
                 .save(consumer);
     }

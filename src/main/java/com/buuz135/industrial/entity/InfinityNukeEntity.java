@@ -140,12 +140,6 @@ public class InfinityNukeEntity extends Entity {
     }
 
     @Override
-    public void onRemovedFromWorld() {
-        super.onRemovedFromWorld();
-
-    }
-
-    @Override
     protected void defineSynchedData() {
         this.entityData.define(RADIUS, 1);
         this.entityData.define(EXPLODING, false);

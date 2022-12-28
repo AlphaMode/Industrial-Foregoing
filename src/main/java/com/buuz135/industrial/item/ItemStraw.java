@@ -26,6 +26,12 @@ import com.buuz135.industrial.api.straw.StrawHandler;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.StrawUtils;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -49,11 +55,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,9 +86,9 @@ public class ItemStraw extends IFCustomItem {
                 if (fluidState != Fluids.EMPTY.defaultFluidState() && block instanceof BucketPickup && fluidState.isSource()) {
                     StrawUtils.getStrawHandler(fluidState.getType()).ifPresent(handler -> {
                         ItemStack stack = ((BucketPickup) block).pickupBlock(world, pos, state);
-                        stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(iFluidHandlerItem -> {
-                            if (!iFluidHandlerItem.getFluidInTank(0).isEmpty()) {
-                                handler.onDrink(world, pos, iFluidHandlerItem.getFluidInTank(0).getFluid(), player, false);
+                        TransferUtil.getFluidContained(stack).ifPresent(fluidStack -> {
+                            if (!fluidStack.isEmpty()) {
+                                handler.onDrink(world, pos, fluidStack.getFluid(), player, false);
                             }
                         });
 
@@ -94,22 +96,18 @@ public class ItemStraw extends IFCustomItem {
                     return heldStack;
                 }
                 BlockEntity tile = world.getBlockEntity(pos);
-                if (tile != null) {
-                    LazyOptional<IFluidHandler> fluidhandlercap = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-                    if (fluidhandlercap.isPresent()) {
-                        IFluidHandler handler = fluidhandlercap.orElseThrow(RuntimeException::new);
-                        int tanks = handler.getTanks();
-                        for (int i = 0; i < tanks; i++) {
-                            FluidStack stack = handler.getFluidInTank(i);
-                            if (!stack.isEmpty()) {
-                                Fluid fluidInstance = stack.getFluid();
-                                Optional<StrawHandler> strawHandler = StrawUtils.getStrawHandler(fluidInstance);
-                                if (fluidInstance != null && strawHandler.isPresent() && stack.getAmount() >= 1000) {
-                                    FluidStack out = handler.drain(1000, IFluidHandler.FluidAction.SIMULATE);
-                                    if (!out.isEmpty() && out.getAmount() >= 1000) {
-                                        strawHandler.ifPresent(straw -> straw.onDrink(world, pos, out.getFluid(), player, true));
-                                        handler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-                                    }
+                Storage<FluidVariant> handler = tile != null ? TransferUtil.getFluidStorage(tile) : TransferUtil.getFluidStorage(world, pos);
+                if (handler != null) {
+                    for (StorageView<FluidVariant> storageView : handler) {
+                        FluidStack stack = new FluidStack(storageView);
+                        if (!stack.isEmpty()) {
+                            Fluid fluidInstance = stack.getFluid();
+                            Optional<StrawHandler> strawHandler = StrawUtils.getStrawHandler(fluidInstance);
+                            if (strawHandler.isPresent() && stack.getAmount() >= FluidConstants.BUCKET) {
+                                FluidStack out = TransferUtil.simulateExtractAnyFluid(handler, FluidConstants.BUCKET);
+                                if (!out.isEmpty() && out.getAmount() >= FluidConstants.BUCKET) {
+                                    strawHandler.ifPresent(straw -> straw.onDrink(world, pos, out.getFluid(), player, true));
+                                    TransferUtil.extractAnyFluid(handler, FluidConstants.BUCKET);
                                 }
                             }
                         }
@@ -138,19 +136,17 @@ public class ItemStraw extends IFCustomItem {
                 }
             }
             BlockEntity tile = worldIn.getBlockEntity(pos);
-            if (tile != null) {
-                LazyOptional<IFluidHandler> fluidhandlercap = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-                if (fluidhandlercap.isPresent()) {
-                    IFluidHandler handler = fluidhandlercap.orElseThrow(RuntimeException::new);
-                    int tanks = handler.getTanks();
-                    for (int i = 0; i < tanks; i++) {
-                        FluidStack stack = handler.getFluidInTank(i);
-                        if (!stack.isEmpty()) {
-                            Fluid fluidInstance = stack.getFluid();
-                            Optional<StrawHandler> strawHandler = StrawUtils.getStrawHandler(fluidInstance);
-                            if (fluidInstance != null && strawHandler.isPresent() && stack.getAmount() >= 1000) {
-                                FluidStack out = handler.drain(stack, IFluidHandler.FluidAction.SIMULATE);
-                                if (out != null && out.getAmount() >= 1000) {
+            Storage<FluidVariant> handler = tile == null ? TransferUtil.getFluidStorage(worldIn, pos) : TransferUtil.getFluidStorage(tile);
+            if (handler != null) {
+                for (StorageView<FluidVariant> storageView : handler) {
+                    FluidStack stack = new FluidStack(storageView);
+                    if (!stack.isEmpty()) {
+                        Fluid fluidInstance = stack.getFluid();
+                        Optional<StrawHandler> strawHandler = StrawUtils.getStrawHandler(fluidInstance);
+                        if (strawHandler.isPresent() && stack.getAmount() >= FluidConstants.BUCKET) {
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                long out = handler.simulateExtract(stack.getType(), stack.getAmount(), tx);
+                                if (out >= FluidConstants.BUCKET) {
                                     playerIn.startUsingItem(handIn);
                                     return new InteractionResultHolder(InteractionResult.SUCCESS, playerIn.getItemInHand(handIn));
                                 }

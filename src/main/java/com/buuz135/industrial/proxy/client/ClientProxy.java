@@ -45,6 +45,8 @@ import com.buuz135.industrial.utils.FluidUtils;
 import com.buuz135.industrial.utils.Reference;
 import io.github.fabricators_of_create.porting_lib.event.client.ModelsBakedCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -55,7 +57,12 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -84,8 +91,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Calendar;
+import java.util.Optional;
 
-@Mod.EventBusSubscriber(value = EnvType.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientProxy extends CommonProxy implements ClientModInitializer {
 
     public static ResourceLocation GUI = new ResourceLocation(Reference.MOD_ID, "textures/gui/machines.png");
@@ -168,20 +175,20 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
             return 0xFFFFFF;
         }, ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get());
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            if (tintIndex == 0 && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
-                if (fluidHandlerItem.getFluidInTank(0).getAmount() > 0) {
-                    int color = FluidUtils.getFluidColor(fluidHandlerItem.getFluidInTank(0));
+            Optional<FluidStack> fluid = TransferUtil.getFluidContained(stack);
+            if (tintIndex == 0 && fluid.isPresent()) {
+                if (fluid.get().getAmount() > 0) {
+                    int color = FluidUtils.getFluidColor(fluid.get());
                     if (color != -1) return color;
                 }
             }
             return 0xFFFFFF;
         }, ModuleTransportStorage.BLACK_HOLE_TANK_COMMON.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SIMPLE.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get());
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            if (tintIndex == 1 && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
-                if (fluidHandlerItem.getFluidInTank(0).getAmount() > 0) {
-                    int color = FluidUtils.getFluidColor(fluidHandlerItem.getFluidInTank(0));
+            Optional<FluidStack> fluid = TransferUtil.getFluidContained(stack);
+            if (tintIndex == 1 && fluid.isPresent()) {
+                if (fluid.get().getAmount() > 0) {
+                    int color = FluidUtils.getFluidColor(fluid.get());
                     if (color != -1) return color;
                 }
             }
@@ -242,9 +249,9 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
 
         BlockEntityRenderers.register((BlockEntityType<? extends MycelialReactorTile>) ModuleGenerator.MYCELIAL_REACTOR.getRight().get(), MycelialReactorTESR::new);
 
-        event.registerEntityRenderer((EntityType<? extends InfinityTridentEntity>) ModuleTool.TRIDENT_ENTITY_TYPE.get(), InfinityTridentRenderer::new);
-        event.registerEntityRenderer((EntityType<? extends InfinityNukeEntity>) ModuleTool.INFINITY_NUKE_ENTITY_TYPE.get(), InfinityNukeRenderer::new);
-        event.registerEntityRenderer((EntityType<? extends InfinityLauncherProjectileEntity>) ModuleTool.INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), InfinityLauncherProjectileRenderer::new);
+        EntityRendererRegistry.register((EntityType<? extends InfinityTridentEntity>) ModuleTool.TRIDENT_ENTITY_TYPE.get(), InfinityTridentRenderer::new);
+        EntityRendererRegistry.register((EntityType<? extends InfinityNukeEntity>) ModuleTool.INFINITY_NUKE_ENTITY_TYPE.get(), InfinityNukeRenderer::new);
+        EntityRendererRegistry.register((EntityType<? extends InfinityLauncherProjectileEntity>) ModuleTool.INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), InfinityLauncherProjectileRenderer::new);
 
         BlockEntityRenderers.register(((BlockEntityType<? extends TransporterTile>) ModuleTransportStorage.TRANSPORTER.getRight().get()), TransporterTESR::new);
 

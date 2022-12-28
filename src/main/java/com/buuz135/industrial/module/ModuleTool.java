@@ -36,8 +36,14 @@ import com.hrznstudio.titanium.itemstack.ItemStackHarnessRegistry;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.network.IButtonHandler;
 import com.hrznstudio.titanium.tab.AdvancedTitaniumTab;
+import io.github.fabricators_of_create.porting_lib.event.common.BlockEvents;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.item.FluidHandlerItemStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -48,6 +54,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import team.reborn.energy.api.EnergyStorage;
+
+import java.util.List;
 
 public class ModuleTool implements IModule {
 
@@ -98,18 +107,34 @@ public class ModuleTool implements IModule {
         NUKE_EXPLOSION = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_explosion", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_explosion")));
 
         TAB_TOOL.addIconStack(() -> new ItemStack(INFINITY_DRILL.orElse(Items.STONE)));
-        ItemStackHarnessRegistry.register(INFINITY_SAW, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_DRILL, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_HAMMER, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_TRIDENT, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_TRIDENT, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_BACKPACK, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_LAUNCHER, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        ItemStackHarnessRegistry.register(INFINITY_NUKE, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), ForgeCapabilities.ENERGY, ForgeCapabilities.FLUID_HANDLER_ITEM, CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY));
-        EventManager.forge(BlockEvent.BreakEvent.class).filter(breakEvent -> breakEvent.getPlayer().getMainHandItem().getItem() == INFINITY_SAW.get() && BlockUtils.isLog((Level) breakEvent.getLevel(), breakEvent.getPos())).process(breakEvent -> {
-            breakEvent.setCanceled(true);
-            breakEvent.getPlayer().getMainHandItem().mineBlock((Level) breakEvent.getLevel(), breakEvent.getState(), breakEvent.getPos(), breakEvent.getPlayer());
-        }).subscribe();
+        ItemStackHarnessRegistry.register(INFINITY_SAW, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_DRILL, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_HAMMER, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_TRIDENT, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_TRIDENT, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_BACKPACK, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_LAUNCHER, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        ItemStackHarnessRegistry.register(INFINITY_NUKE, stack -> new ItemStackHarness(stack, null, (IButtonHandler) stack.getItem(), List.of(EnergyStorage.ITEM, FluidStorage.ITEM), List.of(CapabilityItemStackHolder.ITEMSTACK_HOLDER_CAPABILITY)));
+        BlockEvents.BLOCK_BREAK.register(breakEvent -> {
+            if (breakEvent.getPlayer().getMainHandItem().getItem() == INFINITY_SAW.get() && BlockUtils.isLog((Level) breakEvent.getWorld(), breakEvent.getPos())) {
+                breakEvent.setCanceled(true);
+                breakEvent.getPlayer().getMainHandItem().mineBlock((Level) breakEvent.getWorld(), breakEvent.getState(), breakEvent.getPos(), breakEvent.getPlayer());
+            }
+        });
+
+        FluidStorage.ITEM.registerFallback((itemStack, context) -> {
+            if (itemStack.getItem() instanceof MeatFeederItem) {
+                FluidHandlerItemStack handlerItemStack = new FluidHandlerItemStack(context, 512000) {
+                    @Override
+                    public boolean canFillFluidType(FluidVariant fluid, long amount) {
+                        return fluid.getFluid().isSame(ModuleCore.MEAT.getSourceFluid().get());
+                    }
+                };
+                TransferUtil.insertFluid(handlerItemStack, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), 0));
+                return handlerItemStack;
+            }
+            return null;
+        });
 
     }
 }

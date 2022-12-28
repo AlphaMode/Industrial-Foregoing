@@ -21,6 +21,7 @@
  */
 package com.buuz135.industrial.proxy.block.filter;
 
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -56,7 +57,7 @@ public abstract class RegulatorFilter<TYPE, CAP> {
         }
     }
 
-    public abstract int matches(TYPE stack, CAP cap, boolean isRegulated);
+    public abstract long matches(TYPE stack, CAP cap, boolean isRegulated);
 
     public int getSizeX() {
         return sizeX;
@@ -90,7 +91,7 @@ public abstract class RegulatorFilter<TYPE, CAP> {
         for (int i = 0; i < this.getFilter().length; i++) {
             if (!this.getFilter()[i].getStack().isEmpty()) {
                 CompoundTag slot = new CompoundTag();
-                slot.put("Stack", this.getFilter()[i].getStack().serializeNBT());
+                slot.put("Stack", NBTSerializer.serializeNBT(this.getFilter()[i].getStack()));
                 slot.putInt("Amount", this.getFilter()[i].getAmount());
                 compound.put(String.valueOf(i), slot);
             }

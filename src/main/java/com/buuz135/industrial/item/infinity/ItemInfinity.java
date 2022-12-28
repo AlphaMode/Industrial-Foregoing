@@ -43,6 +43,8 @@ import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -197,7 +199,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        if (!DistExecutor.safeRunForDist(() -> Screen::hasShiftDown, () -> Boolean.FALSE::booleanValue)) { //hasShiftDown
+        if (!EnvExecutor.unsafeRunForDist(() -> Screen::hasShiftDown, () -> Boolean.FALSE::booleanValue)) { //hasShiftDown
             int fuel = getFuelFromStack(stack);
             return (int) Math.round(fuel * 13D / 1_000_000D);
         } else {
@@ -208,7 +210,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
 
     @Override
     public int getBarColor(ItemStack p_150901_) {
-        return !DistExecutor.safeRunForDist(() -> Screen::hasShiftDown, () -> Boolean.FALSE::booleanValue) ? 0xcb00ff /*Purple*/ : 0x00d0ff /*Cyan*/;
+        return !EnvExecutor.unsafeRunForDist(() -> Screen::hasShiftDown, () -> Boolean.FALSE::booleanValue) ? 0xcb00ff /*Purple*/ : 0x00d0ff /*Cyan*/;
     }
 
     @Override
@@ -324,7 +326,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand handIn) {
         if (player.isCrouching()) {
             if (player instanceof ServerPlayer) {
-                IndustrialForegoing.NETWORK.get().sendTo(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+                IndustrialForegoing.NETWORK.get().sendToClient(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), (ServerPlayer) player);
                 NetworkUtil.openGui((ServerPlayer) player, this, buffer ->
                         LocatorFactory.writePacketBuffer(buffer, new HeldStackLocatorInstance(handIn == InteractionHand.MAIN_HAND)));
             }

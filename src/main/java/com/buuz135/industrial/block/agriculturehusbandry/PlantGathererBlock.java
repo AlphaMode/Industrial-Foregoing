@@ -62,7 +62,7 @@ public class PlantGathererBlock extends IndustrialBlock<PlantGathererTile> {
                 .define('H', Items.IRON_HOE)
                 .define('A', Items.IRON_AXE)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
                 .define('R', Items.REDSTONE)
                 .save(consumer);
 

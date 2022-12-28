@@ -81,7 +81,7 @@ public class SludgeRefinerTile extends IndustrialProcessingTile<SludgeRefinerTil
             Optional<Item> optionalItem = Registry.ITEM.tags().getTag(IndustrialTags.Items.SLUDGE_OUTPUT).getRandomElement(this.level.random);
             optionalItem.ifPresent(item -> {
                 if (TransferUtil2.insertItem(output, new ItemStack(item), true) == 0) {
-                    sludge.drainForced(500, IFluidHandler.FluidAction.EXECUTE);
+                    sludge.drainForced(500, false);
                     TransferUtil.insertItem(output, new ItemStack(item));
                 }
             });

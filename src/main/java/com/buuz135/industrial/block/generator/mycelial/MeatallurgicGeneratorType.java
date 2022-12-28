@@ -37,7 +37,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import me.alphamode.forgetags.Tags;
 import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class MeatallurgicGeneratorType implements IMycelialGeneratorType {
     public Pair<Integer, Integer> getTimeAndPowerGeneration(INBTSerializable<CompoundTag>[] inputs) {
         if (inputs.length >= 2 && inputs[0] instanceof SidedFluidTankComponent && inputs[1] instanceof SidedInventoryComponent) {
             if (((SidedFluidTankComponent<?>) inputs[0]).getFluidAmount() >= 250 && ((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).getCount() > 0) {
-                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, IFluidHandler.FluidAction.EXECUTE);
+                ((SidedFluidTankComponent<?>) inputs[0]).drainForced(250, false);
                 ((SidedInventoryComponent<?>) inputs[1]).getStackInSlot(0).shrink(1);
                 return Pair.of(20 * 20, 200);
             }

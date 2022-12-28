@@ -58,7 +58,7 @@ import java.util.List;
 public class MycelialGeneratorTile extends IndustrialGeneratorTile<MycelialGeneratorTile> {
 
     @Save
-    private int powerGeneration;
+    private long powerGeneration;
     private IMycelialGeneratorType type;
     private INBTSerializable<CompoundTag>[] inputs;
     private ProgressBarComponent<MycelialGeneratorTile> bar;
@@ -109,7 +109,7 @@ public class MycelialGeneratorTile extends IndustrialGeneratorTile<MycelialGener
     }
 
     @Override
-    public int getEnergyProducedEveryTick() {
+    public long getEnergyProducedEveryTick() {
         return powerGeneration;
     }
 
@@ -166,7 +166,7 @@ public class MycelialGeneratorTile extends IndustrialGeneratorTile<MycelialGener
     }
 
     @Override
-    public int getEnergyCapacity() {
+    public long getEnergyCapacity() {
         return 100000;
     }
 

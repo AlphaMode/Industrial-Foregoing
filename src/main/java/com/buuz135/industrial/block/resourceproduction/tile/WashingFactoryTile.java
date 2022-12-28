@@ -26,6 +26,7 @@ import com.buuz135.industrial.config.machine.resourceproduction.WashingFactoryCo
 import com.buuz135.industrial.fluid.OreTitaniumFluidType;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleResourceProduction;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.ItemStackUtils;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
@@ -35,14 +36,14 @@ import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import me.alphamode.forgetags.Tags;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.registries.tags.IReverseTag;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -66,8 +67,8 @@ public class WashingFactoryTile extends IndustrialProcessingTile<WashingFactoryT
                 .setInputFilter((stack, integer) -> {
                     if (!stack.is(Tags.Items.RAW_MATERIALS)) return false;
 
-                    for (ResourceLocation resourceLocation : Registry.ITEM.tags().getReverseTag(stack.getItem()).map(IReverseTag::getTagKeys).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
-                        if (resourceLocation.toString().startsWith("forge:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation)) {
+                    for (ResourceLocation resourceLocation : FabricUtils.getReverseTag(Registry.ITEM, stack.getItem()).map(Holder::tags).map(tagKeyStream -> tagKeyStream.map(TagKey::location).collect(Collectors.toList())).orElse(new ArrayList<>())) {
+                        if (resourceLocation.toString().startsWith("c:raw_materials/") && OreTitaniumFluidType.isValid(resourceLocation)) {
                             return true;
                         }
                     }
@@ -100,8 +101,8 @@ public class WashingFactoryTile extends IndustrialProcessingTile<WashingFactoryT
         if (this.input.getStackInSlot(0).isEmpty()) return false;
         ResourceLocation resourceLocation = ItemStackUtils.getOreTag(this.input.getStackInSlot(0));
         if (resourceLocation == null) return false;
-        FluidStack output = OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation);
-        return this.meatInput.getFluidAmount() >= 100 && this.meatOutput.fillForced(output, IFluidHandler.FluidAction.SIMULATE) == 100;
+        FluidStack output = OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 8100, resourceLocation);
+        return this.meatInput.getFluidAmount() >= 8100 && this.meatOutput.fillForced(output, true) == 8100;
     }
 
     @Override
@@ -109,10 +110,10 @@ public class WashingFactoryTile extends IndustrialProcessingTile<WashingFactoryT
         return () -> {
             if (!this.input.getStackInSlot(0).isEmpty()) {
                 ResourceLocation resourceLocation = ItemStackUtils.getOreTag(this.input.getStackInSlot(0));
-                this.meatInput.drainForced(100, IFluidHandler.FluidAction.EXECUTE);
-                FluidStack output = OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 100, resourceLocation);
+                this.meatInput.drainForced(8100, false);
+                FluidStack output = OreTitaniumFluidType.getFluidWithTag(ModuleCore.RAW_ORE_MEAT, 8100, resourceLocation);
                 this.input.getStackInSlot(0).shrink(1);
-                this.meatOutput.fillForced(output, IFluidHandler.FluidAction.EXECUTE);
+                this.meatOutput.fillForced(output, false);
             }
         };
     }

@@ -56,6 +56,7 @@ import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
+import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
@@ -97,7 +98,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ItemInfinityBackpack extends ItemInfinity {
+public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchantingBehaviorItem {
 
     public static int POWER_CONSUMPTION = 0;
     public static int FUEL_CONSUMPTION = 1;
@@ -166,7 +167,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
     }
 
     public static void sync(Level world, String id, ServerPlayer player) {
-        IndustrialForegoing.NETWORK.get().sendTo(new BackpackSyncMessage(id, BackpackDataManager.getData(world).getBackpack(id).serializeNBT()), player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+        IndustrialForegoing.NETWORK.get().sendToClient(new BackpackSyncMessage(id, BackpackDataManager.getData(world).getBackpack(id).serializeNBT()), player);
     }
 
     public static boolean isMagnetEnabled(ItemStack stack) {
@@ -237,7 +238,7 @@ public class ItemInfinityBackpack extends ItemInfinity {
                 stack.setTag(nbt);
             }
             String id = stack.getTag().getString("Id");
-            IndustrialForegoing.NETWORK.get().sendTo(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+            IndustrialForegoing.NETWORK.get().sendToClient(new BackpackOpenedMessage(player.inventory.selected, PlayerInventoryFinder.MAIN), ((ServerPlayer) player));
             sync(worldIn, id, (ServerPlayer) player);
             NetworkUtil.openGui((ServerPlayer) player, this, buffer ->
                     LocatorFactory.writePacketBuffer(buffer, new HeldStackLocatorInstance(handIn == InteractionHand.MAIN_HAND)));

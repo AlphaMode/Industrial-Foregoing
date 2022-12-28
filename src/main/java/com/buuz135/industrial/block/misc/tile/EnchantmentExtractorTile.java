@@ -53,8 +53,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -170,7 +168,7 @@ public class EnchantmentExtractorTile extends IndustrialProcessingTile<Enchantme
                 ItemStack output = removeEnchantments(input, input.getDamageValue(), input.getCount());
                 input.shrink(1);
                 TransferUtil2.insertItem(this.outputNoEnchantedItem, output, false);
-                this.tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), essence), IFluidHandler.FluidAction.EXECUTE);
+                this.tank.fillForced(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), essence), false);
             }
         };
     }

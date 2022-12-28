@@ -22,16 +22,15 @@
 package com.buuz135.industrial.fluid;
 
 import com.buuz135.industrial.utils.ItemStackUtils;
-import com.hrznstudio.titanium.fluid.ClientFluidTypeExtensions;
 import com.hrznstudio.titanium.util.TagUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.FluidType;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class OreTitaniumFluidType extends FluidType {
         String extra = "";
         if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
             String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
             if (items.size() > 0) {
                 extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
             }
@@ -61,7 +60,7 @@ public class OreTitaniumFluidType extends FluidType {
         String extra = "";
         if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
             String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
             if (items.size() > 0) {
                 extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
             }
@@ -80,7 +79,7 @@ public class OreTitaniumFluidType extends FluidType {
         return bucket;
     }
 
-    public static FluidStack getFluidWithTag(OreFluidInstance fluidInstance, int amount, ResourceLocation itemITag) {
+    public static FluidStack getFluidWithTag(OreFluidInstance fluidInstance, long amount, ResourceLocation itemITag) {
         FluidStack stack = new FluidStack(fluidInstance.getSourceFluid(), amount);
         stack.getOrCreateTag().putString(NBT_TAG, itemITag.toString());
         return stack;
@@ -91,13 +90,13 @@ public class OreTitaniumFluidType extends FluidType {
     }
 
     public static boolean isValid(ResourceLocation resourceLocation) {
-        TagKey<Item> key = TagUtil.getItemTag(new ResourceLocation("forge:dusts/" + resourceLocation.toString().replace("forge:raw_materials/", "")));
+        TagKey<Item> key = TagUtil.getItemTag(new ResourceLocation("c:dusts/" + resourceLocation.toString().replace("c:raw_materials/", "")));
         return Registry.ITEM.tags().isKnownTagName(key) && !TagUtil.getAllEntries(Registry.ITEM, key).isEmpty();
     }
 
     public static ItemStack getOutputDust(FluidStack stack) {
         String tag = getFluidTag(stack);
-        return TagUtil.getItemWithPreference(TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/"))));
+        return TagUtil.getItemWithPreference(TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/"))));
     }
 
 
@@ -111,7 +110,7 @@ public class OreTitaniumFluidType extends FluidType {
         public int getTintColor(FluidStack stack) {
             if (Minecraft.getInstance().level != null && stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
                 String tag = stack.getTag().getString(NBT_TAG);
-                List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("forge:raw_materials/", "forge:dusts/")))).stream().toList();
+                List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
                 if (items.size() > 0) {
                     return ItemStackUtils.getColor(new ItemStack(items.get(0)));
                 }

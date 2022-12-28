@@ -62,8 +62,8 @@ public class SludgeRefinerBlock extends IndustrialBlock<SludgeRefinerTile> {
                 .define('B', Items.BUCKET)
                 .define('L', Items.FURNACE)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
-                .define('R', TagUtil.getItemTag(new ResourceLocation("forge:gears/gold")))
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('R', TagUtil.getItemTag(new ResourceLocation("c:gold_gears")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

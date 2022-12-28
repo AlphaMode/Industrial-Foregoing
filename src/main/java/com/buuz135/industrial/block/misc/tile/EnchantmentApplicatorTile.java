@@ -41,8 +41,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
@@ -118,7 +116,7 @@ public class EnchantmentApplicatorTile extends IndustrialProcessingTile<Enchantm
             if (tileEntity != null) {
                 tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(iFluidHandler -> amount.addAndGet(-iFluidHandler.drain(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), amount.get()), IFluidHandler.FluidAction.EXECUTE).getAmount()));
             }
-            if (amount.get() > 0) this.tank.drainForced(amount.get(), IFluidHandler.FluidAction.EXECUTE);
+            if (amount.get() > 0) this.tank.drainForced(amount.get(), false);
         };
     }
 

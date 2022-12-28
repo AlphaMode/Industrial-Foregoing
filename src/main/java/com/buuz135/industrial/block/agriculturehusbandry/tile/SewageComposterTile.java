@@ -32,12 +32,11 @@ import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
@@ -75,7 +74,7 @@ public class SewageComposterTile extends IndustrialProcessingTile<SewageComposte
     @Override
     public Runnable onFinish() {
         return () -> {
-            sewage.drainForced(1000, IFluidHandler.FluidAction.EXECUTE);
+            sewage.drainForced(FluidConstants.BUCKET, false);
             TransferUtil2.insertItem(fertilizerOutput, new ItemStack(ModuleCore.FERTILIZER.get()), false);
         };
     }

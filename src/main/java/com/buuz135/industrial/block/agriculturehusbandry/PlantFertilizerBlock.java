@@ -63,7 +63,7 @@ public class PlantFertilizerBlock extends IndustrialBlock<PlantFertilizerTile> {
                 .define('L', Items.LEATHER)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_SIMPLE)
                 .define('R', Items.REDSTONE)
-                .define('G', TagUtil.getItemTag(new ResourceLocation("forge:gears/iron")))
+                .define('G', TagUtil.getItemTag(new ResourceLocation("c:iron_gears")))
                 .save(consumer);
     }
 }

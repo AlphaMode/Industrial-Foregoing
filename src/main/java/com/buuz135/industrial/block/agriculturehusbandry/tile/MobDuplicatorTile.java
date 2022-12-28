@@ -17,7 +17,6 @@ import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.item.AugmentWrapper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -28,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -81,7 +79,7 @@ public class MobDuplicatorTile extends IndustrialAreaWorkingTile<MobDuplicatorTi
         entityAmount.removeIf(entityLiving -> !entityLiving.isAlive());
         if (entityAmount.size() > 32) return new WorkAction(1, 0);
 
-        int essenceNeeded = (int) (entity.getHealth() * MobDuplicatorConfig.essenceNeeded);
+        long essenceNeeded = (int) (entity.getHealth() * MobDuplicatorConfig.essenceNeeded);
         int canSpawn = (int) ((tank.getFluid().isEmpty() ? 0 : tank.getFluid().getAmount()) / Math.max(essenceNeeded, 1));
         if (canSpawn == 0) return new WorkAction(1, 0);
 
@@ -111,7 +109,7 @@ public class MobDuplicatorTile extends IndustrialAreaWorkingTile<MobDuplicatorTi
 
                 this.level.addFreshEntity(entity);
 
-                tank.drainForced(essenceNeeded, IFluidHandler.FluidAction.EXECUTE);
+                tank.drainForced(essenceNeeded, false);
             }
             --spawnAmount;
         }

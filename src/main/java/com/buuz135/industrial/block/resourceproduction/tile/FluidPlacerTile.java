@@ -36,8 +36,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 
@@ -67,12 +65,12 @@ public class FluidPlacerTile extends IndustrialAreaWorkingTile<FluidPlacerTile> 
             if (isLoaded(pointed) && BlockUtils.canBlockBeBroken(this.level, pointed) && !level.getFluidState(pointed).isSource() && tank.getFluidAmount() >= FluidConstants.BUCKET) {
                 if (tank.getFluid().getFluid().isSame(Fluids.WATER) && level.getBlockState(pointed).hasProperty(BlockStateProperties.WATERLOGGED) && !level.getBlockState(pointed).getValue(BlockStateProperties.WATERLOGGED)) {
                     level.setBlockAndUpdate(pointed, level.getBlockState(pointed).setValue(BlockStateProperties.WATERLOGGED, true));
-                    tank.drainForced(FluidConstants.BUCKET, IFluidHandler.FluidAction.EXECUTE);
+                    tank.drainForced(FluidConstants.BUCKET, false);
                     increasePointer();
                     return new WorkAction(1, getPowerPerOperation);
                 } else if (level.isEmptyBlock(pointed) || (!level.getFluidState(pointed).isEmpty() && !level.getFluidState(pointed).isSource())) {
                     level.setBlockAndUpdate(pointed, tank.getFluid().getFluid().defaultFluidState().createLegacyBlock());
-                    tank.drainForced(FluidConstants.BUCKET, IFluidHandler.FluidAction.EXECUTE);
+                    tank.drainForced(FluidConstants.BUCKET, false);
                     increasePointer();
                     return new WorkAction(1, getPowerPerOperation);
                 }

@@ -64,7 +64,7 @@ public class DissolutionChamberBlock extends IndustrialBlock<DissolutionChamberT
                 .define('B', Items.BUCKET)
                 .define('M', IndustrialTags.Items.MACHINE_FRAME_PITY)
                 .define('G', Tags.Items.INGOTS_GOLD)
-                .define('D', TagUtil.getItemTag(new ResourceLocation("forge:gears/diamond")))
+                .define('D', TagUtil.getItemTag(new ResourceLocation("c:diamond_gears")))
                 .save(consumer);
     }
 }

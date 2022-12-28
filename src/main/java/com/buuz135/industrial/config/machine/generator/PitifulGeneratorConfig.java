@@ -33,9 +33,9 @@ public class PitifulGeneratorConfig {
     public static int powerPerTick = 30;
 
     @ConfigVal(comment = "Max Stored Power [FE] - Default: [10000 FE]")
-    public static int maxStoredPower = 100000;
+    public static long maxStoredPower = 100000;
 
     @ConfigVal(comment = "Amount of FE/t extracted from the Pitiful Generator")
-    public static int extractionRate = 1000;
+    public static long extractionRate = 1000;
 
 }

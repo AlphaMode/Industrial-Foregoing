@@ -33,14 +33,13 @@ import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 
 public class BiofuelGeneratorTile extends IndustrialGeneratorTile<BiofuelGeneratorTile> {
 
     private int getPowerPerTick;
-    private int getExtractionRate;
+    private long getExtractionRate;
 
     @Save
     private SidedFluidTankComponent<BiofuelGeneratorTile> biofuel;
@@ -60,7 +59,7 @@ public class BiofuelGeneratorTile extends IndustrialGeneratorTile<BiofuelGenerat
     @Override
     public int consumeFuel() {
         if (biofuel.getFluidAmount() > 0) {
-            biofuel.drainForced(1, IFluidHandler.FluidAction.EXECUTE);
+            biofuel.drainForced(81, false);
             return 4;
         }
         return 0;
@@ -72,7 +71,7 @@ public class BiofuelGeneratorTile extends IndustrialGeneratorTile<BiofuelGenerat
     }
 
     @Override
-    public int getEnergyProducedEveryTick() {
+    public long getEnergyProducedEveryTick() {
         return getPowerPerTick;
     }
 
@@ -85,7 +84,7 @@ public class BiofuelGeneratorTile extends IndustrialGeneratorTile<BiofuelGenerat
     }
 
     @Override
-    public int getEnergyCapacity() {
+    public long getEnergyCapacity() {
         return BiofuelGeneratorConfig.maxStoredPower;
     }
 

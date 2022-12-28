@@ -27,14 +27,10 @@ import com.buuz135.industrial.item.infinity.InfinityEnergyStorage;
 import com.buuz135.industrial.worlddata.BackpackDataManager;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.capability.FluidHandlerScreenProviderItemStack;
+import io.github.fabricators_of_create.porting_lib.util.ServerLifecycleHooks;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
