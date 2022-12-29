@@ -51,7 +51,7 @@ public class CommonProxy {
 
     public void run() {
         LivingEntityEvents.DROPS.register(MobDeathHandler::onDeath);
-        MountEntityCallback.EVENT.register(new FakePlayerRideEntityHandler());
+        MountEntityCallback.EVENT.register(FakePlayerRideEntityHandler::onFakePlayerRide);
 //        MinecraftForge.EVENT_BUS.register(new SkullHandler());
 
         ServerTickEvents.START_SERVER_TICK.register(ExplosionTickHandler::serverTick);

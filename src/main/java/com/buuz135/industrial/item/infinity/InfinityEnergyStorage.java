@@ -76,8 +76,8 @@ public class InfinityEnergyStorage<T extends IComponentHarness> extends EnergySt
     }
 
     @Override
-    public int getMaxEnergyStored() {
-        return (int) capacity;
+    public long getCapacity() {
+        return capacity;
     }
 
     @Override

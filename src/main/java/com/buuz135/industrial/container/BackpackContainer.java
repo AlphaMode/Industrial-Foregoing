@@ -28,6 +28,7 @@ import com.hrznstudio.titanium.container.BasicAddonContainer;
 import com.hrznstudio.titanium.container.impl.DisableableSlot;
 import com.hrznstudio.titanium.network.locator.LocatorInstance;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +65,7 @@ public class BackpackContainer extends BasicAddonContainer {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             for (int pos = 0; pos < handler.getSlots(); pos++) {
-                if (!handler.getStackInSlot(pos).isEmpty() && handler.isItemValid(pos, itemstack1)) {
+                if (!handler.getStackInSlot(pos).isEmpty() && handler.isItemValid(pos, ItemVariant.of(itemstack1), itemstack1.getCount())) {
                     ItemStack result = handler.insertItem(pos, itemstack1, false);
                     slot.set(result);
                     if (player instanceof ServerPlayer)

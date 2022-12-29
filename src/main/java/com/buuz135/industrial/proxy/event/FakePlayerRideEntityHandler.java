@@ -24,11 +24,12 @@ package com.buuz135.industrial.proxy.event;
 
 import com.buuz135.industrial.utils.IFFakePlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 
 public class FakePlayerRideEntityHandler {
 
-    @SubscribeEvent
-    public static InteractionResult onFakePlayerRide(EntityMountEvent entityMountEvent) {
-        if (entityMountEvent.getEntityMounting() instanceof IFFakePlayer) entityMountEvent.setCanceled(true);
+    public static InteractionResult onFakePlayerRide(Entity mounted, Entity mounting, boolean isMounting) {
+        if (mounting instanceof IFFakePlayer) return InteractionResult.FAIL;
+        return InteractionResult.PASS;
     }
 }

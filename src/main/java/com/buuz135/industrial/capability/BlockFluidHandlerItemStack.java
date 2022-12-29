@@ -22,6 +22,10 @@
 
 package com.buuz135.industrial.capability;
 
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.item.FluidHandlerItemStack;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -32,7 +36,7 @@ public class BlockFluidHandlerItemStack extends FluidHandlerItemStack.SwapEmpty 
 
     private String tagName;
 
-    public BlockFluidHandlerItemStack(ItemStack container, ItemStack emptyContainer, int capacity, String tagName) {
+    public BlockFluidHandlerItemStack(ContainerItemContext container, ItemStack emptyContainer, int capacity, String tagName) {
         super(container, emptyContainer, capacity);
         this.tagName = tagName;
     }
@@ -40,7 +44,7 @@ public class BlockFluidHandlerItemStack extends FluidHandlerItemStack.SwapEmpty 
     @Override
     @Nonnull
     public FluidStack getFluid() {
-        CompoundTag tagCompound = container.getTag();
+        CompoundTag tagCompound = container.getItemVariant().getNbt();
         if (tagCompound == null || !tagCompound.contains("BlockEntityTag") || !tagCompound.getCompound("BlockEntityTag").contains(tagName)) {
             return FluidStack.EMPTY;
         }
@@ -48,16 +52,20 @@ public class BlockFluidHandlerItemStack extends FluidHandlerItemStack.SwapEmpty 
     }
 
     @Override
-    protected void setFluid(FluidStack fluid) {
-        if (!container.hasTag()) {
+    protected boolean setFluid(FluidStack fluid, TransactionContext tx) {
+        ItemStack newStack = container.getItemVariant().toStack();
+        if (!container.getItemVariant().hasNbt()) {
             CompoundTag compoundNBT = new CompoundTag();
             CompoundTag blockEntityTag = new CompoundTag();
             compoundNBT.put("BlockEntityTag", blockEntityTag);
-            container.setTag(compoundNBT);
+            newStack.setTag(compoundNBT);
         }
 
         CompoundTag fluidTag = new CompoundTag();
         fluid.writeToNBT(fluidTag);
-        container.getTag().getCompound("BlockEntityTag").put(tagName, fluidTag);
+        newStack.getTag().getCompound("BlockEntityTag").put(tagName, fluidTag);
+        if (container.exchange(ItemVariant.of(newStack), 1, tx) == 1)
+            return true;
+        return false;
     }
 }

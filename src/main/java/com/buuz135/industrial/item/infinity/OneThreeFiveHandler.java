@@ -73,7 +73,7 @@ public class OneThreeFiveHandler {
         if (player.level.getGameTime() % 20 == 0) {
             for (ItemStack stack : player.getInventory().items) {
                 if (stack.getItem() instanceof ItemInfinity && ((ItemInfinity) stack.getItem()).isSpecial(stack) && ((ItemInfinity) stack.getItem()).isSpecialEnabled(stack)) {
-                    IndustrialForegoing.NETWORK.sendToNearby(player.level, new BlockPos(player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ()), 64, new SpecialParticleMessage(event.player.getUUID()));
+                    IndustrialForegoing.NETWORK.sendToNearby(player.level, new BlockPos(player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ()), 64, new SpecialParticleMessage(player.getUUID()));
                     return;
                 }
             }

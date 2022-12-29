@@ -79,19 +79,17 @@ public class ConveyorDroppingUpgrade extends ConveyorUpgrade {
         if (whitelist != filter.matches(entity)) return;
         if (entity instanceof ItemEntity) {
             BlockEntity tile = getWorld().getBlockEntity(getPos().relative(Direction.DOWN));
-            if (tile != null) {
-                Storage<ItemVariant> handler = TransferUtil.getItemStorage(tile);
-                if (handler != null) {
-                    if (getBoundingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
-                        ItemStack stack = ((ItemEntity) entity).getItem();
-                        for (int i = 0; i < handler.getSlots(); i++) {
-                            stack = handler.insertItem(i, stack, false);
-                            if (stack.isEmpty()) {
-                                entity.remove(Entity.RemovalReason.KILLED);
-                                break;
-                            } else {
-                                ((ItemEntity) entity).setItem(stack);
-                            }
+            Storage<ItemVariant> handler = tile != null ? TransferUtil.getItemStorage(tile) : TransferUtil.getItemStorage(getWorld(), getPos().relative(Direction.DOWN));
+            if (handler != null) {
+                if (getBoundingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
+                    ItemStack stack = ((ItemEntity) entity).getItem();
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        stack = handler.insertItem(i, stack, false);
+                        if (stack.isEmpty()) {
+                            entity.remove(Entity.RemovalReason.KILLED);
+                            break;
+                        } else {
+                            ((ItemEntity) entity).setItem(stack);
                         }
                     }
                 }

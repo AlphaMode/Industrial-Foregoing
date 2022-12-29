@@ -24,6 +24,8 @@ package com.buuz135.industrial.proxy.block.filter;
 
 import com.buuz135.industrial.item.MobImprisonmentToolItem;
 import com.buuz135.industrial.module.ModuleTool;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -82,7 +84,7 @@ public class ItemStackFilter extends AbstractFilter<Entity> {
         }
         if (isEmpty) return false;
         for (GhostSlot stack : this.getFilter()) {
-            FluidStack original = FluidUtil.getFluidContained(stack.getStack()).orElse(null);
+            FluidStack original = TransferUtil.getFluidContained(stack.getStack()).orElse(null);
             if (original != null && original.isFluidEqual(fluidStack)) return true;
         }
         return false;
@@ -98,7 +100,7 @@ public class ItemStackFilter extends AbstractFilter<Entity> {
         CompoundTag compound = new CompoundTag();
         for (int i = 0; i < this.getFilter().length; i++) {
             if (!this.getFilter()[i].getStack().isEmpty())
-                compound.put(String.valueOf(i), this.getFilter()[i].getStack().serializeNBT());
+                compound.put(String.valueOf(i), NBTSerializer.serializeNBT(this.getFilter()[i].getStack()));
         }
         return compound;
     }

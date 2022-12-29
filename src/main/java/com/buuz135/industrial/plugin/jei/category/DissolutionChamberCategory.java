@@ -117,7 +117,7 @@ public class DissolutionChamberCategory implements IRecipeCategory<DissolutionCh
 
         AssetUtil.drawAsset(stack, Minecraft.getInstance().screen, IAssetProvider.getAsset(DefaultAssetProvider.DEFAULT_PROVIDER, AssetTypes.PROGRESS_BAR_BACKGROUND_ARROW_HORIZONTAL), 92, 41 - 8);
 
-        int consumed = recipe.processingTime * DissolutionChamberConfig.powerPerTick;
+        long consumed = recipe.processingTime * DissolutionChamberConfig.powerPerTick;
         EnergyBarScreenAddon.drawForeground(stack, Minecraft.getInstance().screen, DefaultAssetProvider.DEFAULT_PROVIDER, 0, 12, 0, 0, consumed, (int) Math.max(50000, Math.ceil(consumed)));
 
     }

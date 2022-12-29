@@ -23,7 +23,6 @@ package com.buuz135.industrial.capability;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlotExposedStorage;
 import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -35,27 +34,14 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVariant>, SlotExposedStorage {
+public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVariant> {
 
     public final ContainerItemContext context;
-    public final int slotLimit;
+    public final long slotLimit;
 
-    public BLHBlockItemHandlerItemStack(ContainerItemContext context, int slotLimit) {
+    public BLHBlockItemHandlerItemStack(ContainerItemContext context, long slotLimit) {
         this.context = context;
         this.slotLimit = slotLimit;
-    }
-
-    @Override
-    public int getSlots() {
-        return 1;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        ItemStack copied = getStack();
-        copied.setCount(getAmount());
-        return copied;
     }
 
     @Nonnull
@@ -101,15 +87,9 @@ public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVaria
         }
     }
 
-    @Override
-    public int getSlotLimit(int slot) {
-        return slotLimit;
-    }
-
-    @Override
     public boolean isItemValid(int slot, @Nonnull ItemVariant variant, long amount) {
         ItemStack current = getStack();
-        return current.isEmpty() || (current.sameItem(stack) && ItemStack.tagMatches(current, stack));
+        return current.isEmpty() || (current.sameItem(variant.toStack()) && ItemStack.tagMatches(current, variant.toStack()));
     }
 
     @Override
@@ -123,7 +103,7 @@ public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVaria
 
     @Override
     public long getCapacity() {
-        return 0;
+        return slotLimit;
     }
 
     public ItemStack getStack() {
