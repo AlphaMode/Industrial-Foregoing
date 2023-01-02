@@ -102,7 +102,7 @@ public class MultipleFluidHandlerScreenProviderItemStack extends FluidHandlerScr
             if (tankDefinitions[i].canFill && tankDefinitions[i].validator.test(resource)) {
                 FluidStack contained = getFluidInTank(i);
                 if (contained.isEmpty()) {
-                    int fillAmount = Math.min(capacity, resource.getAmount());
+                    long fillAmount = Math.min(capacity, resource.getAmount());
                     if (doFill.execute()) {
                         FluidStack filled = resource.copy();
                         filled.setAmount(fillAmount);

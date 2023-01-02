@@ -42,6 +42,7 @@ import com.buuz135.industrial.registry.IFRegistries;
 import com.buuz135.industrial.utils.Reference;
 import com.buuz135.industrial.utils.SimpleRecipeType;
 import com.buuz135.industrial.utils.apihandlers.straw.*;
+import com.chocohead.mm.api.ClassTinkerers;
 import com.hrznstudio.titanium.fluid.TitaniumFluidInstance;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
@@ -128,10 +129,10 @@ public class ModuleCore implements IModule {
 
     @Override
     public void generateFeatures(DeferredRegistryHelper helper) {
-        PITY_RARITY = Rarity.create("pity", ChatFormatting.GREEN);
-        SIMPLE_RARITY = Rarity.create("simple", ChatFormatting.AQUA);
-        ADVANCED_RARITY = Rarity.create("advanced", ChatFormatting.LIGHT_PURPLE);
-        SUPREME_RARITY = Rarity.create("supreme", ChatFormatting.GOLD);
+        PITY_RARITY = ClassTinkerers.getEnum(Rarity.class, "pity");
+        SIMPLE_RARITY = ClassTinkerers.getEnum(Rarity.class, "simple");
+        ADVANCED_RARITY = ClassTinkerers.getEnum(Rarity.class, "advanced");
+        SUPREME_RARITY = ClassTinkerers.getEnum(Rarity.class, "supreme");
         PITY = helper.registerBlockWithItem("machine_frame_pity", () -> new MachineFrameBlock(PITY_RARITY, TAB_CORE), (block) -> () -> new MachineFrameBlock.MachineFrameItem(block.get(), PITY_RARITY, TAB_CORE));
         SIMPLE = helper.registerBlockWithItem("machine_frame_simple", () -> new MachineFrameBlock(SIMPLE_RARITY, TAB_CORE), (block) -> () -> new MachineFrameBlock.MachineFrameItem(block.get(), SIMPLE_RARITY, TAB_CORE));
         ADVANCED = helper.registerBlockWithItem("machine_frame_advanced", () -> new MachineFrameBlock(ADVANCED_RARITY, TAB_CORE), (block) -> () -> new MachineFrameBlock.MachineFrameItem(block.get(), ADVANCED_RARITY, TAB_CORE));

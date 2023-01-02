@@ -36,6 +36,7 @@ import com.buuz135.industrial.entity.client.*;
 import com.buuz135.industrial.item.MobImprisonmentToolItem;
 import com.buuz135.industrial.item.infinity.InfinityTier;
 import com.buuz135.industrial.item.infinity.ItemInfinity;
+import com.buuz135.industrial.item.infinity.OneThreeFiveHandler;
 import com.buuz135.industrial.module.*;
 import com.buuz135.industrial.proxy.CommonProxy;
 import com.buuz135.industrial.proxy.client.event.IFClientEvents;
@@ -114,6 +115,9 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
             out.accept(new ResourceLocation(Reference.MOD_ID, "block/catears"));
         });
         run();
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> OneThreeFiveHandler.onClientTick());
+        ClientTickEvents.END_CLIENT_TICK.register(client -> OneThreeFiveHandler.onClientTick());
     }
 
     @Override
@@ -126,8 +130,7 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
             }
         });
 
-
-        MinecraftForge.EVENT_BUS.register(new IFClientEvents());
+        IFClientEvents.init();
 
         //((IReloadableResourceManager) Minecraft.getInstance().getResourceManager()).addReloadListener(resourceManager -> FluidUtils.colorCache.clear());
 

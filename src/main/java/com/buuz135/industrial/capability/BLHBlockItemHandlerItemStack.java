@@ -22,7 +22,6 @@
 package com.buuz135.industrial.capability;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -44,50 +43,38 @@ public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVaria
         this.slotLimit = slotLimit;
     }
 
-    @Nonnull
     @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (isItemValid(slot, stack)) {
-            int amount = getSlotLimit(slot);
+    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if (isItemValid(resource, maxAmount)) {
+            long amount = slotLimit;
             long stored = getAmount();
-            long inserted = Math.min(amount - stored, stack.getCount());
-            if (getVoid()) inserted = stack.getCount();
-            if (!simulate) {
-                setStack(stack);
-                setAmount(Math.min(stored + inserted, amount));
-            }
-            if (inserted == stack.getCount()) return ItemStack.EMPTY;
-            return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - inserted);
+            long inserted = Math.min(amount - stored, maxAmount);
+            if (getVoid()) inserted = maxAmount;
+            setStack(resource.toStack());
+            setAmount(Math.min(stored + inserted, amount));
+            if (inserted == maxAmount) return 0;
+            return maxAmount - inserted;
         }
-        return stack;
+        return 0;
     }
 
-    @Nonnull
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (amount == 0) return ItemStack.EMPTY;
+    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if (maxAmount == 0) return 0;
         ItemStack blStack = getStack();
         long stored = getAmount();
-        if (blStack.isEmpty()) return ItemStack.EMPTY;
-        if (stored <= amount) {
-            ItemStack out = blStack.copy();
+        if (blStack.isEmpty()) return 0;
+        if (stored <= maxAmount) {
             long newAmount = stored;
-            if (!simulate) {
-                //setStack(ItemStack.EMPTY);
-                setAmount(0);
-            }
-            out.setCount(newAmount);
-            return out;
+            setAmount(0);
+            return newAmount;
         } else {
-            if (!simulate) {
-                setAmount(stored - amount);
-
-            }
-            return ItemHandlerHelper.copyStackWithSize(blStack, amount);
+            setAmount(stored - maxAmount);
+            return maxAmount;
         }
     }
 
-    public boolean isItemValid(int slot, @Nonnull ItemVariant variant, long amount) {
+    public boolean isItemValid(@Nonnull ItemVariant variant, long amount) {
         ItemStack current = getStack();
         return current.isEmpty() || (current.sameItem(variant.toStack()) && ItemStack.tagMatches(current, variant.toStack()));
     }
@@ -104,6 +91,16 @@ public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVaria
     @Override
     public long getCapacity() {
         return slotLimit;
+    }
+
+    @Override
+    public boolean isResourceBlank() {
+        return getResource().isBlank();
+    }
+
+    @Override
+    public ItemVariant getResource() {
+        return ItemVariant.of(getStack());
     }
 
     public ItemStack getStack() {
@@ -155,27 +152,6 @@ public class BLHBlockItemHandlerItemStack implements SingleSlotStorage<ItemVaria
     private CompoundTag getTag() {
         if (context.getItemVariant().hasNbt() && context.getItemVariant().getNbt().contains("BlockEntityTag"))
             return context.getItemVariant().getNbt().getCompound("BlockEntityTag");
-        return null;
-    }
-
-
-    @Override
-    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-        return 0;
-    }
-
-    @Override
-    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-        return 0;
-    }
-
-    @Override
-    public boolean isResourceBlank() {
-        return false;
-    }
-
-    @Override
-    public ItemVariant getResource() {
         return null;
     }
 }

@@ -28,8 +28,10 @@ import com.buuz135.industrial.proxy.network.SpecialParticleMessage;
 import com.buuz135.industrial.utils.Reference;
 import io.github.fabricators_of_create.porting_lib.event.common.PlayerTickEvents;
 import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,8 +51,7 @@ public class OneThreeFiveHandler {
     public static HashMap<UUID, Long> SPECIAL_ENTITIES = new HashMap<>();
 
     @Environment(EnvType.CLIENT)
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
+    public static void onClientTick() {
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.level != null && !Minecraft.getInstance().isPaused() && Minecraft.getInstance().player.level.getGameTime() % 5 == 0) {
             BlockPos pos = new BlockPos(Minecraft.getInstance().player.blockPosition().getX(), Minecraft.getInstance().player.blockPosition().getY(), Minecraft.getInstance().player.blockPosition().getZ());
             Minecraft.getInstance().player.level.getEntitiesOfClass(LivingEntity.class, new AABB(pos.offset(32, 32, 32), pos.offset(-32, -32, -32)),
@@ -80,10 +81,9 @@ public class OneThreeFiveHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onEntityKill(LivingDeathEvent event) {
-        if (event.getEntity().getUUID().toString().contains(SPECIAL) && event.getSource().getEntity() instanceof Player && !(event.getSource().getEntity() instanceof FakePlayer)) {
-            Player player = (Player) event.getSource().getEntity();
+    public static void onEntityKill(LivingEntity entity, DamageSource source) {
+        if (entity.getUUID().toString().contains(SPECIAL) && source.getEntity() instanceof Player && !(source.getEntity() instanceof FakePlayer)) {
+            Player player = (Player) source.getEntity();
             if (player.getMainHandItem().getItem() instanceof ItemInfinity) {
                 player.getMainHandItem().getTag().putBoolean("Special", true);
             }
@@ -92,7 +92,7 @@ public class OneThreeFiveHandler {
 
     public static void init() {
         PlayerTickEvents.START.register(OneThreeFiveHandler::onPlayerTick);
-
+        ServerLivingEntityEvents.AFTER_DEATH.register(OneThreeFiveHandler::onEntityKill);
     }
 
 }

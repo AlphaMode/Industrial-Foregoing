@@ -28,15 +28,19 @@ import com.buuz135.industrial.module.ModuleTool;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.event.client.RenderPlayerEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -48,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class IFClientEvents {
 
-    public boolean blockOverlayEvent(WorldRenderContext context, @Nullable HitResult hit) {
+    public static boolean blockOverlayEvent(WorldRenderContext context, @Nullable HitResult hit) {
         if (hit != null && hit.getType() == HitResult.Type.BLOCK && Minecraft.getInstance().player.getMainHandItem().getItem().equals(ModuleTool.INFINITY_DRILL)) {
             BlockHitResult blockRayTraceResult = (BlockHitResult) hit;
             ItemStack hand = Minecraft.getInstance().player.getMainHandItem();
@@ -76,20 +80,21 @@ public class IFClientEvents {
         return true;
     }
 
-    @SubscribeEvent
-    public void onRenderPre(RenderPlayerEvent.Pre event) {
+    public static boolean onRenderPre(Player player, PlayerRenderer renderer, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         // todo: test if rewards are rendering.
         //event.getRenderer().addLayer(new ContributorsCatEarsRender(event.getRenderer()));
 
-        if (event.getEntity().getUUID().equals(Minecraft.getInstance().player.getUUID()) && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON)
-            return;
-        if (event.getEntity().getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(ModuleTool.INFINITY_DRILL))
-            event.getEntity().startUsingItem(InteractionHand.MAIN_HAND);
-        else if (event.getEntity().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(ModuleTool.INFINITY_DRILL))
-            event.getEntity().startUsingItem(InteractionHand.OFF_HAND);
+        if (player.getUUID().equals(Minecraft.getInstance().player.getUUID()) && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON)
+            return false;
+        if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(ModuleTool.INFINITY_DRILL))
+            player.startUsingItem(InteractionHand.MAIN_HAND);
+        else if (player.getItemInHand(InteractionHand.OFF_HAND).getItem().equals(ModuleTool.INFINITY_DRILL))
+            player.startUsingItem(InteractionHand.OFF_HAND);
+        return false;
     }
 
-    public void init() {
-        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(this::blockOverlayEvent);
+    public static void init() {
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(IFClientEvents::blockOverlayEvent);
+        RenderPlayerEvents.PRE.register(IFClientEvents::onRenderPre);
     }
 }

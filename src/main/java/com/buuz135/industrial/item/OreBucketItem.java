@@ -22,9 +22,14 @@
 package com.buuz135.industrial.item;
 
 
+import com.buuz135.industrial.utils.FluidStorageItem;
+import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.BucketItemAccessor;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.item.FluidBucketWrapper;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
@@ -37,7 +42,6 @@ import net.minecraft.world.level.material.Fluid;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
@@ -45,7 +49,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class OreBucketItem extends BucketItem {
+public class OreBucketItem extends BucketItem implements FluidStorageItem {
 
     private static final String NBT_TAG = "Tag";
 
@@ -61,14 +65,14 @@ public class OreBucketItem extends BucketItem {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return new FluidBucketWrapper(stack) {
+    public Storage<FluidVariant> getFluidStorage(ItemStack stack, ContainerItemContext context) {
+        return new FluidBucketWrapper(context) {
             @Nonnull
             @Override
             public FluidStack getFluid() {
-                FluidStack stack = new FluidStack(OreBucketItem.this.getFluid(), FluidConstants.BUCKET);
-                if (container.getOrCreateTag().contains(NBT_TAG)) {
-                    String tag = container.getOrCreateTag().getString(NBT_TAG);
+                FluidStack stack = new FluidStack(((BucketItemAccessor)OreBucketItem.this).port_lib$getContent(), FluidConstants.BUCKET);
+                if (context.getItemVariant().copyOrCreateNbt().contains(NBT_TAG)) {
+                    String tag = context.getItemVariant().copyOrCreateNbt().getString(NBT_TAG);
                     stack.getOrCreateTag().putString(NBT_TAG, tag);
                 }
                 return stack;

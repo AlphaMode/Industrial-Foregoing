@@ -28,11 +28,15 @@ import com.buuz135.industrial.capability.BlockFluidHandlerItemStack;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.utils.BlockUtils;
+import com.buuz135.industrial.utils.FluidStorageItem;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.LangUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -153,7 +157,7 @@ public class BlackHoleTankBlock extends IndustrialBlock<BlackHoleTankTile> {
         return ModuleTransportStorage.BLACK_HOLE_TANK_PITY.getRight().get();
     }
 
-    public static class BlackHoleTankItem extends BlockItem {
+    public static class BlackHoleTankItem extends BlockItem implements FluidStorageItem {
 
         private Rarity rarity;
 
@@ -164,33 +168,14 @@ public class BlackHoleTankBlock extends IndustrialBlock<BlackHoleTankTile> {
 
         @Nullable
         @Override
-        public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-            return new BlackHoleTankCapabilityProvider(stack, this.rarity);
+        public Storage<FluidVariant> getFluidStorage(ItemStack stack, ContainerItemContext context) {
+            return new BlockFluidHandlerItemStack(context, new ItemStack(stack.getItem()), BlockUtils.getFluidAmountByRarity(rarity), "tank");
         }
 
         @Nullable
         @Override
         public String getCreatorModId(ItemStack itemStack) {
             return Component.translatable("itemGroup." + this.category.getRecipeFolderName()).getString();
-        }
-    }
-
-    public static class BlackHoleTankCapabilityProvider implements ICapabilityProvider {
-
-        private final ItemStack stack;
-        private LazyOptional<FluidHandlerItemStack> iFluidHandlerItemLazyOptional;
-
-        public BlackHoleTankCapabilityProvider(ItemStack stack, Rarity rarity) {
-            this.stack = stack;
-            this.iFluidHandlerItemLazyOptional = LazyOptional.of(() -> new BlockFluidHandlerItemStack(stack, new ItemStack(stack.getItem()), BlockUtils.getFluidAmountByRarity(rarity), "tank"));
-        }
-
-        @Nonnull
-        @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            if (cap != null && cap.equals(ForgeCapabilities.FLUID_HANDLER_ITEM))
-                return iFluidHandlerItemLazyOptional.cast();
-            return LazyOptional.empty();
         }
     }
 }

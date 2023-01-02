@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "industrialforegoing",
+  "version": "${version}",
+  "name": "Industrial Foregoing",
+  "description": "IF: You need to automate all the things",
+  "license": "MIT",
+  "authors": [
+    "Buuz135",
+    "AlphaMode"
+  ],
+  "accessWidener": "industrial-foregoing.accesswidener",
+  "entrypoints": {
+    "main": [
+      "com.buuz135.industrial.IndustrialForegoing"
+    ],
+    "client": [
+      "com.buuz135.industrial.proxy.client.ClientProxy"
+    ],
+    "mm:early_risers": [
+      "com.buuz135.industrial.IndustrialForegoingASM"
+    ],
+    "fabric-datagen": [
+      "com.buuz135.industrial.IndustrialForegoingData"
+    ],
+    "jei_mod_plugin": [
+      "com.buuz135.industrial.plugin.jei.JEICustomPlugin"
+    ],
+    "rei_client": [
+    ]
+  }
+}

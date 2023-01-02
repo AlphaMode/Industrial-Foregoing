@@ -26,8 +26,7 @@ import com.buuz135.industrial.proxy.CommonProxy;
 import com.buuz135.industrial.proxy.network.*;
 import com.buuz135.industrial.recipe.LaserDrillRarity;
 import com.buuz135.industrial.registry.IFRegistries;
-import com.buuz135.industrial.utils.IFFakePlayer;
-import com.buuz135.industrial.utils.Reference;
+import com.buuz135.industrial.utils.*;
 import com.hrznstudio.titanium.module.ModuleController;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
@@ -38,6 +37,7 @@ import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import io.github.tropheusj.milk.Milk;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -91,6 +91,17 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
         LaserDrillRarity.init();
         PlayerInventoryFinder.init();
         Milk.enableMilkFluid();
+
+        FluidStorage.ITEM.registerFallback((itemStack, context) -> {
+            if (itemStack.getItem() instanceof FluidStorageItem storageItem)
+                return storageItem.getFluidStorage(itemStack, context);
+            return null;
+        });
+        FabricUtils.ITEM.registerFallback((itemStack, context) -> {
+            if (itemStack.getItem() instanceof ItemStorageItem storageItem)
+                return storageItem.getItemStorage(itemStack, context);
+            return null;
+        });
     }
 
     public static FakePlayer getFakePlayer(Level world) {

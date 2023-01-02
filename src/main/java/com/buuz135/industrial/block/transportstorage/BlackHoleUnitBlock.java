@@ -28,17 +28,20 @@ import com.buuz135.industrial.capability.BLHBlockItemHandlerItemStack;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.utils.BlockUtils;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
+import com.buuz135.industrial.utils.ItemStorageItem;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import com.hrznstudio.titanium.util.LangUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
@@ -87,7 +90,8 @@ public class BlackHoleUnitBlock extends IndustrialBlock<BlackHoleUnitTile> {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(iItemHandler -> {
+        Storage<ItemVariant> iItemHandler = FabricUtils.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        if (iItemHandler != null) {
             if (iItemHandler instanceof BLHBlockItemHandlerItemStack) {
                 ItemStack contain = ((BLHBlockItemHandlerItemStack) iItemHandler).getStack();
                 if (!contain.isEmpty()) {
@@ -95,7 +99,7 @@ public class BlackHoleUnitBlock extends IndustrialBlock<BlackHoleUnitTile> {
                     tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.contains") + ": " + ChatFormatting.WHITE + new DecimalFormat().format(((BLHBlockItemHandlerItemStack) iItemHandler).getAmount()) + ChatFormatting.DARK_AQUA + " " + LangUtil.getString("text.industrialforegoing.tooltip.items")));
                 }
             }
-        });
+        }
         tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.can_hold") + ": " + ChatFormatting.WHITE + new DecimalFormat().format(BlockUtils.getStackAmountByRarity(rarity)) + ChatFormatting.DARK_AQUA + " " + LangUtil.getString("text.industrialforegoing.tooltip.items")));
         if (stack.hasTag() && stack.getTag().contains("BlockEntityTag") && stack.getTag().getCompound("BlockEntityTag").contains("voidItems") && stack.getTag().getCompound("BlockEntityTag").getBoolean("voidItems")) {
             tooltip.add(Component.literal(ChatFormatting.GOLD + LangUtil.getString("text.industrialforegoing.tooltip.void_items")));
@@ -167,7 +171,7 @@ public class BlackHoleUnitBlock extends IndustrialBlock<BlackHoleUnitTile> {
         return ModuleTransportStorage.BLACK_HOLE_UNIT_PITY.getRight().get();
     }
 
-    public static class BlackHoleUnitItem extends BlockItem {
+    public static class BlackHoleUnitItem extends BlockItem implements ItemStorageItem {
 
         private Rarity rarity;
 
@@ -178,32 +182,14 @@ public class BlackHoleUnitBlock extends IndustrialBlock<BlackHoleUnitTile> {
 
         @Nullable
         @Override
-        public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-            return new BlackHoleUnitBlock.BlackHoleUnitCapabilityProvider(stack, this.rarity);
+        public Storage<ItemVariant> getItemStorage(ItemStack stack, ContainerItemContext context) {
+            return new BLHBlockItemHandlerItemStack(context, BlockUtils.getStackAmountByRarity(this.rarity));
         }
 
         @Nullable
         @Override
         public String getCreatorModId(ItemStack itemStack) {
             return Component.translatable("itemGroup." + this.category.getRecipeFolderName()).getString();
-        }
-    }
-
-    public static class BlackHoleUnitCapabilityProvider implements ICapabilityProvider {
-
-        private final ItemStack stack;
-        private LazyOptional<BLHBlockItemHandlerItemStack> optional;
-
-        public BlackHoleUnitCapabilityProvider(ItemStack stack, Rarity rarity) {
-            this.stack = stack;
-            this.optional = LazyOptional.of(() -> new BLHBlockItemHandlerItemStack(stack, BlockUtils.getStackAmountByRarity(rarity)));
-        }
-
-        @Nonnull
-        @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            if (cap != null && cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)) return optional.cast();
-            return LazyOptional.empty();
         }
     }
 }
