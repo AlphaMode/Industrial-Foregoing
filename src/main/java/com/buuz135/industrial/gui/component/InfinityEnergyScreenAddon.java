@@ -47,7 +47,7 @@ public class InfinityEnergyScreenAddon extends BasicScreenAddon {
     public InfinityEnergyScreenAddon(int posX, int posY, InfinityEnergyStorage handler) {
         super(posX, posY);
         this.handler = handler;
-        this.tier = handler.getLongCapacity();
+        this.tier = handler.getCapacity();
     }
 
     public static java.util.List<Component> getTooltip(long stored, long capacity) {
@@ -71,11 +71,11 @@ public class InfinityEnergyScreenAddon extends BasicScreenAddon {
 
     @Override
     public void drawForegroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
-        drawForeground(stack, screen, provider, getPosX(), getPosY(), guiX, guiY, handler.getLongEnergyStored(), tier);
+        drawForeground(stack, screen, provider, getPosX(), getPosY(), guiX, guiY, handler.getAmount(), tier);
     }
 
     @Override
     public List<Component> getTooltipLines() {
-        return getTooltip(handler.getLongEnergyStored(), tier);
+        return getTooltip(handler.getAmount(), tier);
     }
 }

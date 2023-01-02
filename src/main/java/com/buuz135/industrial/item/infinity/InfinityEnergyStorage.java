@@ -28,6 +28,7 @@ import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.fabricmc.api.EnvType;
@@ -49,30 +50,34 @@ public class InfinityEnergyStorage<T extends IComponentHarness> extends EnergySt
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        if (!canReceive()) return 0;
-        long stored = getLongEnergyStored();
-        int energyReceived = (int) Math.min(capacity - stored, Math.min(Long.MAX_VALUE, maxReceive));
-        if (!simulate)
-            setEnergyStored(stored + energyReceived);
+    public long insert(long maxReceive, TransactionContext tx) {
+        if (!supportsInsertion()) return 0;
+        updateSnapshots(tx);
+        long stored = getAmount();
+        long energyReceived = Math.min(capacity - stored, Math.min(Long.MAX_VALUE, maxReceive));
+        setEnergyStored(stored + energyReceived);
         return energyReceived;
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
+    protected void onFinalCommit() {
+        if (this.componentHarness != null) {
+            this.componentHarness.markComponentForUpdate(false);
+        }
+    }
+
+    @Override
+    public long extract(long maxExtract, TransactionContext tx) {
         return 0;
     }
 
     @Override
-    public int getEnergyStored() {
+    public long getAmount() {
         return this.energy > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) this.energy;
     }
 
     public void setEnergyStored(long power) {
         this.energy = power;
-        if (this.componentHarness != null) {
-            this.componentHarness.markComponentForUpdate(false);
-        }
     }
 
     @Override
@@ -81,21 +86,13 @@ public class InfinityEnergyStorage<T extends IComponentHarness> extends EnergySt
     }
 
     @Override
-    public boolean canExtract() {
+    public boolean supportsExtraction() {
         return false;
     }
 
     @Override
-    public boolean canReceive() {
+    public boolean supportsInsertion() {
         return true;
-    }
-
-    public long getLongEnergyStored() {
-        return this.energy;
-    }
-
-    public long getLongCapacity() {
-        return capacity;
     }
 
     @Override

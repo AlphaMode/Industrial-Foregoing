@@ -22,9 +22,17 @@
 
 package com.buuz135.industrial.fluid;
 
+import com.hrznstudio.titanium.fluid.TitaniumAttributeHandler;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -35,28 +43,31 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 
-import java.util.function.Consumer;
-
 public class OreFluidInstance {
 
-    private RegistryObject<FluidType> fluidType;
     private RegistryObject<Fluid> flowingFluid;
     private RegistryObject<Fluid> sourceFluid;
     private RegistryObject<Item> bucketFluid;
     private RegistryObject<Block> blockFluid;
     private String fluid;
 
-    public OreFluidInstance(DeferredRegistryHelper helper, String fluid, FluidType.Properties properties, IClientFluidTypeExtensions renderProperties, CreativeModeTab group) {
+    public OreFluidInstance(DeferredRegistryHelper helper, String fluid, TitaniumAttributeHandler.Properties properties, ResourceLocation still, ResourceLocation flowing, CreativeModeTab group) {
         this.fluid = fluid;
         this.sourceFluid = helper.registerGeneric(Registry.FLUID_REGISTRY, fluid, () -> new OreFluid.Source(this));
         this.flowingFluid = helper.registerGeneric(Registry.FLUID_REGISTRY, fluid + "_flowing", () -> new OreFluid.Flowing(this));
         this.bucketFluid = helper.registerGeneric(Registry.ITEM_REGISTRY, fluid + "_bucket", () -> new BucketItem(this.sourceFluid.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(group)));
         this.blockFluid = helper.registerGeneric(Registry.BLOCK_REGISTRY, fluid, () -> new LiquidBlock((FlowingFluid) sourceFluid.get(), Block.Properties.of(Material.WATER).noCollission().strength(100.0F)));
-        this.fluidType = helper.registerGeneric(Registry.FLUID_REGISTRY, fluid, () -> new OreTitaniumFluidType(properties) {
-            @Override
-            public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
-                consumer.accept(renderProperties);
-            }
+        helper.addRegistryCallback(Registry.FLUID_REGISTRY, () -> {
+            TitaniumAttributeHandler handler = new TitaniumAttributeHandler(properties, still, flowing, OreTitaniumFluidType.Clients::getTintColor);
+            FluidVariantAttributes.register(sourceFluid.get(), handler);
+            FluidVariantAttributes.register(flowingFluid.get(), handler);
+
+            EnvExecutor.runWhenOn(EnvType.CLIENT, () ->() -> {
+                FluidRenderHandlerRegistry.INSTANCE.register(sourceFluid.get(), flowingFluid.get(), new SimpleFluidRenderHandler(still, flowing));
+                TitaniumAttributeHandler.TitaniumClientAttributeHandler clientAttributeHandler = new TitaniumAttributeHandler.TitaniumClientAttributeHandler(handler);
+                FluidVariantRendering.register(sourceFluid.get(), clientAttributeHandler);
+                FluidVariantRendering.register(flowingFluid.get(), clientAttributeHandler);
+            });
         });
     }
 

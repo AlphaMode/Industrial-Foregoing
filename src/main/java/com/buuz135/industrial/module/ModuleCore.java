@@ -43,6 +43,7 @@ import com.buuz135.industrial.utils.Reference;
 import com.buuz135.industrial.utils.SimpleRecipeType;
 import com.buuz135.industrial.utils.apihandlers.straw.*;
 import com.chocohead.mm.api.ClassTinkerers;
+import com.hrznstudio.titanium.fluid.TitaniumAttributeHandler;
 import com.hrznstudio.titanium.fluid.TitaniumFluidInstance;
 import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
@@ -166,16 +167,16 @@ public class ModuleCore implements IModule {
         PROCESSING_ADDON_1 = helper.registerGeneric(Registry.ITEM_REGISTRY, "processing_addon_1", () -> new ProcessingAddonItem(1, TAB_CORE));
         PROCESSING_ADDON_2 = helper.registerGeneric(Registry.ITEM_REGISTRY, "processing_addon_2", () -> new ProcessingAddonItem(2, TAB_CORE));
 
-        LATEX = new TitaniumFluidInstance(helper, "latex", FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/latex_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/latex_flow")), TAB_CORE);
-        MEAT = new TitaniumFluidInstance(helper, "meat", FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/meat_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/meat_flow")), TAB_CORE);
-        SEWAGE = new TitaniumFluidInstance(helper, "sewage", FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sewage_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sewage_flow")), TAB_CORE);
-        ESSENCE = new TitaniumFluidInstance(helper, "essence", FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/essence_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/essence_flow")), TAB_CORE);
-        SLUDGE = new TitaniumFluidInstance(helper, "sludge",  FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sludge_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sludge_flow")), TAB_CORE);
-        PINK_SLIME = new TitaniumFluidInstance(helper, "pink_slime",  FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/pink_slime_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/pink_slime_flow")), TAB_CORE);
-        BIOFUEL = new TitaniumFluidInstance(helper, "biofuel",  FluidType.Properties.create().density(1000), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/biofuel_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/biofuel_flow")), TAB_CORE);
-        ETHER = new TitaniumFluidInstance(helper, "ether_gas",  FluidType.Properties.create().density(0), new ClientFluidTypeExtensions(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_flow")), TAB_CORE);
-        RAW_ORE_MEAT = new OreFluidInstance(helper, "raw_ore_meat",  FluidType.Properties.create().density(1000), new OreTitaniumFluidType.Client(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/raw_ore_meat_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/raw_ore_meat_flow")), TAB_CORE);
-        FERMENTED_ORE_MEAT = new OreFluidInstance(helper, "fermented_ore_meat",  FluidType.Properties.create().density(1000), new OreTitaniumFluidType.Client(new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_flow")), TAB_CORE);
+        LATEX = new TitaniumFluidInstance(helper, "latex", TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/latex_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/latex_flow"), TAB_CORE);
+        MEAT = new TitaniumFluidInstance(helper, "meat", TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/meat_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/meat_flow"), TAB_CORE);
+        SEWAGE = new TitaniumFluidInstance(helper, "sewage", TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sewage_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sewage_flow"), TAB_CORE);
+        ESSENCE = new TitaniumFluidInstance(helper, "essence", TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/essence_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/essence_flow"), TAB_CORE);
+        SLUDGE = new TitaniumFluidInstance(helper, "sludge",  TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sludge_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/sludge_flow"), TAB_CORE);
+        PINK_SLIME = new TitaniumFluidInstance(helper, "pink_slime",  TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/pink_slime_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/pink_slime_flow"), TAB_CORE);
+        BIOFUEL = new TitaniumFluidInstance(helper, "biofuel",  TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/biofuel_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/biofuel_flow"), TAB_CORE);
+        ETHER = new TitaniumFluidInstance(helper, "ether_gas",  TitaniumAttributeHandler.Properties.create().density(0), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_flow"), TAB_CORE);
+        RAW_ORE_MEAT = new OreFluidInstance(helper, "raw_ore_meat",  TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/raw_ore_meat_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/raw_ore_meat_flow"), TAB_CORE);
+        FERMENTED_ORE_MEAT = new OreFluidInstance(helper, "fermented_ore_meat",  TitaniumAttributeHandler.Properties.create().density(1000), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_still"), new ResourceLocation(Reference.MOD_ID, "blocks/fluids/ether_gas_flow"), TAB_CORE);
 
         IRON_GEAR = helper.registerGeneric(Registry.ITEM_REGISTRY, "iron_gear", () -> new Item(new Item.Properties().tab(TAB_CORE)));
         GOLD_GEAR = helper.registerGeneric(Registry.ITEM_REGISTRY, "gold_gear", () -> new Item(new Item.Properties().tab(TAB_CORE)));

@@ -22,7 +22,9 @@
 package com.buuz135.industrial.fluid;
 
 import com.buuz135.industrial.utils.ItemStackUtils;
+import com.hrznstudio.titanium.fluid.TitaniumAttributeHandler;
 import com.hrznstudio.titanium.util.TagUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -34,12 +36,11 @@ import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import java.util.List;
 
-public class OreTitaniumFluidType extends FluidType {
+public class OreTitaniumFluidType {
 
     public static final String NBT_TAG = "Tag";
 
-    public OreTitaniumFluidType(final Properties properties) {
-        super(properties);
+    public OreTitaniumFluidType(final TitaniumAttributeHandler.Properties properties) {
     }
 
     @Override
@@ -100,16 +101,11 @@ public class OreTitaniumFluidType extends FluidType {
     }
 
 
-    public static class Client extends ClientFluidTypeExtensions {
+    public static class Clients {
 
-        public Client(ResourceLocation still, ResourceLocation flow) {
-            super(still, flow);
-        }
-
-        @Override
-        public int getTintColor(FluidStack stack) {
-            if (Minecraft.getInstance().level != null && stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
-                String tag = stack.getTag().getString(NBT_TAG);
+        public static int getTintColor(FluidVariant stack) {
+            if (Minecraft.getInstance().level != null && stack.hasNbt() && stack.getNbt().contains(NBT_TAG)) {
+                String tag = stack.getNbt().getString(NBT_TAG);
                 List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
                 if (items.size() > 0) {
                     return ItemStackUtils.getColor(new ItemStack(items.get(0)));

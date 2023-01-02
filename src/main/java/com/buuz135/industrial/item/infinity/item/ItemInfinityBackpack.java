@@ -327,7 +327,7 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
     public IFactory<InfinityEnergyStorage> getEnergyConstructor(ItemStack stack) {
         return () -> new InfinityEnergyStorage(InfinityTier.ARTIFACT.getPowerNeeded(), -21, 24) {
             @Override
-            public long getLongEnergyStored() {
+            public long getAmount() {
                 if (stack.hasTag()) {
                     return Math.min(stack.getTag().getLong("Energy"), InfinityTier.ARTIFACT.getPowerNeeded());
                 } else {
@@ -344,7 +344,7 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
             }
 
             @Override
-            public boolean canReceive() {
+            public boolean supportsInsertion() {
                 return ItemInfinity.canCharge(stack);
             }
         };

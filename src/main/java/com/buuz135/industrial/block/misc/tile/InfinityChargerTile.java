@@ -58,14 +58,14 @@ public class InfinityChargerTile extends IndustrialMachineTile<InfinityChargerTi
             if (iEnergyStorage != null) {
                 if (this.getEnergyStorage() instanceof InfinityEnergyStorage) {
                     if (iEnergyStorage instanceof InfinityEnergyStorage) {
-                        long added = Math.min(Long.MAX_VALUE - ((InfinityEnergyStorage) iEnergyStorage).getLongEnergyStored(), Math.min(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongCapacity(), ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored()));
-                        ((InfinityEnergyStorage) iEnergyStorage).setEnergyStored(((InfinityEnergyStorage) iEnergyStorage).getLongEnergyStored() + added);
-                        ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored() - added);
+                        long added = Math.min(Long.MAX_VALUE - ((InfinityEnergyStorage) iEnergyStorage).getAmount(), Math.min(this.getEnergyStorage().getCapacity(), this.getEnergyStorage().getAmount()));
+                        ((InfinityEnergyStorage) iEnergyStorage).setEnergyStored(((InfinityEnergyStorage) iEnergyStorage).getAmount() + added);
+                        ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(this.getEnergyStorage().getAmount() - added);
                         markForUpdate();
                     } else {
                         long extracted = this.getEnergyStorage().getAmount();
                         try (Transaction t = TransferUtil.getTransaction()) {
-                            ((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).setEnergyStored(((InfinityEnergyStorage<InfinityChargerTile>) this.getEnergyStorage()).getLongEnergyStored() - iEnergyStorage.insert(extracted, t));
+                            this.getEnergyStorage().setEnergyStored(this.getEnergyStorage().getAmount() - iEnergyStorage.insert(extracted, t));
                             t.commit();
                         }
                         markForUpdate();
