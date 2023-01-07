@@ -10,13 +10,14 @@ import net.minecraft.world.item.ItemStack;
 public class TransferUtil2 {
 
     // ItemHandlerHelper.insertItem
-    public static long insertItem(Storage<ItemVariant> storage, ItemStack stack, boolean simulate) {
+    public static ItemStack insertItem(Storage<ItemVariant> storage, ItemStack stack, boolean simulate) {
         try (var transaction = TransferUtil.getTransaction()) {
-            if (simulate) {
-                return storage.simulateInsert(ItemVariant.of(stack), stack.getCount(), transaction);
-            } else {
-                return storage.insert(ItemVariant.of(stack), stack.getCount(), transaction);
-            }
+            ItemStack newStack = stack.copy();
+            long inserted = storage.insert(ItemVariant.of(stack), stack.getCount(), transaction);
+            newStack.setCount(stack.getCount() - (int) inserted);
+            if (!simulate)
+                transaction.commit();
+            return newStack;
         }
     }
 
@@ -25,8 +26,7 @@ public class TransferUtil2 {
         try (var transaction = TransferUtil.getTransaction()) {
             var storage = PlayerInventoryStorage.of(player);
             var variant = ItemVariant.of(stack);
-            var inserted = storage.insert(variant, stack.getCount(), transaction);
-            storage.drop(variant, stack.getCount() - inserted, transaction);
+            storage.offerOrDrop(variant, stack.getCount(), transaction);
         }
     }
 }

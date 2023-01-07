@@ -25,11 +25,17 @@ import com.buuz135.industrial.block.tile.IndustrialProcessingTile;
 import com.buuz135.industrial.config.machine.misc.EnchantmentApplicatorConfig;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleMisc;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.DyeColor;
@@ -44,7 +50,9 @@ import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class EnchantmentApplicatorTile extends IndustrialProcessingTile<EnchantmentApplicatorTile> {
 
@@ -86,9 +94,9 @@ public class EnchantmentApplicatorTile extends IndustrialProcessingTile<Enchantm
     public boolean canIncrease() {
         Pair<ItemStack, Integer> output = updateRepairOutput();
         long amount = this.tank.getFluidAmount();
-        BlockEntity tileEntity = this.level.getBlockEntity(this.worldPosition.above());
-        if (tileEntity != null && tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).isPresent()) {
-            amount += tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).map(iFluidHandler -> iFluidHandler.drain(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), Integer.MAX_VALUE), IFluidHandler.FluidAction.SIMULATE).getAmount()).orElse(0);
+        Optional<Storage<FluidVariant>> storageOptional = FabricUtils.getStorage(FluidStorage.SIDED, this.level, this.worldPosition.above(), null);
+        if (storageOptional.isPresent()) {
+            amount += storageOptional.map(iFluidHandler -> iFluidHandler.simulateExtract(FluidVariant.of(ModuleCore.ESSENCE.getSourceFluid().get()), Long.MAX_VALUE, null)).orElse(0L);
         }
         return !output.getLeft().isEmpty() && amount >= getEssenceConsumed(output.getRight()) && this.output.getStackInSlot(0).isEmpty();
     }
@@ -111,11 +119,8 @@ public class EnchantmentApplicatorTile extends IndustrialProcessingTile<Enchantm
             this.inputFirst.setStackInSlot(0, ItemStack.EMPTY);
             this.inputSecond.getStackInSlot(0).shrink(1);
             this.output.setStackInSlot(0, output.getLeft());
-            AtomicInteger amount = new AtomicInteger(getEssenceConsumed(output.getRight()));
-            BlockEntity tileEntity = this.level.getBlockEntity(this.worldPosition.above());
-            if (tileEntity != null) {
-                tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(iFluidHandler -> amount.addAndGet(-iFluidHandler.drain(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), amount.get()), IFluidHandler.FluidAction.EXECUTE).getAmount()));
-            }
+            AtomicLong amount = new AtomicLong(getEssenceConsumed(output.getRight()));
+            FabricUtils.getStorage(FluidStorage.SIDED, this.level, this.worldPosition.above(), null).ifPresent(iFluidHandler -> amount.addAndGet(-TransferUtil.extractFluid(iFluidHandler, new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), amount.get()))));
             if (amount.get() > 0) this.tank.drainForced(amount.get(), false);
         };
     }
@@ -138,6 +143,12 @@ public class EnchantmentApplicatorTile extends IndustrialProcessingTile<Enchantm
     @Override
     public int getMaxProgress() {
         return EnchantmentApplicatorConfig.maxProgress;
+    }
+
+    protected boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        if (stack.getItem() instanceof CustomEnchantingBehaviorItem customEnchantingBehaviorItem)
+            return customEnchantingBehaviorItem.isBookEnchantable(stack, book);
+        return true;
     }
 
     public Pair<ItemStack, Integer> updateRepairOutput() {
@@ -238,7 +249,7 @@ public class EnchantmentApplicatorTile extends IndustrialProcessingTile<Enchantm
                     }
                 }
             }
-            if (addEnchantment && !inputFirstCopy.isBookEnchantable(inputSecond)) inputFirstCopy = ItemStack.EMPTY;
+            if (addEnchantment && !isBookEnchantable(inputFirstCopy, inputSecond)) inputFirstCopy = ItemStack.EMPTY;
             maximumCost = j + i;
             if (i <= 0) {
                 inputFirstCopy = ItemStack.EMPTY;

@@ -32,12 +32,17 @@ import com.buuz135.industrial.utils.TransferUtil2;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import io.github.fabricators_of_create.porting_lib.block.HarvestableBlock;
 import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
+import io.github.fabricators_of_create.porting_lib.util.PortingHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -60,6 +65,12 @@ public class BlockBreakerTile extends IndustrialAreaWorkingTile<BlockBreakerTile
         this.getPowerPerOperation = BlockBreakerConfig.powerPerOperation;
     }
 
+    protected boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
+        if (state.getBlock() instanceof HarvestableBlock harvestableBlock)
+            return harvestableBlock.canHarvestBlock(state, level, pos, player);
+        return PortingHooks.isCorrectToolForDrops(state, player);
+    }
+
     @Override
     public WorkAction work() {
         if (hasEnergy(getPowerPerOperation)) {
@@ -67,7 +78,7 @@ public class BlockBreakerTile extends IndustrialAreaWorkingTile<BlockBreakerTile
             if (isLoaded(pointed) && !level.isEmptyBlock(pointed) && BlockUtils.canBlockBeBroken(this.level, pointed)) {
                 FakePlayer fakePlayer = IndustrialForegoing.getFakePlayer(this.level, pointed);
                 fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.NETHERITE_PICKAXE));
-                if (this.level.getBlockState(pointed).getDestroySpeed(this.level, pointed) >= 0 && this.level.getBlockState(pointed).canHarvestBlock(this.level, pointed, fakePlayer)) {
+                if (this.level.getBlockState(pointed).getDestroySpeed(this.level, pointed) >= 0 && canHarvestBlock(this.level.getBlockState(pointed), this.level, pointed, fakePlayer)) {
                     for (ItemStack blockDrop : BlockUtils.getBlockDrops(this.level, pointed)) {
                         ItemStack result = TransferUtil2.insertItem(output, blockDrop, false);
                         if (!result.isEmpty()) {

@@ -23,8 +23,6 @@
 package com.buuz135.industrial.item.infinity.item;
 
 import com.buuz135.industrial.IndustrialForegoing;
-import com.buuz135.industrial.capability.BackpackCapabilityProvider;
-import com.buuz135.industrial.capability.MultipleFluidHandlerScreenProviderItemStack;
 import com.buuz135.industrial.container.BackpackContainer;
 import com.buuz135.industrial.gui.component.SlotDefinitionGuiAddon;
 import com.buuz135.industrial.item.infinity.InfinityEnergyStorage;
@@ -37,6 +35,7 @@ import com.buuz135.industrial.proxy.CommonProxy;
 import com.buuz135.industrial.proxy.network.BackpackOpenedMessage;
 import com.buuz135.industrial.proxy.network.BackpackSyncMessage;
 import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.TransferUtil2;
 import com.buuz135.industrial.worlddata.BackpackDataManager;
@@ -57,9 +56,18 @@ import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.network.locator.instance.InventoryStackLocatorInstance;
 import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.event.common.PlayerEvents;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -123,7 +131,7 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                                     ItemStack slotStack = handler.getSlotDefinition(pos).getStack().copy();
                                     slotStack.setCount(1);
                                     if (!slotStack.isEmpty() && slotStack.sameItem(picked) && ItemStack.tagMatches(slotStack, picked)) {
-                                        ItemStack returned = handler.insertItem(pos, picked.copy(), false);
+                                        ItemStack returned = FabricUtils.insertSlot(handler, pos, picked.copy(), false);
                                         picked.setCount(returned.getCount());
                                         entityItemPickupEvent.setResult(Event.Result.ALLOW);
                                         if (entityItemPickupEvent.getEntity() instanceof ServerPlayer) {
@@ -138,27 +146,30 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                 }
             }
         }).subscribe();
-        EventManager.forge(PlayerXpEvent.PickupXp.class).filter(pickupXp -> pickupXp.getOrb().isAlive()).process(pickupXp -> {
-            findFirstBackpack(pickupXp.getEntity()).ifPresent(target -> {
-                ItemStack stack = target.getFinder().getStackGetter().apply(pickupXp.getEntity(), target.getSlot());
-                if (!stack.isEmpty()) {
-                    if (stack.getItem() instanceof ItemInfinityBackpack && (getPickUpMode(stack) == 2 || getPickUpMode(stack) == 0)) {
-                        if (stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                            ExperienceOrb entity = pickupXp.getOrb();
-                            IFluidHandlerItem handlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
-                            if (handlerItem != null) {
-                                if (handlerItem.fill(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), entity.getValue() * 20), IFluidHandler.FluidAction.SIMULATE) > 0) {
-                                    handlerItem.fill(new FluidStack(ModuleCore.ESSENCE.getSourceFluid().get(), entity.getValue() * 20), IFluidHandler.FluidAction.EXECUTE);
+        PlayerEvents.PICKUP_XP.register(pickupXp -> {
+            if (!pickupXp.getOrb().isAlive())
+                return;
+            findFirstBackpack(pickupXp.getPlayer()).ifPresent(target -> {
+                ContainerItemContext stack = ContainerItemContext.ofPlayerSlot(pickupXp.getPlayer(), PlayerInventoryStorage.of(pickupXp.getPlayer()).getSlot(target.getSlot()));
+                if (!stack.getItemVariant().isBlank()) {
+                    if (stack.getItemVariant().getItem() instanceof ItemInfinityBackpack && (getPickUpMode(stack.getItemVariant().toStack()) == 2 || getPickUpMode(stack.getItemVariant().toStack()) == 0)) {
+                        Storage<FluidVariant> handlerItem = stack.find(FluidStorage.ITEM);
+                        ExperienceOrb entity = pickupXp.getOrb();
+                        if (handlerItem != null) {
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                if (handlerItem.simulateInsert(FluidVariant.of(ModuleCore.ESSENCE.getSourceFluid().get()), entity.getValue() * 20L, tx) > 0) {
+                                    handlerItem.insert(FluidVariant.of(ModuleCore.ESSENCE.getSourceFluid().get()), entity.getValue() * 20L, tx);
                                     entity.onClientRemoval();
                                     pickupXp.setCanceled(true);
+                                    tx.commit();
                                 }
-
                             }
+
                         }
                     }
                 }
             });
-        }).subscribe();
+        });
     }
 
     public static int getSlotSize(ItemStack stack) {
@@ -220,11 +231,11 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
     }
 
 
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return new BackpackCapabilityProvider(stack, getTankConstructor(stack), getEnergyConstructor(stack));
-    }
+//    @Nullable TODO: PORT
+//    @Override
+//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+//        return new BackpackCapabilityProvider(stack, getTankConstructor(stack), getEnergyConstructor(stack));
+//    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand handIn) {
@@ -267,17 +278,17 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
         }
         if (!entityIn.level.isClientSide && entityIn instanceof Player) {
             if (enoughFuel(stack)) {
-                if ((((Player) entityIn).getFoodData().needsFood() || ((Player) entityIn).getFoodData().getSaturationLevel() < 10) && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                    IFluidHandlerItem handlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
-                    if (handlerItem instanceof MultipleFluidHandlerScreenProviderItemStack) {
-                        FluidStack fluidStack = handlerItem.getFluidInTank(2);
-                        if (!fluidStack.isEmpty() && fluidStack.getAmount() >= 400) {
-                            ((MultipleFluidHandlerScreenProviderItemStack) handlerItem).setFluidInTank(2, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), fluidStack.getAmount() - 400));
-                            ((Player) entityIn).getFoodData().eat(1, 1);
-                            consumeFuel(stack);
-                        }
-                    }
-                }
+//                if ((((Player) entityIn).getFoodData().needsFood() || ((Player) entityIn).getFoodData().getSaturationLevel() < 10) && stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
+//                    IFluidHandlerItem handlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElseGet(null);
+//                    if (handlerItem instanceof MultipleFluidHandlerScreenProviderItemStack) {
+//                        FluidStack fluidStack = handlerItem.getFluidInTank(2);
+//                        if (!fluidStack.isEmpty() && fluidStack.getAmount() >= 400) {
+//                            ((MultipleFluidHandlerScreenProviderItemStack) handlerItem).setFluidInTank(2, new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), fluidStack.getAmount() - 400));
+//                            ((Player) entityIn).getFoodData().eat(1, 1);
+//                            consumeFuel(stack);
+//                        }
+//                    }
+//                } TODO: PORT
             }
             if (entityIn.level.getGameTime() % 10 == 0) {
                 BackpackDataManager manager = BackpackDataManager.getData(entityIn.level);
@@ -293,9 +304,9 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                                     Inventory inventory = ((Player) entityIn).inventory;
                                     for (int inv = 0; inv <= 35; inv++) {
                                         ItemStack inventoryStack = inventory.getItem(inv);
-                                        if (!inventoryStack.isEmpty() && inventoryStack.getCount() < inventoryStack.getMaxStackSize() && handler.isItemValid(i, inventoryStack) && enoughFuel(stack)) {
+                                        if (!inventoryStack.isEmpty() && inventoryStack.getCount() < inventoryStack.getMaxStackSize() && handler.isItemValid(i, ItemVariant.of(inventoryStack), inventoryStack.getCount()) && enoughFuel(stack)) {
                                             int extracting = inventoryStack.getMaxStackSize() - inventoryStack.getCount();
-                                            ItemStack extractedSLot = handler.extractItem(i, extracting, false);
+                                            ItemStack extractedSLot = FabricUtils.extractSlot(handler, i, extracting, false);
                                             inventoryStack.setCount(inventoryStack.getCount() + extractedSLot.getCount());
                                             if (entityIn instanceof ServerPlayer)
                                                 sync(entityIn.level, stack.getOrCreateTag().getString("Id"), (ServerPlayer) entityIn);
@@ -313,15 +324,15 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
         super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
     }
 
-    @Override
-    public IFactory<FluidHandlerScreenProviderItemStack> getTankConstructor(ItemStack stack) {
-        int y = 88;
-        return () -> new MultipleFluidHandlerScreenProviderItemStack(stack, 1_000_000,
-                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("biofuel", -21, y + 25 * 0, fluidStack -> fluidStack.getFluid().isSame(ModuleCore.BIOFUEL.getSourceFluid().get()), false, true, FluidTankComponent.Type.SMALL),
-                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("essence", -21, y + 25 * 1, fluidStack -> fluidStack.getFluid().is(IndustrialTags.Fluids.EXPERIENCE), true, true, FluidTankComponent.Type.SMALL),
-                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("meat", -21, y + 25 * 2, fluidStack -> fluidStack.getFluid().isSame(ModuleCore.MEAT.getSourceFluid().get()), false, true, FluidTankComponent.Type.SMALL)
-        );
-    }
+//    @Override TODO: PORT
+//    public IFactory<FluidHandlerScreenProviderItemStack> getTankConstructor(ItemStack stack) {
+//        int y = 88;
+//        return () -> new MultipleFluidHandlerScreenProviderItemStack(stack, 1_000_000,
+//                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("biofuel", -21, y + 25 * 0, fluidStack -> fluidStack.getFluid().isSame(ModuleCore.BIOFUEL.getSourceFluid().get()), false, true, FluidTankComponent.Type.SMALL),
+//                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("essence", -21, y + 25 * 1, fluidStack -> fluidStack.getFluid().is(IndustrialTags.Fluids.EXPERIENCE), true, true, FluidTankComponent.Type.SMALL),
+//                new MultipleFluidHandlerScreenProviderItemStack.TankDefinition("meat", -21, y + 25 * 2, fluidStack -> fluidStack.getFluid().isSame(ModuleCore.MEAT.getSourceFluid().get()), false, true, FluidTankComponent.Type.SMALL)
+//        );
+//    }
 
     @Override
     public IFactory<InfinityEnergyStorage> getEnergyConstructor(ItemStack stack) {
@@ -367,9 +378,9 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                     ItemStack result = ItemStack.EMPTY;
                     boolean hasCursorChanged = false;
                     if (button == 2) {//MIDDLE
-                        ItemStack simulated = handler.extractItem(slot, 1, true);
+                        ItemStack simulated = FabricUtils.extractSlot(handler, slot, 1, true);
                         if (!simulated.isEmpty() && (cursor.isEmpty() || ItemHandlerHelper.canItemStacksStack(simulated, cursor))) {
-                            result = handler.extractItem(slot, 1, false);
+                            result = FabricUtils.extractSlot(handler, slot, 1, false);
                             result.setCount(cursor.getCount() + 1);
                             hasCursorChanged = true;
                         }
@@ -385,10 +396,10 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                                         handler.getSlotDefinition(slot).setStack(ItemStack.EMPTY);
                                         handler.getSlotDefinition(slot).setAmount(0);
                                     } else {
-                                        TransferUtil2.giveItemToPlayer(playerEntity, handler.extractItem(slot, maxStack, false));
+                                        TransferUtil2.giveItemToPlayer(playerEntity, FabricUtils.extractSlot(handler, slot, maxStack, false));
                                     }
                                 } else {
-                                    result = handler.extractItem(slot, maxStack, false);
+                                    result = FabricUtils.extractSlot(handler, slot, maxStack, false);
                                     hasCursorChanged = true;
                                 }
                             }
@@ -397,7 +408,7 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                                 BackpackDataManager.SlotDefinition definition = handler.getSlotDefinition(slot);
                                 definition.setRefillItems(!definition.isRefillItems());
                             } else {
-                                result = handler.extractItem(slot, maxStack / 2, false);
+                                result = FabricUtils.extractSlot(handler, slot, maxStack / 2, false);
                                 hasCursorChanged = true;
                             }
                         }

@@ -90,18 +90,18 @@ public class ModuleTool implements IModule {
         INFINITY_SAW = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_saw", () -> new ItemInfinitySaw(TAB_TOOL));
         INFINITY_HAMMER = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_hammer", () -> new ItemInfinityHammer(TAB_TOOL));
         INFINITY_TRIDENT = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_trident", () -> new ItemInfinityTrident(TAB_TOOL));
-        TRIDENT_ENTITY_TYPE = registryHelper.registerEntityType("trident_entity", () -> EntityType.Builder.<InfinityTridentEntity>of(InfinityTridentEntity::new, MobCategory.MISC).sized(0.5F, 0.5F)
-                .setShouldReceiveVelocityUpdates(true)
-                .setCustomClientFactory((spawnEntity, world) -> new InfinityTridentEntity((EntityType<? extends InfinityTridentEntity>) TRIDENT_ENTITY_TYPE.get(), world)).clientTrackingRange(4).updateInterval(20).build("trident_entity"));
+        TRIDENT_ENTITY_TYPE = registryHelper.registerEntityType("trident_entity", () -> FabricEntityTypeBuilder.<InfinityTridentEntity>create(MobCategory.MISC, InfinityTridentEntity::new).dimensions(EntityDimensions.fixed(0.5F, 0.5F))
+                .forceTrackedVelocityUpdates(true)
+                .entityFactory((spawnEntity, world) -> new InfinityTridentEntity((EntityType<? extends InfinityTridentEntity>) TRIDENT_ENTITY_TYPE.get(), world)).trackRangeChunks(4).trackedUpdateRate(20).build());
         INFINITY_BACKPACK = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_backpack", () -> new ItemInfinityBackpack());
         INFINITY_LAUNCHER = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_launcher", () -> new ItemInfinityLauncher(TAB_TOOL));
         INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE = registryHelper.registerEntityType("launcher_projectile_entity", () -> FabricEntityTypeBuilder.<InfinityLauncherProjectileEntity>create(MobCategory.MISC, InfinityLauncherProjectileEntity::new).dimensions(EntityDimensions.fixed(0.5F, 0.5F))
                 .forceTrackedVelocityUpdates(true)
-                .setCustomClientFactory((spawnEntity, world) -> new InfinityLauncherProjectileEntity((EntityType<? extends InfinityLauncherProjectileEntity>) INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), world)).clientTrackingRange(4).updateInterval(20).build("launcher_projectile_entity"));
+                .entityFactory((spawnEntity, world) -> new InfinityLauncherProjectileEntity((EntityType<? extends InfinityLauncherProjectileEntity>) INFINITY_LAUNCHER_PROJECTILE_ENTITY_TYPE.get(), world)).trackRangeChunks(4).trackedUpdateRate(20).build());
         INFINITY_NUKE = registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "infinity_nuke", () -> new ItemInfinityNuke(TAB_TOOL));
         INFINITY_NUKE_ENTITY_TYPE = registryHelper.registerEntityType("infinity_nuke", () -> FabricEntityTypeBuilder.<InfinityNukeEntity>create(MobCategory.MISC, InfinityNukeEntity::new).dimensions(EntityDimensions.fixed(0.5F, 1.5F))
                 .forceTrackedVelocityUpdates(true)
-                .setCustomClientFactory((spawnEntity, world) -> new InfinityNukeEntity((EntityType<? extends InfinityNukeEntity>) INFINITY_NUKE_ENTITY_TYPE.get(), world)).fireImmune().clientTrackingRange(8).updateInterval(20).build("infinity_nuke"));
+                .entityFactory((spawnEntity, world) -> new InfinityNukeEntity((EntityType<? extends InfinityNukeEntity>) INFINITY_NUKE_ENTITY_TYPE.get(), world)).fireImmune().trackRangeChunks(8).trackedUpdateRate(20).build());
         NUKE_CHARGING = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_charging", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_charging")));
         NUKE_ARMING = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_arming", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_arming")));
         NUKE_EXPLOSION = registryHelper.registerGeneric(Registry.SOUND_EVENT_REGISTRY, "nuke_explosion", () -> new SoundEvent(new ResourceLocation(Reference.MOD_ID, "nuke_explosion")));

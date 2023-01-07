@@ -30,6 +30,9 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -121,7 +124,10 @@ public class MechanicalDirtTile extends IndustrialWorkingTile<MechanicalDirtTile
                         if (difference <= 25) difference = difference / 2;
                         else difference = 25;
                         if (meat.getFluidAmount() >= difference) {
-                            meat.drainForced(((MechanicalDirtTile) tile).getMeat().fill(new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), meat.drainForced(difference, IFluidHandler.FluidAction.SIMULATE).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                meat.drainForced(((MechanicalDirtTile) tile).getMeat().insert(FluidVariant.of(ModuleCore.MEAT.getSourceFluid().get()), meat.drainForced(difference, true).getAmount(), tx), false);
+                                tx.commit();
+                            }
                         }
                     }
                     difference = getEnergyStorage().getAmount() - ((MechanicalDirtTile) tile).getEnergyStorage().getAmount();
@@ -129,7 +135,10 @@ public class MechanicalDirtTile extends IndustrialWorkingTile<MechanicalDirtTile
                         if (difference <= 1000 && difference > 1) difference = difference / 2;
                         if (difference > 1000) difference = 1000;
                         if (getEnergyStorage().getAmount() >= difference) {
-                            getEnergyStorage().extractEnergy(((MechanicalDirtTile) tile).getEnergyStorage().receiveEnergy(difference, false), false);
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                getEnergyStorage().extract(((MechanicalDirtTile) tile).getEnergyStorage().insert(difference, tx), tx);
+                                tx.commit();
+                            }
                         }
                     }
                 }

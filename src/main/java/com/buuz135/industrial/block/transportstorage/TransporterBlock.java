@@ -26,6 +26,7 @@ import com.buuz135.industrial.block.transportstorage.tile.TransporterTile;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.util.RayTraceUtils;
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -63,7 +64,7 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class TransporterBlock extends BasicTileBlock<TransporterTile> implements SimpleWaterloggedBlock {
+public class TransporterBlock extends BasicTileBlock<TransporterTile> implements SimpleWaterloggedBlock, BlockPickInteractionAware {
 
     public TransporterBlock(CreativeModeTab group) {
         super("transporter", Properties.of(Material.HEAVY_METAL, MaterialColor.COLOR_ORANGE).noCollission().strength(2.0f), TransporterTile.class);
@@ -96,7 +97,7 @@ public class TransporterBlock extends BasicTileBlock<TransporterTile> implements
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
+    public ItemStack getPickedStack(BlockState state, BlockGetter world, BlockPos pos, Player player, HitResult target) {
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof TransporterTile) {
             if (target instanceof BlockHitResult) {

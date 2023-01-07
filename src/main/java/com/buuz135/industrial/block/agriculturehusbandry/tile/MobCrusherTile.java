@@ -43,6 +43,7 @@ import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.item.AugmentWrapper;
 import com.hrznstudio.titanium.util.LangUtil;
+import io.github.fabricators_of_create.porting_lib.event.common.LivingEntityEvents;
 import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -135,7 +136,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
             if (mobs.size() > 0) {
                 Mob entity = mobs.get(0);
                 FakePlayer player = IndustrialForegoing.getFakePlayer(this.level);
-                if (Registry.ENTITY_TYPE.tags().getTag(IndustrialTags.EntityTypes.MOB_CRUSHER_INSTANT_KILL_BLACKLIST).contains(entity.getType())) {
+                if (entity.getType().is(IndustrialTags.EntityTypes.MOB_CRUSHER_INSTANT_KILL_BLACKLIST)) {
                     return damage(entity, player);
                 } else {
                     return instantKill(entity, player);
@@ -177,7 +178,7 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        ForgeHooks.onLivingDrops(entity, source, extra, looting, true);
+        LivingEntityEvents.DROPS_WITH_LEVEL.invoker().onLivingEntityDrops(entity, source, extra, looting, true);
         extra.forEach(itemEntity -> {
             TransferUtil2.insertItem(this.output, itemEntity.getItem(), false);
             itemEntity.remove(Entity.RemovalReason.KILLED);

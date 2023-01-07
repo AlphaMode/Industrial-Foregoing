@@ -30,6 +30,8 @@ import com.buuz135.industrial.recipe.DissolutionChamberRecipe;
 import com.buuz135.industrial.utils.BlockUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.hrznstudio.titanium.util.RayTraceUtils;
+import io.github.fabricators_of_create.porting_lib.block.PlayerDestroyBlock;
+import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.BlockAccessor;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -51,6 +53,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -61,7 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ItemInfinityDrill extends ItemInfinity {
+public class ItemInfinityDrill extends ItemInfinity implements CustomEnchantingBehaviorItem {
 
     public static Material[] mineableMaterials = {Material.GRASS, Material.DIRT, Material.HEAVY_METAL, Material.CLAY, Material.GLASS, Material.ICE, Material.METAL, Material.ICE_SOLID, Material.PISTON, Material.STONE, Material.SAND, Material.TOP_SNOW};
     public static int POWER_CONSUMPTION = 10000;
@@ -74,12 +77,19 @@ public class ItemInfinityDrill extends ItemInfinity {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return Items.DIAMOND_PICKAXE.canApplyAtEnchantingTable(new ItemStack(Items.DIAMOND_PICKAXE), enchantment) || Items.DIAMOND_SHOVEL.canApplyAtEnchantingTable(new ItemStack(Items.DIAMOND_SHOVEL), enchantment);
+        return enchantment.canEnchant(new ItemStack(Items.DIAMOND_PICKAXE)) || enchantment.canEnchant(new ItemStack(Items.DIAMOND_SHOVEL));
     }
 
     @Override
     public boolean isCorrectToolForDrops(BlockState blockIn) {
         return Items.DIAMOND_PICKAXE.isCorrectToolForDrops(blockIn) || Items.DIAMOND_SHOVEL.isCorrectToolForDrops(blockIn);
+    }
+
+    protected boolean onDestroyedByPlayer(Block block, BlockState tempState, Level worldIn, BlockPos blockPos, Player player, boolean willHarvest, FluidState fluid) {
+        if (block instanceof PlayerDestroyBlock destroyBlock)
+            destroyBlock.onDestroyedByPlayer(tempState, worldIn, blockPos, player, willHarvest, fluid);
+        block.playerWillDestroy(worldIn, blockPos, tempState, player);
+        return worldIn.setBlock(blockPos, fluid.createLegacyBlock(), worldIn.isClientSide ? 11 : 3);
     }
 
     @Override
@@ -99,7 +109,8 @@ public class ItemInfinityDrill extends ItemInfinity {
                         if (!BlockUtils.isBlockstateInMaterial(tempState, mineableMaterials)) return;
                         if (tempState.getDestroySpeed(worldIn, blockPos) < 0) return;
                         int xp = PortingHooks.onBlockBreakEvent(worldIn, ((ServerPlayer) entityLiving).gameMode.getGameModeForPlayer(), (ServerPlayer) entityLiving, blockPos);
-                        if (xp >= 0 && block.onDestroyedByPlayer(tempState, worldIn, blockPos, (Player) entityLiving, true, tempState.getFluidState())) {
+
+                        if (xp >= 0 && onDestroyedByPlayer(block, tempState, worldIn, blockPos, (Player) entityLiving, true, tempState.getFluidState())) {
                             block.destroy(worldIn, blockPos, tempState);
                             //block.harvestBlock(worldIn, (PlayerEntity) entityLiving, blockPos, tempState, null, stack);
                             Block.getDrops(tempState, (ServerLevel) worldIn, blockPos, null, (Player) entityLiving, stack).forEach(itemStack -> {

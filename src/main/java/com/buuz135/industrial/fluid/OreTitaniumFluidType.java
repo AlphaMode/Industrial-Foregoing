@@ -43,42 +43,42 @@ public class OreTitaniumFluidType {
     public OreTitaniumFluidType(final TitaniumAttributeHandler.Properties properties) {
     }
 
-    @Override
-    public Component getDescription(FluidStack stack) {
-        String extra = "";
-        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
-            String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
-            if (items.size() > 0) {
-                extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
-            }
-        }
-        return Component.literal(super.getDescription(stack).getString() + extra);
-    }
+//    @Override
+//    public Component getDescription(FluidStack stack) {
+//        String extra = "";
+//        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
+//            String tag = stack.getTag().getString(NBT_TAG);
+//            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
+//            if (items.size() > 0) {
+//                extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
+//            }
+//        }
+//        return Component.literal(super.getDescription(stack).getString() + extra);
+//    }
 
-    @Override
-    public String getDescriptionId(FluidStack stack) {
-        String extra = "";
-        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
-            String tag = stack.getTag().getString(NBT_TAG);
-            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
-            if (items.size() > 0) {
-                extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
-            }
-        }
-        return Component.translatable(super.getDescriptionId(stack)).getString() + extra;
-    }
+//    @Override
+//    public String getDescriptionId(FluidStack stack) {
+//        String extra = "";
+//        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
+//            String tag = stack.getTag().getString(NBT_TAG);
+//            List<Item> items = TagUtil.getAllEntries(Registry.ITEM, TagUtil.getItemTag(new ResourceLocation(tag.replace("c:raw_materials/", "c:dusts/")))).stream().toList();
+//            if (items.size() > 0) {
+//                extra = " (" + Component.translatable(items.get(0).getDescriptionId()).getString() + ")";
+//            }
+//        }
+//        return Component.translatable(super.getDescriptionId(stack)).getString() + extra;
+//    }
 
 
-    @Override
-    public ItemStack getBucket(FluidStack stack) {
-        ItemStack bucket = super.getBucket(stack);
-        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
-            String tag = stack.getTag().getString(NBT_TAG);
-            bucket.getOrCreateTag().putString(NBT_TAG, tag);
-        }
-        return bucket;
-    }
+//    @Override
+//    public ItemStack getBucket(FluidStack stack) {
+//        ItemStack bucket = super.getBucket(stack);
+//        if (stack.hasTag() && stack.getTag().contains(NBT_TAG)) {
+//            String tag = stack.getTag().getString(NBT_TAG);
+//            bucket.getOrCreateTag().putString(NBT_TAG, tag);
+//        }
+//        return bucket;
+//    }
 
     public static FluidStack getFluidWithTag(OreFluidInstance fluidInstance, long amount, ResourceLocation itemITag) {
         FluidStack stack = new FluidStack(fluidInstance.getSourceFluid(), amount);
@@ -92,7 +92,7 @@ public class OreTitaniumFluidType {
 
     public static boolean isValid(ResourceLocation resourceLocation) {
         TagKey<Item> key = TagUtil.getItemTag(new ResourceLocation("c:dusts/" + resourceLocation.toString().replace("c:raw_materials/", "")));
-        return Registry.ITEM.tags().isKnownTagName(key) && !TagUtil.getAllEntries(Registry.ITEM, key).isEmpty();
+        return Registry.ITEM.getTag(key).isPresent() && !TagUtil.getAllEntries(Registry.ITEM, key).isEmpty();
     }
 
     public static ItemStack getOutputDust(FluidStack stack) {

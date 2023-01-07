@@ -90,7 +90,7 @@ public class FluidSievingMachineTile extends IndustrialProcessingTile<FluidSievi
 
     @Override
     public boolean canIncrease() {
-        return this.input.getFluidAmount() >= 100 && !InventoryUtil.getStacks(this.sand).isEmpty() && TransferUtil2.insertItem(this.output, OreTitaniumFluidType.getOutputDust(this.input.getFluid()), true) == 0;
+        return this.input.getFluidAmount() >= 100 && !InventoryUtil.getStacks(this.sand).isEmpty() && TransferUtil2.insertItem(this.output, OreTitaniumFluidType.getOutputDust(this.input.getFluid()), true).isEmpty();
     }
 
     @Override

@@ -80,7 +80,7 @@ public class FurnaceGeneratorType implements IMycelialGeneratorType {
         if (inputs.length > 0 && inputs[0] instanceof SidedInventoryComponent && ((SidedInventoryComponent<?>) inputs[0]).getStackInSlot(0).getCount() > 0) {
             ItemStack itemstack = ((SidedInventoryComponent) inputs[0]).getStackInSlot(0);
             int burnTime = FabricUtils.getBurnTime(itemstack, RecipeType.SMELTING);
-            if (itemstack.hasCraftingRemainingItem())
+            if (!itemstack.getRecipeRemainder().isEmpty())
                 ((SidedInventoryComponent) inputs[0]).setStackInSlot(0, itemstack.getRecipeRemainder());
             else if (!itemstack.isEmpty()) {
                 itemstack.shrink(1);
@@ -110,7 +110,7 @@ public class FurnaceGeneratorType implements IMycelialGeneratorType {
 
     @Override
     public List<MycelialGeneratorRecipe> getRecipes() {
-        return Registry.ITEM.stream().map(ItemStack::new).filter(stack -> FabricUtils.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), ForgeHooks.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
+        return Registry.ITEM.stream().map(ItemStack::new).filter(stack -> FabricUtils.getBurnTime(stack, RecipeType.SMELTING) > 0).map(item -> new MycelialGeneratorRecipe(Collections.singletonList(Collections.singletonList(Ingredient.of(item))), new ArrayList<>(), FabricUtils.getBurnTime(item, RecipeType.SMELTING), 80)).collect(Collectors.toList());
     }
 
     @Override

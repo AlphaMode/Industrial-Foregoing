@@ -28,7 +28,7 @@ public class NumberUtils {
 
     private static DecimalFormat formatterWithUnits = new DecimalFormat("####0.#");
 
-    public static String getFormatedBigNumber(int number) {
+    public static String getFormatedBigNumber(long number) {
         if (number >= 1000000000) { //BILLION
             float numb = number / 1000000000F;
             return formatterWithUnits.format(numb) + "B";

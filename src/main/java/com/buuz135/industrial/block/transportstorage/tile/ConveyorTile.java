@@ -34,6 +34,7 @@ import com.buuz135.industrial.utils.MovementUtils;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
 import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
@@ -306,8 +307,9 @@ public class ConveyorTile extends ActiveTile<ConveyorTile> implements IBlockCont
             if (!state1.getValue(ConveyorBlock.TYPE).isVertical()) {
                 long amount = Math.max(tank.getFluidAmount() - 1, 1);
                 ConveyorTile conveyorTile = (ConveyorTile) level.getBlockEntity(this.worldPosition.relative(facing));
-                FluidStack drained = tank.drain(conveyorTile.getTank().fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                if (!drained.isEmpty() && drained.getAmount() > 0) {
+                FluidStack toExtract = TransferUtil.simulateExtractAnyFluid(tank, amount);
+                long drained = TransferUtil.extract(tank, toExtract.getType(), TransferUtil.insertFluid(conveyorTile.getTank(), toExtract));
+                if (drained > 0) {
                     this.requestFluidSync();
                     conveyorTile.requestFluidSync();
                 }

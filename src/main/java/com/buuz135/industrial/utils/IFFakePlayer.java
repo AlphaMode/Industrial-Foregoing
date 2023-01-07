@@ -49,6 +49,6 @@ public class IFFakePlayer extends FakePlayer {
 
     public boolean placeBlock(Level world, BlockPos pos, ItemStack stack) {
         this.setItemInHand(InteractionHand.MAIN_HAND, stack);
-        return ForgeHooks.onPlaceItemIntoWorld(new UseOnContext(this, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0, 0, 0), Direction.DOWN, pos, false))) == InteractionResult.SUCCESS;
+        return stack.useOn(new UseOnContext(this, InteractionHand.MAIN_HAND, new BlockHitResult(new Vec3(0, 0, 0), Direction.DOWN, pos, false))) == InteractionResult.SUCCESS;
     }
 }

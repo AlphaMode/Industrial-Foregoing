@@ -34,7 +34,9 @@ import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -78,9 +80,9 @@ public class SludgeRefinerTile extends IndustrialProcessingTile<SludgeRefinerTil
     @Override
     public Runnable onFinish() {
         return () -> {
-            Optional<Item> optionalItem = Registry.ITEM.tags().getTag(IndustrialTags.Items.SLUDGE_OUTPUT).getRandomElement(this.level.random);
+            Optional<Item> optionalItem = Registry.ITEM.getTag(IndustrialTags.Items.SLUDGE_OUTPUT).flatMap(holders -> Util.getRandomSafe(holders.stream().map(Holder::value).toList(), this.level.random));
             optionalItem.ifPresent(item -> {
-                if (TransferUtil2.insertItem(output, new ItemStack(item), true) == 0) {
+                if (TransferUtil2.insertItem(output, new ItemStack(item), true).isEmpty()) {
                     sludge.drainForced(500, false);
                     TransferUtil.insertItem(output, new ItemStack(item));
                 }

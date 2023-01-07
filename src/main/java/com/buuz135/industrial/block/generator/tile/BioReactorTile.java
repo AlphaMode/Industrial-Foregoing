@@ -144,7 +144,7 @@ public class BioReactorTile extends IndustrialWorkingTile<BioReactorTile> {
             }
         }
         for (TagKey<Item> itemTag : VALID) {
-            if (Registry.ITEM.tags().getTag(itemTag).contains(stack.getItem()) && (foundSlot == -1 || (input.getInventory().getStackInSlot(foundSlot).getCount() + stack.getCount() <= input.getInventory().getStackInSlot(foundSlot).getMaxStackSize() && slot == foundSlot)))
+            if (stack.is(itemTag) && (foundSlot == -1 || (input.getInventory().getStackInSlot(foundSlot).getCount() + stack.getCount() <= input.getInventory().getStackInSlot(foundSlot).getMaxStackSize() && slot == foundSlot)))
                 return true; //contains
         }
         return false;

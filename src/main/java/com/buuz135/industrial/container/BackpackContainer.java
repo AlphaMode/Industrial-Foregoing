@@ -23,6 +23,7 @@
 package com.buuz135.industrial.container;
 
 import com.buuz135.industrial.item.infinity.item.ItemInfinityBackpack;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.worlddata.BackpackDataManager;
 import com.hrznstudio.titanium.container.BasicAddonContainer;
 import com.hrznstudio.titanium.container.impl.DisableableSlot;
@@ -66,7 +67,7 @@ public class BackpackContainer extends BasicAddonContainer {
             itemstack = itemstack1.copy();
             for (int pos = 0; pos < handler.getSlots(); pos++) {
                 if (!handler.getStackInSlot(pos).isEmpty() && handler.isItemValid(pos, ItemVariant.of(itemstack1), itemstack1.getCount())) {
-                    ItemStack result = handler.insertItem(pos, itemstack1, false);
+                    ItemStack result = FabricUtils.insertSlot(handler, pos, itemstack1, false);
                     slot.set(result);
                     if (player instanceof ServerPlayer)
                         ItemInfinityBackpack.sync(player.level, id, (ServerPlayer) player);

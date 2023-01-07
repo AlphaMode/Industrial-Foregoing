@@ -16,7 +16,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +28,9 @@ import java.util.stream.Collectors;
 public class IndustrialForegoingData implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        var existingData = System.getProperty("twilightforest.data.existingData").split(";");
+        ExistingFileHelper helper = new ExistingFileHelper(Arrays.stream(existingData).map(Paths::get).toList(), Collections.emptySet(),
+                true, null, null);
 //        TitaniumData.addDataProvider(event);
         NonNullLazy<List<Block>> blocksToProcess = NonNullLazy.of(() ->
                 Registry.BLOCK
@@ -41,7 +48,7 @@ public class IndustrialForegoingData implements DataGeneratorEntrypoint {
         generator.addProvider(true, new IndustrialSerializableProvider(generator, Reference.MOD_ID));
         generator.addProvider(true, new TitaniumLootTableProvider(generator, blocksToProcess));
         generator.addProvider(true, new BlockItemModelGeneratorProvider(generator, Reference.MOD_ID, blocksToProcess));
-        generator.addProvider(true, new IndustrialBlockstateProvider(generator, event.getExistingFileHelper(), blocksToProcess));
-        generator.addProvider(true, new IndustrialModelProvider(generator, event.getExistingFileHelper()));
+        generator.addProvider(true, new IndustrialBlockstateProvider(generator, helper, blocksToProcess));
+        generator.addProvider(true, new IndustrialModelProvider(generator, helper));
     }
 }

@@ -106,7 +106,7 @@ public class DissolutionChamberTile extends IndustrialProcessingTile<Dissolution
 
     @Override
     public boolean canIncrease() {
-        return currentRecipe != null && TransferUtil2.insertItem(output, currentRecipe.output.copy(), true) == 0 && (currentRecipe.outputFluid == null || outputFluid.fillForced(currentRecipe.outputFluid.copy(), true) == currentRecipe.outputFluid.getAmount());
+        return currentRecipe != null && TransferUtil2.insertItem(output, currentRecipe.output.copy(), true).isEmpty() && (currentRecipe.outputFluid == null || outputFluid.fillForced(currentRecipe.outputFluid.copy(), true) == currentRecipe.outputFluid.getAmount());
     }
 
     @Override

@@ -32,11 +32,14 @@ import com.buuz135.industrial.gui.component.custom.TexturedStateButtonGuiCompone
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.proxy.block.filter.IFilter;
 import com.buuz135.industrial.proxy.block.filter.ItemStackFilter;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.Reference;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -56,6 +59,7 @@ import me.alphamode.forgetags.Tags;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -78,22 +82,21 @@ public class ConveyorDroppingUpgrade extends ConveyorUpgrade {
         if (entity instanceof Player) return;
         if (whitelist != filter.matches(entity)) return;
         if (entity instanceof ItemEntity) {
-            BlockEntity tile = getWorld().getBlockEntity(getPos().relative(Direction.DOWN));
-            Storage<ItemVariant> handler = tile != null ? TransferUtil.getItemStorage(tile) : TransferUtil.getItemStorage(getWorld(), getPos().relative(Direction.DOWN));
-            if (handler != null) {
+            FabricUtils.getStorage(ItemStorage.SIDED, getWorld(), getPos().relative(Direction.DOWN), Direction.UP).ifPresent(handler -> {
                 if (getBoundingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
                     ItemStack stack = ((ItemEntity) entity).getItem();
-                    for (int i = 0; i < handler.getSlots(); i++) {
-                        stack = handler.insertItem(i, stack, false);
-                        if (stack.isEmpty()) {
-                            entity.remove(Entity.RemovalReason.KILLED);
-                            break;
-                        } else {
-                            ((ItemEntity) entity).setItem(stack);
-                        }
+                    try (Transaction tx = TransferUtil.getTransaction()) {
+                        long inserted = handler.insert(ItemVariant.of(stack), stack.getCount(), tx);
+                        stack.setCount(stack.getCount() - (int) inserted);
+                        tx.commit();
+                    }
+                    if (stack.isEmpty()) {
+                        entity.remove(Entity.RemovalReason.KILLED);
+                    } else {
+                        ((ItemEntity) entity).setItem(stack);
                     }
                 }
-            }
+            });
         }
         if (!entity.isAlive()) return;
         double entityHeight = entity.getBoundingBox().maxY - entity.getBoundingBox().minY;

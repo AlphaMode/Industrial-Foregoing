@@ -43,6 +43,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelp
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -265,18 +266,25 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
 
     private class BlackHoleHandler implements SingleSlotStorage<ItemVariant> {
 
-        private int amount;
+        private long amount;
 
-        public BlackHoleHandler(int amount) {
+        public BlackHoleHandler(long amount) {
             this.amount = amount;
         }
 
-        @Nonnull
         @Override
-        public ItemStack getStackInSlot(int slot) {
-            ItemStack copied = blStack.copy();
-            copied.setCount(stored);
-            return copied;
+        public long getAmount() {
+            return stored;
+        }
+
+        @Override
+        public boolean isResourceBlank() {
+            return getResource().isBlank();
+        }
+
+        @Override
+        public ItemVariant getResource() {
+            return ItemVariant.of(blStack);
         }
 
         @Nonnull
@@ -294,29 +302,26 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
             return stack;
         }
 
-        @Nonnull
         @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (amount == 0) return ItemStack.EMPTY;
-            if (blStack.isEmpty()) return ItemStack.EMPTY;
+        public long extract(ItemVariant resource, long amount, TransactionContext transaction) {
+            if (amount == 0) return 0;
+            if (blStack.isEmpty()) return 0;
             if (stored <= amount) {
-                ItemStack out = blStack.copy();
-                int newAmount = stored;
+                long newAmount = stored;
                 if (!simulate) {
                     setStack(ItemStack.EMPTY);
                     setAmount(0);
                 }
-                out.setCount(newAmount);
-                return out;
+                return newAmount;
             } else {
                 if (!simulate) {
                     setAmount(stored - amount);
                 }
-                return ItemHandlerHelper.copyStackWithSize(blStack, amount);
+                return amount;
             }
+            return 0;
         }
 
-        @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             if (slot == 0) {
                 ItemStack fl = blStack;
@@ -328,5 +333,9 @@ public class BlackHoleUnitTile extends BHTile<BlackHoleUnitTile> {
             return false;
         }
 
+        @Override
+        public long getCapacity() {
+            return amount;
+        }
     }
 }

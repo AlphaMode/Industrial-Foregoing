@@ -215,10 +215,10 @@ public class PotionBrewerTile extends IndustrialProcessingTile<PotionBrewerTile>
         for (int i = 0; i < indices.length; i++) indices[i] = i;
         ItemStack ingredient = this.brewingItems.getInventory().getStackInSlot(slot);
         input.add(ingredient);
-        if (ForgeEventFactory.onPotionAttemptBrew(input)) return;
+//        if (ForgeEventFactory.onPotionAttemptBrew(input)) return;
         BrewingRecipeRegistry.brewPotions(input, ingredient, indices);
         ingredient.shrink(1);
-        ForgeEventFactory.onPotionBrewed(input);
+//        ForgeEventFactory.onPotionBrewed(input);
         for (int i : indices) {
             this.output.setStackInSlot(i, input.get(i));
         }

@@ -24,12 +24,14 @@ package com.buuz135.industrial.block.transportstorage.tile;
 
 import com.buuz135.industrial.capability.tile.BigSidedFluidTankComponent;
 import com.buuz135.industrial.utils.BlockUtils;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.NumberUtils;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.filter.FilterSlot;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.filter.ItemStackFilter;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -63,7 +65,7 @@ public class BlackHoleTankTile extends BHTile<BlackHoleTankTile> {
             }
         }
                 .setColor(DyeColor.BLUE)
-                .setValidator(fluidStack -> filter.getFilterSlots()[0].getFilter().isEmpty() ? true : filter.getFilterSlots()[0].getFilter().getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).map(iFluidHandlerItem -> iFluidHandlerItem.getFluidInTank(0).isFluidEqual(fluidStack)).orElse(false)
+                .setValidator(fluidStack -> filter.getFilterSlots()[0].getFilter().isEmpty() ? true : TransferUtil.getFluidContained(filter.getFilterSlots()[0].getFilter()).map(iFluidHandlerItem -> iFluidHandlerItem.isFluidEqual(fluidStack)).orElse(false)
                 ));
         this.addFilter(filter = new ItemStackFilter("filter", 1));
         FilterSlot slot = new FilterSlot<>(79, 60, 0, ItemStack.EMPTY);
@@ -93,7 +95,7 @@ public class BlackHoleTankTile extends BHTile<BlackHoleTankTile> {
     @Override
     public ItemStack getDisplayStack() {
         if (tank.getFluidAmount() > 0) {
-            ItemStack filledBucket = FluidUtil.getFilledBucket(tank.getFluid());
+            ItemStack filledBucket = FabricUtils.getFilledBucket(tank.getFluid());
             if (!filledBucket.isEmpty()) return filledBucket;
         }
         return new ItemStack(Items.BUCKET);

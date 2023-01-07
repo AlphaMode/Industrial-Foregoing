@@ -76,7 +76,7 @@ public class ItemInfinitySaw extends ItemInfinity implements CustomEnchantingBeh
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return Items.DIAMOND_AXE.canApplyAtEnchantingTable(new ItemStack(Items.DIAMOND_AXE), enchantment);
+        return enchantment.canEnchant(new ItemStack(Items.DIAMOND_AXE));
     }
 
     @Override

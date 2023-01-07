@@ -26,6 +26,8 @@ import com.buuz135.industrial.item.IFCustomItem;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.proxy.CommonProxy;
 import com.buuz135.industrial.proxy.network.BackpackOpenedMessage;
+import com.buuz135.industrial.utils.EnergyStorageItem;
+import com.buuz135.industrial.utils.FluidStorageItem;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.hrznstudio.titanium.api.IFactory;
@@ -43,9 +45,14 @@ import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.PlayerInventoryFinder;
 import com.hrznstudio.titanium.network.locator.instance.HeldStackLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.item.EntitySwingListenerItem;
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -77,6 +84,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -86,7 +94,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonHandler, IInfinityDrillScreenAddons {
+public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonHandler, IInfinityDrillScreenAddons, EnergyStorageItem, FluidStorageItem, EntitySwingListenerItem {
 
     private final int powerConsumption;
     private final int biofuelConsumption;
@@ -182,8 +190,21 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
         return true;
     }
 
+    private int lastSlot;
+
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+        boolean fromInvalid = oldStack.isEmpty();
+        boolean toInvalid   = newStack.isEmpty();
+
+        if (fromInvalid && toInvalid) return false;
+        if (fromInvalid || toInvalid) return true;
+
+        boolean slotChanged = false;
+        if (hand == InteractionHand.MAIN_HAND) {
+            slotChanged = player.getInventory().selected != lastSlot;
+            lastSlot = player.getInventory().selected;
+        }
         return slotChanged && !oldStack.equals(newStack);
     }
 
@@ -343,10 +364,20 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
         return true;
     }
 
-    @Nullable
+//    @Nullable TODO: PORT
+//    @Override
+//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+//        return new InfinityCapabilityProvider(stack, getTankConstructor(stack), getEnergyConstructor(stack));
+//    }
+
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return new InfinityCapabilityProvider(stack, getTankConstructor(stack), getEnergyConstructor(stack));
+    public Storage<FluidVariant> getFluidStorage(ItemStack stack, ContainerItemContext context) {
+        return getTankConstructor(context).create();
+    }
+
+    @Override
+    public EnergyStorage getEnergyStorage(ItemStack stack, ContainerItemContext context) {
+        return getEnergyConstructor(stack).create();
     }
 
     @Override
@@ -417,15 +448,15 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
         return factory;
     }
 
-    public IFactory<? extends FluidHandlerScreenProviderItemStack> getTankConstructor(ItemStack stack) {
+    public IFactory<? extends FluidHandlerScreenProviderItemStack> getTankConstructor(ContainerItemContext stack) {
         return () -> new FluidHandlerScreenProviderItemStack(stack, 1_000_000) {
             @Override
-            public boolean canFillFluidType(FluidStack fluid) {
+            public boolean canFillFluidType(FluidVariant fluid, long amount) {
                 return fluid != null && fluid.getFluid() != null && fluid.getFluid().equals(ModuleCore.BIOFUEL.getSourceFluid().get());
             }
 
             @Override
-            public boolean canDrainFluidType(FluidStack fluid) {
+            public boolean canDrainFluidType(FluidVariant fluid, long amount) {
                 return false;
             }
 
@@ -433,7 +464,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
             @Override
             @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-                return Collections.singletonList(() -> new TankScreenAddon(30, 20, this, FluidTankComponent.Type.NORMAL));
+                return Collections.singletonList(() -> new TankScreenAddon(30, 20, (SingleSlotStorage<FluidVariant>) (Object) this, FluidTankComponent.Type.NORMAL));
             }
         };
     }
@@ -441,7 +472,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
     public IFactory<InfinityEnergyStorage> getEnergyConstructor(ItemStack stack) {
         return () -> new InfinityEnergyStorage(InfinityTier.ARTIFACT.getPowerNeeded(), 10, 20) {
             @Override
-            public long getLongEnergyStored() {
+            public long getAmount() {
                 if (stack.hasTag()) {
                     return Math.min(stack.getTag().getLong("Energy"), InfinityTier.ARTIFACT.getPowerNeeded());
                 } else {
@@ -458,7 +489,7 @@ public class ItemInfinity extends IFCustomItem implements MenuProvider, IButtonH
             }
 
             @Override
-            public boolean canReceive() {
+            public boolean supportsInsertion() {
                 return ItemInfinity.canCharge(stack);
             }
         };

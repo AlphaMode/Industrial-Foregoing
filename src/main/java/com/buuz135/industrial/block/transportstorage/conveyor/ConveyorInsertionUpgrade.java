@@ -41,7 +41,10 @@ import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -96,8 +99,10 @@ public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
                 if (getWorkingBox().bounds().move(getPos()).inflate(0.01).intersects(entity.getBoundingBox())) {
                     if (whitelist != filter.matches((ItemEntity) entity)) return;
                     ItemStack stack = ((ItemEntity) entity).getItem();
-                    for (int i = 0; i < handler.getSlots(); i++) {
-                        stack = handler.insertItem(i, stack, false);
+                    for (StorageView<ItemVariant> view : handler) {
+                        ItemStack newStack = stack.copy();
+                        long inserted = TransferUtil.insertItem(handler, stack);
+                        newStack.setCount((int) Math.min(newStack.getMaxStackSize(), inserted));
                         if (stack.isEmpty()) {
                             ((ItemEntity) entity).setItem(ItemStack.EMPTY);
                             entity.remove(Entity.RemovalReason.KILLED);
@@ -119,9 +124,13 @@ public class ConveyorInsertionUpgrade extends ConveyorUpgrade {
         if (getWorld().getGameTime() % 2 == 0 && getContainer() instanceof ConveyorTile) {
             FluidTank tank = ((ConveyorTile) getContainer()).getTank();
             getHandlerCapability(FluidStorage.SIDED).ifPresent(fluidHandler -> {
-                if (!tank.drain(50, IFluidHandler.FluidAction.SIMULATE).isEmpty() && fluidHandler.fill(tank.drain(50, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0 && whitelist == filter.matches(tank.drain(50, IFluidHandler.FluidAction.SIMULATE))) {
-                    FluidStack drain = tank.drain(fluidHandler.fill(tank.drain(50, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                    if (!drain.isEmpty() && drain.getAmount() > 0) getContainer().requestFluidSync();
+                if (!TransferUtil.simulateExtractAnyFluid(tank, 4050).isEmpty() && fluidHandler.simulateInsert(TransferUtil.simulateExtractAnyFluid(tank, 4050).getType(), TransferUtil.simulateExtractAnyFluid(tank, 4050).getAmount(), null) > 0 && whitelist == filter.matches(TransferUtil.simulateExtractAnyFluid(tank, 4050))) {
+                    FluidStack simulated = TransferUtil.simulateExtractAnyFluid(tank, 4050);
+                    try (Transaction tx = TransferUtil.getTransaction()) {
+                        long drain = tank.extract(simulated.getType(), fluidHandler.insert(simulated.getType(), simulated.getAmount(), tx), tx);
+                        tx.commit();
+                        if (drain > 0) getContainer().requestFluidSync();
+                    }
                 }
             });
         }

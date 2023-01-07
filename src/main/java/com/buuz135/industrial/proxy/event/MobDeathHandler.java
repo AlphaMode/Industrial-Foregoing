@@ -31,7 +31,7 @@ import java.util.Collection;
 
 public class MobDeathHandler {
 
-    public static boolean onDeath(LivingEntity target, DamageSource source, Collection<ItemEntity> drops) {
+    public static boolean onDeath(LivingEntity target, DamageSource source, Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
         if (source.equals(CommonProxy.custom)) {
             drops.clear();
         }

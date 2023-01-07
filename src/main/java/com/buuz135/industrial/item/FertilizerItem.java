@@ -49,7 +49,7 @@ public class FertilizerItem extends IFCustomItem {
         BlockPos pos = context.getClickedPos();
         Level worldIn = context.getLevel();
         if (!player.mayUseItemAt(pos.relative(facing), facing, itemstack)) return InteractionResult.FAIL;
-        if (BoneMealItem.applyBonemeal(itemstack, worldIn, pos, player)) {
+        if (BoneMealItem.growCrop(itemstack, worldIn, pos)) {
             if (!worldIn.isClientSide) {
                 worldIn.levelEvent(2005, pos, 0);
             }

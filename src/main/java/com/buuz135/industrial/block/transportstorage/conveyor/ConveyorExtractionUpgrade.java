@@ -38,7 +38,9 @@ import com.buuz135.industrial.utils.Reference;
 import com.google.common.collect.Sets;
 import com.hrznstudio.titanium.recipe.generator.TitaniumShapedRecipeBuilder;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -172,11 +174,12 @@ public class ConveyorExtractionUpgrade extends ConveyorUpgrade {
             });
         }
         if (getContainer() instanceof ConveyorTile) {
-            IFluidTank tank = ((ConveyorTile) getContainer()).getTank();
-            getHandlerCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(fluidHandler -> {
-                if (!fluidHandler.drain(250, IFluidHandler.FluidAction.SIMULATE).isEmpty() && whitelist == filter.matches(fluidHandler.drain(250, IFluidHandler.FluidAction.SIMULATE))) {
-                    FluidStack drain = fluidHandler.drain(tank.fill(fluidHandler.drain(250, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                    if (drain.isEmpty() && drain.getAmount() > 0) getContainer().requestFluidSync();
+            FluidTank tank = ((ConveyorTile) getContainer()).getTank();
+            getHandlerCapability(FluidStorage.SIDED).ifPresent(fluidHandler -> {
+                if (!TransferUtil.simulateExtractAnyFluid(fluidHandler, 20250).isEmpty() && whitelist == filter.matches(TransferUtil.simulateExtractAnyFluid(fluidHandler, 20250))) {
+                    FluidStack simulatedExtracted = TransferUtil.simulateExtractAnyFluid(fluidHandler, 20250);
+                    long drain = TransferUtil.extract(fluidHandler, simulatedExtracted.getType(), TransferUtil.insertFluid(tank, simulatedExtracted));
+                    if (drain > 0) getContainer().requestFluidSync();
                 }
             });
 

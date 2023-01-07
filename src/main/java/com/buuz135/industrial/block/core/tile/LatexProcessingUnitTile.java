@@ -69,7 +69,7 @@ public class LatexProcessingUnitTile extends IndustrialProcessingTile<LatexProce
 
     @Override
     public boolean canIncrease() {
-        return latex.getFluidAmount() >= AMOUNT_LATEX && water.getFluidAmount() >= AMOUNT_WATER && TransferUtil2.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()), true) == 0;
+        return latex.getFluidAmount() >= AMOUNT_LATEX && water.getFluidAmount() >= AMOUNT_WATER && TransferUtil2.insertItem(output, new ItemStack(ModuleCore.TINY_DRY_RUBBER.get()), true).isEmpty();
     }
 
     @Override

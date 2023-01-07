@@ -29,6 +29,7 @@ import com.buuz135.industrial.block.transportstorage.tile.TransporterTile;
 import com.buuz135.industrial.proxy.block.filter.IFilter;
 import com.buuz135.industrial.proxy.block.filter.RegulatorFilter;
 import com.buuz135.industrial.proxy.client.render.TransporterTESR;
+import com.buuz135.industrial.utils.FabricUtils;
 import com.buuz135.industrial.utils.FluidUtils;
 import com.buuz135.industrial.utils.IndustrialTags;
 import com.buuz135.industrial.utils.Reference;
@@ -40,9 +41,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -121,20 +124,23 @@ public class TransporterFluidType extends FilteredTransporterType<FluidStack, St
                 for (Direction direction : ((TransporterTile) container).getTransporterTypeMap().keySet()) {
                     TransporterType transporterType = ((TransporterTile) container).getTransporterTypeMap().get(direction);
                     if (transporterType instanceof TransporterFluidType && transporterType.getAction() == TransporterTypeFactory.TransporterAction.INSERT) {
-                        TileUtil.getTileEntity(getLevel(), getPos().relative(this.getSide())).ifPresent(tileEntity -> tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, getSide().getOpposite()).ifPresent(origin -> {
-                            TileUtil.getTileEntity(getLevel(), getPos().relative(direction)).ifPresent(otherTile -> otherTile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()).ifPresent(destination -> {
-                                int amount = (int) (50 * getEfficiency());
-                                FluidStack simulatedStack = origin.drain(amount, IFluidHandler.FluidAction.SIMULATE);
-                                int filteredAmount = ((TransporterFluidType) transporterType).getFilter().matches(simulatedStack, destination, ((TransporterFluidType) transporterType).isRegulated());
+                        FabricUtils.getStorage(FluidStorage.SIDED, getLevel(), getPos().relative(this.getSide()), getSide().getOpposite()).ifPresent(origin -> {
+                            FabricUtils.getStorage(FluidStorage.SIDED, getLevel(), getPos().relative(direction), direction.getOpposite()).ifPresent(destination -> {
+                                long amount = (long) (50 * getEfficiency());
+                                FluidStack simulatedStack = TransferUtil.simulateExtractAnyFluid(origin, amount);
+                                long filteredAmount = ((TransporterFluidType) transporterType).getFilter().matches(simulatedStack, destination, ((TransporterFluidType) transporterType).isRegulated());
                                 if (filter(this.getFilter(), isWhitelist(), simulatedStack, origin, false) && filteredAmount > 0 && filter(((TransporterFluidType) transporterType).getFilter(), ((TransporterFluidType) transporterType).isWhitelist(), simulatedStack, destination, ((TransporterFluidType) transporterType).isRegulated())) {
-                                    int simulatedInserted = destination.fill(simulatedStack, IFluidHandler.FluidAction.SIMULATE);
+                                    long simulatedInserted;
+                                    try (Transaction tx = TransferUtil.getTransaction()) {
+                                        simulatedInserted = destination.insert(simulatedStack.getType(), simulatedStack.getAmount(), tx);
+                                    }
                                     if (simulatedInserted > 0) {
-                                        destination.fill(origin.drain(simulatedInserted, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                        TransferUtil.insert(destination, simulatedStack.getType(), TransferUtil.extractAnyFluid(origin, simulatedInserted).getAmount());
                                         ((TransporterFluidType) transporterType).addTransferedStack(getSide(), simulatedStack);
                                     }
                                 }
-                            }));
-                        }));
+                            });
+                        });
                     }
                 }
             }

@@ -45,6 +45,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -100,6 +101,11 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
         FabricUtils.ITEM.registerFallback((itemStack, context) -> {
             if (itemStack.getItem() instanceof ItemStorageItem storageItem)
                 return storageItem.getItemStorage(itemStack, context);
+            return null;
+        });
+        EnergyStorage.ITEM.registerFallback((itemStack, context) -> {
+            if (itemStack.getItem() instanceof EnergyStorageItem storageItem)
+                return storageItem.getEnergyStorage(itemStack, context);
             return null;
         });
     }
