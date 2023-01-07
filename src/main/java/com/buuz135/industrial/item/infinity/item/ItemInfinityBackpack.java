@@ -414,9 +414,9 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
                         }
                     } else {
                         if (button == 0) {
-                            result = handler.insertItem(slot, cursor, false);
+                            result = FabricUtils.insertSlot(handler, slot, cursor, false);
                             hasCursorChanged = true;
-                        } else if (button == 1 && handler.insertItem(slot, ItemHandlerHelper.copyStackWithSize(cursor, 1), false).isEmpty()) {
+                        } else if (button == 1 && FabricUtils.insertSlot(handler, slot, ItemHandlerHelper.copyStackWithSize(cursor, 1), false).isEmpty()) {
                             cursor.shrink(1);
                             result = cursor;
                             hasCursorChanged = true;
