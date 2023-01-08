@@ -26,6 +26,7 @@ import com.buuz135.industrial.block.tile.IndustrialAreaWorkingTile;
 import com.buuz135.industrial.block.tile.RangeManager;
 import com.buuz135.industrial.config.machine.agriculturehusbandry.MobCrusherConfig;
 import com.buuz135.industrial.item.addon.RangeAddonItem;
+import com.buuz135.industrial.mixin.MobAccessor;
 import com.buuz135.industrial.module.ModuleAgricultureHusbandry;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.utils.IndustrialTags;
@@ -47,7 +48,6 @@ import io.github.fabricators_of_create.porting_lib.event.common.LivingEntityEven
 import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -74,16 +74,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
-
-    private final Method DROP_SPECIAL_ITEMS = ObfuscationReflectionHelper.findMethod(Mob.class, "m_7472_", DamageSource.class, int.class, boolean.class);
 
     @Save
     private SidedInventoryComponent<MobCrusherTile> output;
@@ -95,7 +91,6 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
 
     public MobCrusherTile(BlockPos blockPos, BlockState blockState) {
         super(ModuleAgricultureHusbandry.MOB_CRUSHER, RangeManager.RangeType.BEHIND, true, MobCrusherConfig.powerPerOperation, blockPos, blockState);
-        if (!DROP_SPECIAL_ITEMS.isAccessible()) DROP_SPECIAL_ITEMS.setAccessible(true);
         this.dropXP = true;
         this.addTank(tank = (SidedFluidTankComponent<MobCrusherTile>) new SidedFluidTankComponent<MobCrusherTile>("essence", MobCrusherConfig.tankSize, 43, 20, 0).
                 setColor(DyeColor.LIME).
@@ -169,14 +164,10 @@ public class MobCrusherTile extends IndustrialAreaWorkingTile<MobCrusherTile> {
         table.getRandomItems(context.create(LootContextParamSets.ENTITY)).forEach(stack -> TransferUtil2.insertItem(this.output, stack, false));
         List<ItemEntity> extra = new ArrayList<>();
         //Drop special items
-        try {
-            if (entity.captureDrops() == null) entity.captureDrops(new ArrayList<>());
-            DROP_SPECIAL_ITEMS.invoke(entity, source, looting, true);
-            if (entity.captureDrops() != null) {
-                extra.addAll(entity.captureDrops());
-            }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (entity.captureDrops() == null) entity.captureDrops(new ArrayList<>());
+        ((MobAccessor)entity).callDropCustomDeathLoot(source, looting, true);
+        if (entity.captureDrops() != null) {
+            extra.addAll(entity.captureDrops());
         }
         LivingEntityEvents.DROPS_WITH_LEVEL.invoker().onLivingEntityDrops(entity, source, extra, looting, true);
         extra.forEach(itemEntity -> {

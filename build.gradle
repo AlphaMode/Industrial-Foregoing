@@ -91,7 +91,7 @@ dependencies {
 //    modCompileOnlyApi("mezz.jei:jei-1.19.2-common-api:11.5.0.297")
 //    modCompileOnlyApi("mezz.jei:jei-1.19.2-fabric-api:11.5.0.297")
     // at runtime, use the full JEI jar for Fabric
-    modImplementation("mezz.jei:jei-1.19.2-fabric:11.5.0.297")
+    modCompileOnly("mezz.jei:jei-1.19.2-fabric:11.5.0.297") { transitive = false }
     modImplementation(project.dependencies.create('com.hrznstudio:titanium:1.19.2-3.7.1'))
     modImplementation(include("io.github.tropheusj:milk-lib:${project.milk_lib_version}"))
     modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraftVersion}"))

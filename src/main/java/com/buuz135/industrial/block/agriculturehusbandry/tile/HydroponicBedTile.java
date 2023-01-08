@@ -17,6 +17,7 @@ import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.IPlantable;
 import io.github.fabricators_of_create.porting_lib.util.PlantType;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -32,7 +33,6 @@ import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -137,14 +137,20 @@ public class HydroponicBedTile extends IndustrialWorkingTile<HydroponicBedTile> 
                         if (difference <= 25) difference = difference / 2;
                         else difference = 25;
                         if (water.getFluidAmount() >= difference) {
-                            water.drainForced(((HydroponicBedTile) tile).getWater().fill(new FluidStack(Fluids.WATER, water.drainForced(difference, IFluidHandler.FluidAction.SIMULATE).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                water.drainForced(((HydroponicBedTile) tile).getWater().insert(FluidVariant.of(Fluids.WATER), water.drainForced(difference, true).getAmount(), tx), false);
+                                tx.commit();
+                            }
                         }
                     }
                     difference = ether.getFluidAmount() - ((HydroponicBedTile) tile).getEther().getFluidAmount();
                     if (difference > 0) {
                         difference = 1;
                         if (ether.getFluidAmount() >= difference) {
-                            ether.drainForced(((HydroponicBedTile) tile).getEther().fill(new FluidStack(ModuleCore.ETHER.getSourceFluid().get(), ether.drainForced(difference, IFluidHandler.FluidAction.SIMULATE).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                            try (Transaction tx = TransferUtil.getTransaction()) {
+                                ether.drainForced(((HydroponicBedTile) tile).getEther().insert(FluidVariant.of(ModuleCore.ETHER.getSourceFluid().get()), ether.drainForced(difference, true).getAmount(), tx), false);
+                                tx.commit();
+                            }
                         }
                     }
                     difference = getEnergyStorage().getAmount() - ((HydroponicBedTile) tile).getEnergyStorage().getAmount();

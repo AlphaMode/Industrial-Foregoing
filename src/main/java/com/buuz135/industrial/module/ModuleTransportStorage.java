@@ -47,22 +47,20 @@ import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCal
 import io.github.fabricators_of_create.porting_lib.model.SimpleModelState;
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -109,12 +107,11 @@ public class ModuleTransportStorage implements IModule {
     @Override
     public void generateFeatures(DeferredRegistryHelper registryHelper) {
         TAB_TRANSPORT.addIconStack(() -> new ItemStack(CONVEYOR.getLeft().orElse(Blocks.STONE)));
-        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "conveyor", () -> new ExtendedScreenHandlerType<>(ContainerConveyor::new));
+        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "conveyor", () -> ContainerConveyor.TYPE);
         ConveyorUpgradeFactory.FACTORIES.forEach(conveyorUpgradeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, "conveyor_" + conveyorUpgradeFactory.getName() + "_upgrade", () -> new ItemConveyorUpgrade(conveyorUpgradeFactory, TAB_TRANSPORT)));
-        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "transporter", () -> new ExtendedScreenHandlerType<>(ContainerTransporter::new));
+        registryHelper.registerGeneric(Registry.MENU_REGISTRY, "transporter", () -> ContainerTransporter.TYPE);
         TransporterTypeFactory.FACTORIES.forEach(transporterTypeFactory -> registryHelper.registerGeneric(Registry.ITEM_REGISTRY, transporterTypeFactory.getName() + "_transporter_type", () -> new ItemTransporterType(transporterTypeFactory, TAB_TRANSPORT)));
         EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::onClient);
-
     }
 
     @Environment(EnvType.CLIENT)

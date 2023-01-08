@@ -10,9 +10,9 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -25,7 +25,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +48,17 @@ public class FabricUtils {
         return registry.getHolder(registry.getResourceKey(value).get());
     }
 
+    public static ItemStack insertItem(Storage<ItemVariant> storage, ItemStack stack, boolean simulate) {
+        try (Transaction tx = TransferUtil.getTransaction()) {
+            ItemStack newStack = stack.copy();
+            long inserted = storage.insert(ItemVariant.of(stack), stack.getCount(), tx);
+            newStack.setCount(stack.getCount() - (int) inserted);
+            if (!simulate)
+                tx.commit();
+            return newStack;
+        }
+    }
+
     public static ItemStack insertSlot(SlotExposedStorage storage, int slot, ItemStack stack, boolean simulate) {
         try (Transaction tx = TransferUtil.getTransaction()) {
             ItemStack newStack = stack.copy();
@@ -68,6 +78,16 @@ public class FabricUtils {
             if (!simulate)
                 tx.commit();
             return newStack;
+        }
+    }
+
+    public static ItemStack extractItemView(StorageView<ItemVariant> view, long amount, boolean simulate) {
+        try (Transaction tx =TransferUtil.getTransaction()) {
+            long extracted = view.extract(view.getResource(), amount, tx);
+            ItemStack stack = view.getResource().toStack((int) Math.min(view.getResource().getItem().getMaxStackSize(), extracted));
+            if (!simulate)
+                tx.commit();
+            return stack;
         }
     }
 

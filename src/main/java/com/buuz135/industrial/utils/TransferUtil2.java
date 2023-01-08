@@ -27,6 +27,15 @@ public class TransferUtil2 {
             var storage = PlayerInventoryStorage.of(player);
             var variant = ItemVariant.of(stack);
             storage.offerOrDrop(variant, stack.getCount(), transaction);
+            transaction.commit();
+        }
+    }
+
+    public static void giveItemToPlayer(Player player, ItemVariant variant, long amount) {
+        try (var transaction = TransferUtil.getTransaction()) {
+            var storage = PlayerInventoryStorage.of(player);
+            storage.offerOrDrop(variant, amount, transaction);
+            transaction.commit();
         }
     }
 }

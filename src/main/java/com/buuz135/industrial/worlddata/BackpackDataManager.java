@@ -221,11 +221,6 @@ public class BackpackDataManager extends SavedData {
         }
 
         @Override
-        public void onFinalViewCommit() {
-            onFinalCommit();
-        }
-
-        @Override
         public int getSlotLimit(int slot) {
             return maxAmount;
         }

@@ -44,6 +44,7 @@ import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -67,7 +68,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class TransporterItemType extends FilteredTransporterType<ItemStack, Storage<ItemVariant>> {
+public class TransporterItemType extends FilteredTransporterType<ResourceAmount<ItemVariant>, Storage<ItemVariant>> {
 
     public static final int QUEUE_SIZE = 6;
 
@@ -89,24 +90,24 @@ public class TransporterItemType extends FilteredTransporterType<ItemStack, Stor
     }
 
     @Override
-    public RegulatorFilter<ItemStack, Storage<ItemVariant>> createFilter() {
-        return new RegulatorFilter<ItemStack, Storage<ItemVariant>>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
+    public RegulatorFilter<ResourceAmount<ItemVariant>, Storage<ItemVariant>> createFilter() {
+        return new RegulatorFilter<ResourceAmount<ItemVariant>, Storage<ItemVariant>>(20, 20, 5, 3, 16, 64, 1024 * 8, "") {
             @Override
-            public long matches(ItemStack stack, Storage<ItemVariant> itemHandler, boolean isRegulated) {
-                if (isEmpty()) return stack.getCount();
+            public long matches(ResourceAmount<ItemVariant> stack, Storage<ItemVariant> itemHandler, boolean isRegulated) {
+                if (isEmpty()) return stack.amount();
                 long amount = 0;
                 if (isRegulated) {
                     for (StorageView<ItemVariant> view : itemHandler) {
-                        if (view.getResource().toStack().sameItem(stack)) {
+                        if (view.getResource().toStack().sameItem(stack.resource().toStack())) {
                             amount += view.getAmount();
                         }
                     }
                 }
 
                 for (IFilter.GhostSlot slot : this.getFilter()) {
-                    if (stack.sameItem(slot.getStack())) {
+                    if (stack.resource().toStack().sameItem(slot.getStack())) {
                         long maxAmount = isRegulated ? slot.getAmount() : Long.MAX_VALUE;
-                        long returnAmount = Math.min(stack.getCount(), maxAmount - amount);
+                        long returnAmount = Math.min(stack.amount(), maxAmount - amount);
                         if (returnAmount > 0) return returnAmount;
                     }
                 }

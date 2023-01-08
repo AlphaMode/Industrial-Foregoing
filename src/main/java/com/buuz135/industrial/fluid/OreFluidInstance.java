@@ -58,6 +58,8 @@ public class OreFluidInstance {
         this.bucketFluid = helper.registerGeneric(Registry.ITEM_REGISTRY, fluid + "_bucket", () -> new BucketItem(this.sourceFluid.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(group)));
         this.blockFluid = helper.registerGeneric(Registry.BLOCK_REGISTRY, fluid, () -> new LiquidBlock((FlowingFluid) sourceFluid.get(), Block.Properties.of(Material.WATER).noCollission().strength(100.0F)));
         helper.addRegistryCallback(Registry.FLUID_REGISTRY, () -> {
+            if (FluidVariantAttributes.getHandler(sourceFluid.get()) != null)
+                return;
             TitaniumAttributeHandler handler = new TitaniumAttributeHandler(properties, still, flowing, OreTitaniumFluidType.Clients::getTintColor);
             FluidVariantAttributes.register(sourceFluid.get(), handler);
             FluidVariantAttributes.register(flowingFluid.get(), handler);

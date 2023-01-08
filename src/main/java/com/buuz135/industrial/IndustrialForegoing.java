@@ -72,6 +72,10 @@ public class IndustrialForegoing extends ModuleController implements ModInitiali
         NETWORK.registerMessage(PlungerPlayerHitMessage.class);
     }
 
+    public IndustrialForegoing() {
+        super(Reference.MOD_ID);
+    }
+
     @Override
     public void onInitialize() {
         proxy = new CommonProxy();

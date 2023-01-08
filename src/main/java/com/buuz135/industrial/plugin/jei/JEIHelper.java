@@ -23,6 +23,9 @@
 package com.buuz135.industrial.plugin.jei;
 
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
+import mezz.jei.api.helpers.IPlatformFluidHelper;
+import mezz.jei.common.platform.Services;
 import mezz.jei.fabric.ingredients.fluid.JeiFluidIngredient;
 import net.minecraft.world.item.ItemStack;
 
@@ -42,7 +45,7 @@ public class JEIHelper {
         return new JeiFluidIngredient(stack.getFluid(), stack.getAmount(), stack.getTag());
     }
 
-    public static List<JeiFluidIngredient> toIngredients(List<FluidStack> stack) {
-        return stack.stream().map(fluidStack -> new JeiFluidIngredient(fluidStack.getFluid(), fluidStack.getAmount(), fluidStack.getTag())).toList();
+    public static List<IJeiFluidIngredient> toIngredients(List<FluidStack> stack) {
+        return stack.stream().map(fluidStack -> ((IPlatformFluidHelper<IJeiFluidIngredient>)Services.PLATFORM.getFluidHelper()).create(fluidStack.getFluid(), fluidStack.getAmount(), fluidStack.getTag())).toList();
     }
 }

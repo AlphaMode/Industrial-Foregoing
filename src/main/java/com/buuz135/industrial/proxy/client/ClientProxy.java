@@ -49,8 +49,8 @@ import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCal
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.client.ClientHooks;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
@@ -60,10 +60,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -103,6 +99,7 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientHooks.wrapModTooltips(Reference.MOD_ID);
         TextureStitchCallback.PRE.register((atlas, spriteAdder) -> {
             if (atlas.location().equals(InventoryMenu.BLOCK_ATLAS)) {
                 spriteAdder.accept(TransporterTESR.TEXTURE);
@@ -141,7 +138,7 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_ADVANCED.getLeft().get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModuleTransportStorage.BLACK_HOLE_TANK_SUPREME.getLeft().get(), RenderType.cutout());
 
-        Minecraft.getInstance().getBlockColors().register((state, worldIn, pos, tintIndex) -> {
+        ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> {
             if (tintIndex == 0 && worldIn != null && pos != null) {
                 BlockEntity entity = worldIn.getBlockEntity(pos);
                 if (entity instanceof ConveyorTile) {
@@ -167,7 +164,7 @@ public class ClientProxy extends CommonProxy implements ClientModInitializer {
             }
             return 0xFFFFFF;
         }, ModuleTool.INFINITY_BACKPACK.get(), ModuleTool.INFINITY_LAUNCHER.get(), ModuleTool.INFINITY_NUKE.get(), ModuleTool.INFINITY_TRIDENT.get(), ModuleTool.INFINITY_HAMMER.get(), ModuleTool.INFINITY_SAW.get(), ModuleTool.INFINITY_DRILL.get());
-        Minecraft.getInstance().getBlockColors().register((state, worldIn, pos, tintIndex) -> {
+        ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> {
             if (tintIndex == 0 && worldIn != null && pos != null && worldIn.getBlockEntity(pos) instanceof BlackHoleTankTile) {
                 BlackHoleTankTile tank = (BlackHoleTankTile) worldIn.getBlockEntity(pos);
                 if (tank != null && tank.getTank().getFluidAmount() > 0) {

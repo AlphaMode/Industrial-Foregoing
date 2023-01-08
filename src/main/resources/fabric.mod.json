@@ -10,6 +10,9 @@
     "AlphaMode"
   ],
   "accessWidener": "industrial-foregoing.accesswidener",
+  "mixins": [
+    "industrial.mixins.json"
+  ],
   "entrypoints": {
     "main": [
       "com.buuz135.industrial.IndustrialForegoing"
