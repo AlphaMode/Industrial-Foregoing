@@ -37,6 +37,7 @@ import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.fluid.FluidTankComponent;
 import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -142,7 +143,7 @@ public class FermentationStationTile extends IndustrialProcessingTile<Fermentati
                                 ProductionType type = ProductionType.values()[production];
                                 List<Component> list = new ArrayList<>(super.getTooltipLines());
                                 list.add(Component.translatable("text.industrialforegoing.tooltip.fermentation_station.time").append(type.getTicks() / 20 + "s"));
-                                list.add(Component.translatable("text.industrialforegoing.tooltip.fermentation_station.catalyst").append(type.getNeededFluid().isEmpty() ? "None" : Component.translatable(type.getNeededFluid().getTranslationKey()).getString()));
+                                list.add(Component.translatable("text.industrialforegoing.tooltip.fermentation_station.catalyst").append(type.getNeededFluid().isEmpty() ? "None" : FluidVariantAttributes.getName(type.getNeededFluid().getType()).getString()));
 
                                 return list;
                             }
