@@ -117,35 +117,35 @@ public class ItemInfinityBackpack extends ItemInfinity implements CustomEnchanti
     public ItemInfinityBackpack() {
         super("infinity_backpack", ModuleTool.TAB_TOOL, new Properties().stacksTo(1), POWER_CONSUMPTION, FUEL_CONSUMPTION, false);
         this.disableArea();
-        EventManager.forge(EntityItemPickupEvent.class).filter(entityItemPickupEvent -> !entityItemPickupEvent.getItem().getItem().isEmpty()).process(entityItemPickupEvent -> {
-            for (PlayerInventoryFinder.Target target : findAllBackpacks(entityItemPickupEvent.getEntity())) {
-                ItemStack stack = target.getFinder().getStackGetter().apply(entityItemPickupEvent.getEntity(), target.getSlot());
-                if (!stack.isEmpty()) {
-                    if (stack.getItem() instanceof ItemInfinityBackpack && (getPickUpMode(stack) == 1 || getPickUpMode(stack) == 0)) {
-                        BackpackDataManager manager = BackpackDataManager.getData(entityItemPickupEvent.getItem().level);
-                        if (manager != null && stack.getOrCreateTag().contains("Id")) {
-                            BackpackDataManager.BackpackItemHandler handler = manager.getBackpack(stack.getOrCreateTag().getString("Id"));
-                            if (handler != null) {
-                                ItemStack picked = entityItemPickupEvent.getItem().getItem();
-                                for (int pos = 0; pos < handler.getSlots(); pos++) {
-                                    ItemStack slotStack = handler.getSlotDefinition(pos).getStack().copy();
-                                    slotStack.setCount(1);
-                                    if (!slotStack.isEmpty() && slotStack.sameItem(picked) && ItemStack.tagMatches(slotStack, picked)) {
-                                        ItemStack returned = FabricUtils.insertSlot(handler, pos, picked.copy(), false);
-                                        picked.setCount(returned.getCount());
-                                        entityItemPickupEvent.setResult(Event.Result.ALLOW);
-                                        if (entityItemPickupEvent.getEntity() instanceof ServerPlayer) {
-                                            sync(entityItemPickupEvent.getEntity().level, stack.getOrCreateTag().getString("Id"), (ServerPlayer) entityItemPickupEvent.getEntity());
-                                        }
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }).subscribe();
+//        EventManager.forge(EntityItemPickupEvent.class).filter(entityItemPickupEvent -> !entityItemPickupEvent.getItem().getItem().isEmpty()).process(entityItemPickupEvent -> { TODO: PORT
+//            for (PlayerInventoryFinder.Target target : findAllBackpacks(entityItemPickupEvent.getEntity())) {
+//                ItemStack stack = target.getFinder().getStackGetter().apply(entityItemPickupEvent.getEntity(), target.getSlot());
+//                if (!stack.isEmpty()) {
+//                    if (stack.getItem() instanceof ItemInfinityBackpack && (getPickUpMode(stack) == 1 || getPickUpMode(stack) == 0)) {
+//                        BackpackDataManager manager = BackpackDataManager.getData(entityItemPickupEvent.getItem().level);
+//                        if (manager != null && stack.getOrCreateTag().contains("Id")) {
+//                            BackpackDataManager.BackpackItemHandler handler = manager.getBackpack(stack.getOrCreateTag().getString("Id"));
+//                            if (handler != null) {
+//                                ItemStack picked = entityItemPickupEvent.getItem().getItem();
+//                                for (int pos = 0; pos < handler.getSlots(); pos++) {
+//                                    ItemStack slotStack = handler.getSlotDefinition(pos).getStack().copy();
+//                                    slotStack.setCount(1);
+//                                    if (!slotStack.isEmpty() && slotStack.sameItem(picked) && ItemStack.tagMatches(slotStack, picked)) {
+//                                        ItemStack returned = FabricUtils.insertSlot(handler, pos, picked.copy(), false);
+//                                        picked.setCount(returned.getCount());
+//                                        entityItemPickupEvent.setResult(Event.Result.ALLOW);
+//                                        if (entityItemPickupEvent.getEntity() instanceof ServerPlayer) {
+//                                            sync(entityItemPickupEvent.getEntity().level, stack.getOrCreateTag().getString("Id"), (ServerPlayer) entityItemPickupEvent.getEntity());
+//                                        }
+//                                        return;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }).subscribe();
         PlayerEvents.PICKUP_XP.register(pickupXp -> {
             if (!pickupXp.getOrb().isAlive())
                 return;

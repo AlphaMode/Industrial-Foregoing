@@ -157,7 +157,7 @@ public class TransporterWorldType extends FilteredTransporterType<ResourceAmount
 
     private void findSlot(Storage<ItemVariant> itemHandler) {
         for (StorageView<ItemVariant> slot : itemHandler) {
-            if (slot == extractSlot)
+            if (slot.getUnderlyingView() == extractSlot.getUnderlyingView())
                 continue;
             if (!slot.isResourceBlank() && filter(this.getFilter(), this.isWhitelist(), new ResourceAmount<>(slot.getResource(), slot.getAmount()), itemHandler, false)) {
                 this.extractSlot = slot;

@@ -53,6 +53,7 @@ import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Registry;
@@ -139,9 +140,10 @@ public class ModuleCore implements IModule {
         ADVANCED = helper.registerBlockWithItem("machine_frame_advanced", () -> new MachineFrameBlock(ADVANCED_RARITY, TAB_CORE), (block) -> () -> new MachineFrameBlock.MachineFrameItem(block.get(), ADVANCED_RARITY, TAB_CORE));
         SUPREME = helper.registerBlockWithItem("machine_frame_supreme", () -> new MachineFrameBlock(SUPREME_RARITY, TAB_CORE), (block) -> () -> new MachineFrameBlock.MachineFrameItem(block.get(), SUPREME_RARITY, TAB_CORE));
         EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::onClient);
-        EventManager.forge(TickEvent.LevelTickEvent.class).
-                filter(worldTickEvent -> worldTickEvent.phase == TickEvent.Phase.END && worldTickEvent.type == TickEvent.Type.LEVEL && worldTickEvent.level.getGameTime() % 40 == 0 && FluidExtractorTile.EXTRACTION.containsKey(worldTickEvent.level.dimensionType())).
-                process(worldTickEvent -> FluidExtractorTile.EXTRACTION.get(worldTickEvent.level.dimensionType()).values().forEach(blockPosFluidExtractionProgressHashMap -> blockPosFluidExtractionProgressHashMap.keySet().forEach(pos -> worldTickEvent.level.destroyBlockProgress(blockPosFluidExtractionProgressHashMap.get(pos).getBreakID(), pos, blockPosFluidExtractionProgressHashMap.get(pos).getProgress())))).subscribe();
+        ServerTickEvents.END_WORLD_TICK.register(level -> {
+            if (level.getGameTime() % 40 == 0 && FluidExtractorTile.EXTRACTION.containsKey(level.dimensionType()))
+                FluidExtractorTile.EXTRACTION.get(level.dimensionType()).values().forEach(blockPosFluidExtractionProgressHashMap -> blockPosFluidExtractionProgressHashMap.keySet().forEach(pos -> level.destroyBlockProgress(blockPosFluidExtractionProgressHashMap.get(pos).getBreakID(), pos, blockPosFluidExtractionProgressHashMap.get(pos).getProgress())));
+        });
         for (int i = 0; i < RANGE_ADDONS.length; i++) {
             int finalI = i;
             RANGE_ADDONS[i] = helper.registerGeneric(Registry.ITEM_REGISTRY, "range_addon" + i, () -> new RangeAddonItem(finalI, TAB_CORE));

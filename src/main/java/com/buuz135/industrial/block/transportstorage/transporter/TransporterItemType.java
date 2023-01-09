@@ -130,25 +130,28 @@ public class TransporterItemType extends FilteredTransporterType<ResourceAmount<
                     if (transporterType instanceof TransporterItemType && transporterType.getAction() == TransporterTypeFactory.TransporterAction.INSERT) {
                         FabricUtils.getStorage(ItemStorage.SIDED, getLevel(), getPos().relative(this.getSide()), getSide().getOpposite()).ifPresent(origin -> {
                             FabricUtils.getStorage(ItemStorage.SIDED, getLevel(), getPos().relative(direction), direction.getOpposite()).ifPresent(destination -> {
-                                if (extractSlot >= origin.getSlots() || extractSlot.isResourceBlank()
+                                if (extractSlot.isResourceBlank()
                                         || !filter(this.getFilter(), this.isWhitelist(), new ResourceAmount<>(extractSlot.getResource(), extractSlot.getAmount()), origin, false)
                                         || !filter(((TransporterItemType) transporterType).getFilter(), ((TransporterItemType) transporterType).isWhitelist(), new ResourceAmount<>(extractSlot.getResource(), extractSlot.getAmount()), destination, ((TransporterItemType) transporterType).isRegulated()))
                                     findSlot(origin, ((TransporterItemType) transporterType).getFilter(), ((TransporterItemType) transporterType).isWhitelist(), destination, ((TransporterItemType) transporterType).isRegulated());
-                                if (extractSlot >= origin.getSlots()) return;
                                 if (!extractSlot.isResourceBlank()) {
                                     int amount = (int) (1 * getEfficiency());
                                     ItemStack extracted = FabricUtils.extractItemView(extractSlot, amount, true);
                                     var resource = new ResourceAmount<>(ItemVariant.of(extracted), extracted.getCount());
                                     long simulatedAmount = ((TransporterItemType) transporterType).getFilter().matches(resource, destination, ((TransporterItemType) transporterType).isRegulated());
-                                    if (!extracted.isEmpty() && filter(this.getFilter(), this.isWhitelist(), resource, origin, false) && filter(((TransporterItemType) transporterType).getFilter(), ((TransporterItemType) transporterType).isWhitelist(), origin.getStackInSlot(extractSlot), destination, ((TransporterItemType) transporterType).isRegulated()) && simulatedAmount > 0) {
+                                    if (!extracted.isEmpty() && filter(this.getFilter(), this.isWhitelist(), resource, origin, false) && filter(((TransporterItemType) transporterType).getFilter(), ((TransporterItemType) transporterType).isWhitelist(), new ResourceAmount<>(extractSlot.getResource(), extractSlot.getAmount()), destination, ((TransporterItemType) transporterType).isRegulated()) && simulatedAmount > 0) {
                                         ItemStack returned = TransferUtil2.insertItem(destination, extracted, true);
                                         if (returned.isEmpty() || amount - returned.getCount() > 0) {
-                                            extracted = origin.extractItem(extractSlot, returned.isEmpty() ? simulatedAmount : simulatedAmount - returned.getCount(), false);
+                                            extracted = FabricUtils.extractItemView(extractSlot, returned.isEmpty() ? simulatedAmount : simulatedAmount - returned.getCount(), false);
                                             TransferUtil2.insertItem(destination, extracted, false);
                                             ((TransporterItemType) transporterType).addTransferedStack(getSide(), extracted);
                                         } else {
-                                            this.extractSlot++;
-                                            if (this.extractSlot >= origin.getSlots()) this.extractSlot = 0;
+                                            for (StorageView<ItemVariant> view : origin) {
+                                                if (view.getUnderlyingView() != extractSlot.getUnderlyingView()) {
+                                                    this.extractSlot = view;
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -184,13 +187,15 @@ public class TransporterItemType extends FilteredTransporterType<ResourceAmount<
     }
 
     private void findSlot(Storage<ItemVariant> itemHandler, RegulatorFilter<ResourceAmount<ItemVariant>, Storage<ItemVariant>> otherFilter, boolean otherWhitelist, Storage<ItemVariant> otherItemHandler, boolean otherRegulated) {
-        for (int i = this.extractSlot; i < itemHandler.getSlots(); i++) {
-            if (!itemHandler.getStackInSlot(i).isEmpty() && filter(this.getFilter(), this.isWhitelist(), itemHandler.getStackInSlot(i), itemHandler, false) && filter(otherFilter, otherWhitelist, itemHandler.getStackInSlot(i), otherItemHandler, otherRegulated)) {
-                this.extractSlot = i;
+        for (StorageView<ItemVariant> view : itemHandler) {
+            if (view.getUnderlyingView() == extractSlot.getUnderlyingView())
+                continue;
+            if (!view.isResourceBlank() && filter(this.getFilter(), this.isWhitelist(), new ResourceAmount<>(view.getResource(), view.getAmount()), itemHandler, false) && filter(otherFilter, otherWhitelist, new ResourceAmount<>(view.getResource(), view.getAmount()), otherItemHandler, otherRegulated)) {
+                this.extractSlot = view;
                 return;
             }
         }
-        this.extractSlot = 0;
+        this.extractSlot = null;
     }
 
     public void addTransferedStack(Direction direction, ItemStack stack) {
